@@ -1,1 +1,1 @@
-# game_engine
+# Game Engine, written in C.
