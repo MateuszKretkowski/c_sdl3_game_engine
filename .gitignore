@@ -1,0 +1,29 @@
+# Build artifacts
+*.exe
+*.o
+*.obj
+*.out
+*.a
+*.lib
+*.dll
+
+# Compiled binary directories
+bin/
+build/
+dist/
+
+# SDL3 files (if included locally)
+SDL3*/
+*.log
+
+# Editor settings
+.vscode/
+*.code-workspace
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Backup / temp files
+*.tmp
+*~

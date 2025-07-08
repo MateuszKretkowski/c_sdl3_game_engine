@@ -2,12 +2,21 @@
 #include <stdlib.h>
 #include <stdint.h>
 
+#include <SDL3/SDL.h>
+
+#define SDL_MAIN_USE_CALLBACKS
+#include <SDL3/SDL_main.h>
+
 #include "config.h"
 
-int main() {
-    FILE *file = fopen("output.ppm", "w");
-    uint8_t framebuffer[HEIGHT][WIDTH][3];
+bool isRunning;
 
-    // akcja: 
+SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv);
+
+int main(int argc, char *argv[])
+{
+    while (isRunning) {
+
+    }
     return 0;
 }
