@@ -1,22 +1,17 @@
 {
-    "configurations": [
-        {
-            "name": "Win32",
-            "includePath": [
-                "C:/libs/SDL3/SDL3-3.2.16/x86_64-w64-mingw32/include",
-                "${workspaceFolder}"
-            ],
-            "defines": [
-                "_DEBUG",
-                "UNICODE",
-                "_UNICODE"
-            ],
-            "windowsSdkVersion": "10.0.22621.0",
-            "compilerPath": "cl.exe",
-            "cStandard": "c17",
-            "cppStandard": "c++17",
-            "intelliSenseMode": "windows-msvc-x64"
-        }
-    ],
-    "version": 4
+  "configurations": [
+    {
+      "name": "Win32",
+      "includePath": [
+        "${workspaceFolder}/src",
+        "C:/libs/SDL3/SDL3-3.2.16/x86_64-w64-mingw32/include"
+      ],
+      "defines": [],
+      "compilerPath": "C:/msys64/ucrt64/bin/gcc.exe",  // ← tu pełna ścieżka!
+      "cStandard": "c17",
+      "cppStandard": "c++17",
+      "intelliSenseMode": "windows-gcc-x64"
+    }
+  ],
+  "version": 4
 }
