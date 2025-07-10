@@ -4,18 +4,19 @@
 
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
-#include <GL/gl.h>
-
-#include "config.h"
+#include <glad/glad.h>
+#include <windows.h>
 
 int main(int argc, char *argv[]) {
-    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
-        fprintf(stderr, "Error SDL_Init: %s\n", SDL_GetError());
+    if (SDL_Init(SDL_INIT_VIDEO) != 1) {
+        printf("SDL_Init failed: %s\n", SDL_GetError());
         return 1;
     }
-
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
     SDL_Window *window = SDL_CreateWindow(
         "atiEngine",
@@ -33,6 +34,11 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "Error SDL_GLContext: %s\n", SDL_GetError());
         SDL_DestroyWindow(window);
         SDL_Quit();
+        return 1;
+    }
+
+    if (!gladLoadGL()) {
+        fprintf(stderr, "Failed to load OpenGL functions\n");
         return 1;
     }
 

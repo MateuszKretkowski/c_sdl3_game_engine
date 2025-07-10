@@ -3,9 +3,12 @@
     {
       "name": "Win32",
       "includePath": [
-        "${workspaceFolder}/src",
-        "C:/libs/SDL3/SDL3-3.2.16/x86_64-w64-mingw32/include"
+        "${workspaceFolder}/**",
+        "${workspaceFolder}/include",
+        "C:/libs/SDL3/SDL3-3.2.16/x86_64-w64-mingw32/include",
+        "C:/libs/SDL3/SDL3-3.2.16/x86_64-w64-mingw32/include/SDL3"
       ],
+
       "defines": [],
       "compilerPath": "C:/msys64/ucrt64/bin/gcc.exe",  // ← tu pełna ścieżka!
       "cStandard": "c17",
