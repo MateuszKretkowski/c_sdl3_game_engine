@@ -42,6 +42,10 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
+    int width, height;
+    SDL_GetWindowSize(window, &width, &height);
+    glViewport(0, 0, width, height);
+
     SDL_GL_SetSwapInterval(1); // VSync = ON
 
     int running = 1;
@@ -51,6 +55,9 @@ int main(int argc, char *argv[]) {
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_EVENT_QUIT) {
                 running = 0;
+            }
+            else if (event.type == SDL_EVENT_WINDOW_RESIZED) {
+                glViewport(0, 0, event.window.data1, event.window.data2);
             }
         }
 
