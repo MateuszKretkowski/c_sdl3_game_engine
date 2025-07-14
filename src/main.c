@@ -6,8 +6,12 @@
 #include <SDL3/SDL_main.h>
 #include <glad/glad.h>
 #include <windows.h>
+#include "graphics.h"
+#include "utils.h"
 
 int main(int argc, char *argv[]) {
+    SetCurrentDirectoryA("..");
+    
     if (SDL_Init(SDL_INIT_VIDEO) != 1) {
         printf("SDL_Init failed: %s\n", SDL_GetError());
         return 1;
@@ -48,6 +52,10 @@ int main(int argc, char *argv[]) {
 
     SDL_GL_SetSwapInterval(1); // VSync = ON
 
+    GLuint vbo = create_vbo(vertices, 3);
+    GLuint vao = create_vao(vbo);
+    GLuint shaderProgram = create_shader_program();
+
     int running = 1;
     SDL_Event event;
 
@@ -63,6 +71,8 @@ int main(int argc, char *argv[]) {
 
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
+
+        draw_triangle(shaderProgram, vao);
 
         SDL_GL_SwapWindow(window);
     }

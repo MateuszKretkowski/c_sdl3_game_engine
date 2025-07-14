@@ -10,14 +10,17 @@
                 "src/graphics.c",
                 "src/glad.c",
                 "-IC:/msys64/ucrt64/include",         // Główne nagłówki MSYS2
-                "-IC:/msys64/ucrt64/include/SDL3",     // Nagłówki SDL3 (np. <SDL3/SDL.h>)
-                "-Iinclude",                           // Twoje własne nagłówki (np. glad.h)
-                "-LC:/msys64/ucrt64/lib",              // Linker szuka bibliotek .a i .dll.a
+                "-IC:/msys64/ucrt64/include/SDL3",     // Nagłówki SDL3
+                "-Iinclude",                           // Twoje własne nagłówki (glad.h, graphics.h)
+                "-LC:/msys64/ucrt64/lib",              // Folder z bibliotekami .a/.dll.a
                 "-lSDL3",
                 "-lopengl32",
                 "-o",
                 "build/main.exe"
             ],
+            "options": {
+                "cwd": "${workspaceFolder}"   // 👈 TO DODAJESZ – ustawia katalog roboczy
+            },
             "group": {
                 "kind": "build",
                 "isDefault": true

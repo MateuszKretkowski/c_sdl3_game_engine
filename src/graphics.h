@@ -4,7 +4,9 @@
 #include <glad/glad.h>
 #include "utils.h"
 
-char* load_shader_source;
+char* load_shader_source(const char* path);
+
+extern Vector3 vertices[];
 
 GLuint create_vbo(Vector3 vertices[], size_t count);
 GLuint create_vao(GLuint VBO);

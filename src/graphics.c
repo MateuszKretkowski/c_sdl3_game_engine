@@ -59,9 +59,10 @@ GLuint create_vao(GLuint VBO) {
 
 GLuint create_vertex_shader() {
     GLuint vertexShader;
-    char* vertexShaderSource = load_shader_source("/shaders/vertex_shader.glsl");
+    char* vertexShaderSource = load_shader_source("shaders/vertex_shader.glsl");
     vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+    const GLchar* src = (const GLchar*)vertexShaderSource;
+    glShaderSource(vertexShader, 1, &src, NULL);
     glCompileShader(vertexShader);
     int success;
     char infoLog[512];
@@ -76,9 +77,10 @@ GLuint create_vertex_shader() {
 
 GLuint create_fragment_shader() {
     GLuint fragmentShader;
-    char* fragmentShaderSource = load_shader_source("/shaders/fragment_shader.glsl");
+    char* fragmentShaderSource = load_shader_source("shaders/fragment_shader.glsl");
     fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+    const GLchar* src = (const GLchar*)fragmentShaderSource;
+    glShaderSource(fragmentShader, 1, &src, NULL);
     glCompileShader(fragmentShader);
     int success;
     char infoLog[512];
