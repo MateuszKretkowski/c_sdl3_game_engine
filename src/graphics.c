@@ -49,6 +49,20 @@ GLuint create_vbo(Vector3 vertices[], size_t count) {
     return VBO;
 }
 
+GLuint create_vao(GLuint VBO) {
+    GLuint VAO;
+    glGenVertexArrays(1, &VAO);
+
+    glBindVertexArray(VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vector3), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    glBindVertexArray(0);
+    return VAO;
+}
+
 GLuint create_vertex_shader() {
     GLuint vertexShader;
     char* vertexShaderSource = load_shader_source("/shaders/vertex_shader.glsl");
@@ -100,8 +114,18 @@ GLuint create_shader_program() {
         glGetShaderInfoLog(shaderProgram, 512, NULL, infoLog);
         fprintf(stderr, "Error SHADER_PROGRAM_COMPILATION_FAILED: %s\n", infoLog);
     }
-    glUseProgram(shaderProgram);
+ 
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
     return shaderProgram;
+}
+
+void draw_triangle(GLuint shaderProgram, GLuint VAO) {
+    glUseProgram(shaderProgram);
+
+    glBindVertexArray(VAO);
+
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+
+    glBindVertexArray(0);
 }
