@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <glad/glad.h>
+#include "utils.h"
 
 char* load_shader_source(const char* path) {
     FILE *file = fopen(path, "rb");
@@ -27,13 +28,6 @@ char* load_shader_source(const char* path) {
     fclose(file);
     return source;
 }
-
-
-typedef struct {
-    float x;
-    float y;
-    float z;
-} Vector3;
 
 Vector3 vertices[] = {
     {-0.5f, -0.5f, 0.0f},
