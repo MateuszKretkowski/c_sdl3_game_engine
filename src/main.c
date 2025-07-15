@@ -8,6 +8,7 @@
 #include <windows.h>
 #include "graphics.h"
 #include "utils.h"
+#include "mesh.h"
 
 int main(int argc, char *argv[]) {
     SetCurrentDirectoryA("..");
@@ -52,8 +53,16 @@ int main(int argc, char *argv[]) {
 
     SDL_GL_SetSwapInterval(1); // VSync = ON
 
-    GLuint vbo = create_vbo(vertices, 3);
-    GLuint vao = create_vao(vbo);
+    int rows = 7;
+    int cols = 3;
+    int vertexCount = rows * cols;
+    int indexCount = (rows-1)*(cols-1)*6;
+
+    Vertex *vertices = generate_grid_vertices(rows, cols);
+    GLuint *indices = generate_indices_by_grid(rows, cols);
+    GLuint vbo = create_vbo(vertices, vertexCount);
+    GLuint ebo = create_ebo(indices, indexCount);
+    GLuint vao = create_vao(vbo, ebo);
     GLuint shaderProgram = create_shader_program();
 
     int running = 1;
@@ -72,7 +81,7 @@ int main(int argc, char *argv[]) {
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        draw_triangle(shaderProgram, vao);
+        draw_triangle(shaderProgram, vao, indexCount);
 
         SDL_GL_SwapWindow(window);
     }

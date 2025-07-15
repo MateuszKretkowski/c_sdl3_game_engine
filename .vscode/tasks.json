@@ -9,6 +9,7 @@
                 "src/main.c",
                 "src/graphics.c",
                 "src/glad.c",
+                "src/mesh.c",
                 "-IC:/msys64/ucrt64/include",         // Główne nagłówki MSYS2
                 "-IC:/msys64/ucrt64/include/SDL3",     // Nagłówki SDL3
                 "-Iinclude",                           // Twoje własne nagłówki (glad.h, graphics.h)

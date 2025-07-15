@@ -29,13 +29,14 @@ char* load_shader_source(const char* path) {
     return source;
 }
 
-Vertex vertices[] = {
+/* Vertex vertices[] = {
     {{-0.5f, -0.5f, 0.0f}, {182.0f/255.0f, 97.0f/255.0f, 209.0f/255.0f, 1}},
     {{0.5f, -0.5f, 0.0f}, {151.0f/255.0f, 131.0f/255.0f, 201.0f/255.0f, 0.7}},
-    {{0.0f,  0.5f, 0.0f}, {163.0f/255.0f, 116.0f/255.0f, 63.0f/255.0f, 0.4}}
-};
+    {{0.0f,  0.5f, 0.0f}, {163.0f/255.0f, 116.0f/255.0f, 63.0f/255.0f, 0.4}},
+    {{0.0f,  0.5f, 0.0f}, {113.0f/255.0f, 216.0f/255.0f, 13.0f/255.0f, 0.4}}
+}; */
 
-GLuint create_vbo(Vertex vertices[], size_t count) {
+GLuint create_vbo(Vertex *vertices, size_t count) {
     GLuint VBO;
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -43,12 +44,13 @@ GLuint create_vbo(Vertex vertices[], size_t count) {
     return VBO;
 }
 
-GLuint create_vao(GLuint VBO) {
+GLuint create_vao(GLuint VBO, GLuint EBO) {
     GLuint VAO;
     glGenVertexArrays(1, &VAO);
 
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
     glEnableVertexAttribArray(0);
@@ -57,6 +59,14 @@ GLuint create_vao(GLuint VBO) {
 
     glBindVertexArray(0);
     return VAO;
+}
+
+GLuint create_ebo(GLuint *indices, size_t count) {
+    GLuint EBO;
+    glGenBuffers(1, &EBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, count*sizeof(GLuint), indices, GL_STATIC_DRAW);
+    return EBO;
 }
 
 GLuint create_vertex_shader() {
@@ -118,12 +128,9 @@ GLuint create_shader_program() {
     return shaderProgram;
 }
 
-void draw_triangle(GLuint shaderProgram, GLuint VAO) {
+void draw_triangle(GLuint shaderProgram, GLuint VAO, int indexCount) {
     glUseProgram(shaderProgram);
-
     glBindVertexArray(VAO);
-
-    glDrawArrays(GL_TRIANGLES, 0, 3);
-
+    glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 }
