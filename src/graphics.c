@@ -29,17 +29,17 @@ char* load_shader_source(const char* path) {
     return source;
 }
 
-Vector3 vertices[] = {
-    {-0.5f, -0.5f, 0.0f},
-    {0.5f, -0.5f, 0.0f},
-    {0.0f,  0.5f, 0.0f}
+Vertex vertices[] = {
+    {{-0.5f, -0.5f, 0.0f}, {182.0f/255.0f, 97.0f/255.0f, 209.0f/255.0f, 1}},
+    {{0.5f, -0.5f, 0.0f}, {151.0f/255.0f, 131.0f/255.0f, 201.0f/255.0f, 0.7}},
+    {{0.0f,  0.5f, 0.0f}, {163.0f/255.0f, 116.0f/255.0f, 63.0f/255.0f, 0.4}}
 };
 
-GLuint create_vbo(Vector3 vertices[], size_t count) {
+GLuint create_vbo(Vertex vertices[], size_t count) {
     GLuint VBO;
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(Vector3)*count, vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex)*count, vertices, GL_STATIC_DRAW);
     return VBO;
 }
 
@@ -50,8 +50,10 @@ GLuint create_vao(GLuint VBO) {
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vector3), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
     glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(3*sizeof(float)));
+    glEnableVertexAttribArray(1);
 
     glBindVertexArray(0);
     return VAO;

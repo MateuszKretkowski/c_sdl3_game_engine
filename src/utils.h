@@ -21,5 +21,10 @@ typedef struct {
     float w;
 } Vector4;
 
+typedef struct {
+    Vector3 position;
+    Vector4 color;
+} Vertex;
+
 
 #endif // UTILS_H
