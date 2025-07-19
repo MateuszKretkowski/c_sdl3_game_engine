@@ -9,6 +9,7 @@
 #include "graphics.h"
 #include "utils.h"
 #include "mesh.h"
+#include "math.h"
 
 int main(int argc, char *argv[]) {
     SetCurrentDirectoryA("..");
@@ -65,9 +66,17 @@ int main(int argc, char *argv[]) {
     GLuint vao = create_vao(vbo, ebo);
     GLuint shaderProgram = create_shader_program();
 
+    
     int running = 1;
     SDL_Event event;
 
+    Vertex vertices[] = {
+        {{-0.5f, -0.5f, 0.0f}, {182.0f/255.0f, 97.0f/255.0f, 209.0f/255.0f, 1}},
+        {{0.5f, -0.5f, 0.0f}, {151.0f/255.0f, 131.0f/255.0f, 201.0f/255.0f, 0.7}},
+        {{0.0f,  0.5f, 0.0f}, {163.0f/255.0f, 116.0f/255.0f, 63.0f/255.0f, 0.4}},
+        {{0.0f,  0.5f, 0.0f}, {113.0f/255.0f, 216.0f/255.0f, 13.0f/255.0f, 0.4}}
+    };
+    
     while (running) {
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_EVENT_QUIT) {
@@ -77,12 +86,23 @@ int main(int argc, char *argv[]) {
                 glViewport(0, 0, event.window.data1, event.window.data2);
             }
         }
-
+        
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-
-        draw_triangle(shaderProgram, vao, indexCount);
-
+        
+        glUseProgram(shaderProgram);
+        
+        // sin(color);
+        
+        float timeValue = SDL_GetTicks() / 1000.0f;
+        float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
+        int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
+        glUniform4f(vertexColorLocation-0.2, greenValue, greenValue+0.3, greenValue+0.6, 1.0f);
+        
+        glBindVertexArray(vao);
+        glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
+        glBindVertexArray(0);
+        
         SDL_GL_SwapWindow(window);
     }
 
