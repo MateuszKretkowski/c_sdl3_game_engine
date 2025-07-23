@@ -91,6 +91,7 @@ int main(int argc, char *argv[]) {
         glClear(GL_COLOR_BUFFER_BIT);
         
         shader_use(&standard_shader);
+        shader_set_float(&standard_shader, "horizontal_offset", 0.5f);
         
         glBindVertexArray(vao);
         glDrawArrays(GL_TRIANGLES, 0, 4);
