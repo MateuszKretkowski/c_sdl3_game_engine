@@ -2,10 +2,7 @@
 #define SHADER_H
 
 #include <glad/glad.h>
-
-typedef struct {
-    GLuint id;
-} Shader;
+#include "utils.h"
 
 Shader shader_create(const char* vertex_path, const char* fragment_path);
 void shader_use(const Shader* shader);

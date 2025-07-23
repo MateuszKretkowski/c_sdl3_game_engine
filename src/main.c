@@ -7,6 +7,7 @@
 #include <glad/glad.h>
 #include <windows.h>
 #include "graphics.h"
+#include "shader.h"
 #include "utils.h"
 #include "mesh.h"
 #include "math.h"
@@ -54,10 +55,6 @@ int main(int argc, char *argv[]) {
 
     SDL_GL_SetSwapInterval(1); // VSync = ON
 
-    int rows = 7;
-    int cols = 3;
-    int vertexCount = rows * cols;
-    int indexCount = (rows-1)*(cols-1)*6;
     
     Vertex vertices[] = {
         {{-0.5f, -0.5f, 0.0f}, {182.0f/255.0f, 97.0f/255.0f, 209.0f/255.0f, 1}},
@@ -65,13 +62,15 @@ int main(int argc, char *argv[]) {
         {{0.0f,  0.5f, 0.0f}, {163.0f/255.0f, 116.0f/255.0f, 63.0f/255.0f, 0.4}},
         {{0.0f,  0.5f, 0.0f}, {113.0f/255.0f, 216.0f/255.0f, 13.0f/255.0f, 0.4}}
     };
+    
+    int vertexCount = sizeof(vertices) / sizeof(Vertex);
 
     // Vertex *vertices = generate_grid_vertices(rows, cols);
     // GLuint *indices = generate_indices_by_grid(rows, cols);
     GLuint vbo = create_vbo(vertices, vertexCount);
     // GLuint ebo = create_ebo(indices, indexCount);
     GLuint vao = create_vao(vbo, NULL);
-    GLuint shaderProgram = create_shader_program();
+    Shader standard_shader = shader_create("shaders/vertex_shader.glsl", "shaders/fragment_shader.glsl");
 
     
     int running = 1;
@@ -91,7 +90,7 @@ int main(int argc, char *argv[]) {
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         
-        glUseProgram(shaderProgram);
+        shader_use(&standard_shader);
         
         glBindVertexArray(vao);
         glDrawArrays(GL_TRIANGLES, 0, 4);
