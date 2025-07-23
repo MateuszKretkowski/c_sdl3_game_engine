@@ -58,24 +58,25 @@ int main(int argc, char *argv[]) {
     int cols = 3;
     int vertexCount = rows * cols;
     int indexCount = (rows-1)*(cols-1)*6;
-
-    Vertex *vertices = generate_grid_vertices(rows, cols);
-    GLuint *indices = generate_indices_by_grid(rows, cols);
-    GLuint vbo = create_vbo(vertices, vertexCount);
-    GLuint ebo = create_ebo(indices, indexCount);
-    GLuint vao = create_vao(vbo, ebo);
-    GLuint shaderProgram = create_shader_program();
-
     
-    int running = 1;
-    SDL_Event event;
-
     Vertex vertices[] = {
         {{-0.5f, -0.5f, 0.0f}, {182.0f/255.0f, 97.0f/255.0f, 209.0f/255.0f, 1}},
         {{0.5f, -0.5f, 0.0f}, {151.0f/255.0f, 131.0f/255.0f, 201.0f/255.0f, 0.7}},
         {{0.0f,  0.5f, 0.0f}, {163.0f/255.0f, 116.0f/255.0f, 63.0f/255.0f, 0.4}},
         {{0.0f,  0.5f, 0.0f}, {113.0f/255.0f, 216.0f/255.0f, 13.0f/255.0f, 0.4}}
     };
+
+    // Vertex *vertices = generate_grid_vertices(rows, cols);
+    // GLuint *indices = generate_indices_by_grid(rows, cols);
+    GLuint vbo = create_vbo(vertices, vertexCount);
+    // GLuint ebo = create_ebo(indices, indexCount);
+    GLuint vao = create_vao(vbo, NULL);
+    GLuint shaderProgram = create_shader_program();
+
+    
+    int running = 1;
+    SDL_Event event;
+
     
     while (running) {
         while (SDL_PollEvent(&event)) {
@@ -92,15 +93,8 @@ int main(int argc, char *argv[]) {
         
         glUseProgram(shaderProgram);
         
-        // sin(color);
-        
-        float timeValue = SDL_GetTicks() / 1000.0f;
-        float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
-        int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
-        glUniform4f(vertexColorLocation-0.2, greenValue, greenValue+0.3, greenValue+0.6, 1.0f);
-        
         glBindVertexArray(vao);
-        glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
+        glDrawArrays(GL_TRIANGLES, 0, 4);
         glBindVertexArray(0);
         
         SDL_GL_SwapWindow(window);
