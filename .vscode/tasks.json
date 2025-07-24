@@ -12,6 +12,7 @@
                 "src/mesh.c",
                 "src/utils.c",
                 "src/shader.c",
+                "src/textures.c",
                 "-IC:/msys64/ucrt64/include",         // Główne nagłówki MSYS2
                 "-IC:/msys64/ucrt64/include/SDL3",     // Nagłówki SDL3
                 "-Iinclude",                           // Twoje własne nagłówki (glad.h, graphics.h)

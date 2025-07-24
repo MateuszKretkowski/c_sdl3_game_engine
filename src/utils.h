@@ -24,6 +24,7 @@ typedef struct {
 typedef struct {
     Vector3 position;
     Vector4 color;
+    Vector2 uv;
 } Vertex;
 
 typedef struct {

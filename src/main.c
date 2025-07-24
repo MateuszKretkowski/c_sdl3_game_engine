@@ -11,6 +11,7 @@
 #include "utils.h"
 #include "mesh.h"
 #include "math.h"
+#include "textures.h"
 
 int main(int argc, char *argv[]) {
     SetCurrentDirectoryA("..");
@@ -55,12 +56,27 @@ int main(int argc, char *argv[]) {
 
     SDL_GL_SetSwapInterval(1); // VSync = ON
 
+    // TEXTURES
+    GLuint checkerboard_texture = generate_texture(width, height, NULL); // if NULL then CREATE_CHECKERBOARD_TEXTURE;
     
+    int indexCount = 6;
+
     Vertex vertices[] = {
-        {{-0.5f, -0.5f, 0.0f}, {182.0f/255.0f, 97.0f/255.0f, 209.0f/255.0f, 1}},
-        {{0.5f, -0.5f, 0.0f}, {151.0f/255.0f, 131.0f/255.0f, 201.0f/255.0f, 0.7}},
-        {{0.0f,  0.5f, 0.0f}, {163.0f/255.0f, 116.0f/255.0f, 63.0f/255.0f, 0.4}},
-        {{0.0f,  0.5f, 0.0f}, {113.0f/255.0f, 216.0f/255.0f, 13.0f/255.0f, 0.4}}
+        { { 0.5f,  0.5f, 0.0f }, { 1.0f, 0.0f, 0.0f, 1.0f }, { 1.0f, 1.0f } }, // top right
+        { { 0.5f, -0.5f, 0.0f }, { 0.0f, 1.0f, 0.0f, 1.0f }, { 1.0f, 0.0f } }, // bottom right
+        { {-0.5f, -0.5f, 0.0f }, { 0.0f, 0.0f, 1.0f, 1.0f }, { 0.0f, 0.0f } }, // bottom left
+        { {-0.5f,  0.5f, 0.0f }, { 1.0f, 1.0f, 0.0f, 1.0f }, { 0.0f, 1.0f } }  // top left
+    };
+
+    GLuint indices[] = {
+        0, 1, 3,  // pierwszy trójkąt: top right, bottom right, top left
+        1, 2, 3   // drugi trójkąt: bottom right, bottom left, top left
+    };
+
+    float texCoords[] = {
+        0.0f, 0.0f,  // lower-left corner  
+        1.0f, 0.0f,  // lower-right corner
+        0.5f, 1.0f   // top-center corner
     };
     
     int vertexCount = sizeof(vertices) / sizeof(Vertex);
@@ -68,8 +84,8 @@ int main(int argc, char *argv[]) {
     // Vertex *vertices = generate_grid_vertices(rows, cols);
     // GLuint *indices = generate_indices_by_grid(rows, cols);
     GLuint vbo = create_vbo(vertices, vertexCount);
-    // GLuint ebo = create_ebo(indices, indexCount);
-    GLuint vao = create_vao(vbo, NULL);
+    GLuint ebo = create_ebo(indices, indexCount);
+    GLuint vao = create_vao(vbo, &ebo);
     Shader standard_shader = shader_create("shaders/vertex_shader.glsl", "shaders/fragment_shader.glsl");
 
     
@@ -92,9 +108,15 @@ int main(int argc, char *argv[]) {
         
         shader_use(&standard_shader);
         shader_set_float(&standard_shader, "horizontal_offset", 0.5f);
+
+        GLint location = glGetUniformLocation(standard_shader.id, "ourTexture");
+        printf("ourTexture location = %d\n", location);
         
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, checkerboard_texture);
+        shader_set_int(&standard_shader, "ourTexture", 0);
         glBindVertexArray(vao);
-        glDrawArrays(GL_TRIANGLES, 0, 4);
+        glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
         
         SDL_GL_SwapWindow(window);
