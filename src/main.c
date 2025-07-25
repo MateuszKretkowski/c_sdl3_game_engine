@@ -57,7 +57,7 @@ int main(int argc, char *argv[]) {
     SDL_GL_SetSwapInterval(1); // VSync = ON
 
     // TEXTURES
-    GLuint checkerboard_texture = generate_texture(width, height, NULL); // if NULL then CREATE_CHECKERBOARD_TEXTURE;
+    GLuint checkerboard_texture = generate_texture("brick_texture/bricks_color.png"); // if NULL then CREATE_CHECKERBOARD_TEXTURE;
     
     int indexCount = 6;
 
@@ -110,7 +110,6 @@ int main(int argc, char *argv[]) {
         shader_set_float(&standard_shader, "horizontal_offset", 0.5f);
 
         GLint location = glGetUniformLocation(standard_shader.id, "ourTexture");
-        printf("ourTexture location = %d\n", location);
         
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, checkerboard_texture);

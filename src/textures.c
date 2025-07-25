@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#define STB_IMAGE_IMPLEMENTATION
+#include "../libs/stb_image.h"
 
 #include <glad/glad.h>
 
@@ -20,12 +22,19 @@ unsigned char *create_checkerboard_texture(int width, int height, int box_size) 
     return checkerboard_texture;
 }
 
-GLuint generate_texture(int width, int height, unsigned char *data) {
-    unsigned char *curr_tex = data;
-    bool shouldFree = false;
-    if (curr_tex == NULL) {
-        curr_tex = create_checkerboard_texture(width, height, 20);
-        shouldFree = true;
+GLuint generate_texture(const char *path) {
+    int width, height, channels;
+
+    char full_path[256];
+    snprintf(full_path, sizeof(full_path), "textures/%s", path);
+
+    unsigned char *curr_tex = stbi_load(full_path, &width, &height, &channels, 3);
+    bool shouldFree = true;
+
+    if (!curr_tex) {
+        printf("Failed to load image: %s. Using fallback checkerboard.\n", path);
+        width = height = 64;
+        curr_tex = create_checkerboard_texture(width, height, 8);
     }
 
     GLuint texture;
@@ -36,15 +45,16 @@ GLuint generate_texture(int width, int height, unsigned char *data) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    if (curr_tex) {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, curr_tex);
-        glGenerateMipmap(GL_TEXTURE_2D);
-    }
-    else {
-        fprintf(stderr, "ERROR: FAILED TO LOAD TEXTURE");
-    }
-    if (shouldFree) {
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0,
+                 GL_RGB, GL_UNSIGNED_BYTE, curr_tex);
+    glGenerateMipmap(GL_TEXTURE_2D);
+
+    if (stbi_failure_reason()) {
         free(curr_tex);
+    } else {
+        stbi_image_free(curr_tex);
     }
+
     return texture;
 }
