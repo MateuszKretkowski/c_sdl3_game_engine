@@ -57,7 +57,8 @@ int main(int argc, char *argv[]) {
     SDL_GL_SetSwapInterval(1); // VSync = ON
 
     // TEXTURES
-    GLuint checkerboard_texture = generate_texture("brick_texture/bricks_color.png"); // if NULL then CREATE_CHECKERBOARD_TEXTURE;
+    GLuint bricks_texture = generate_texture("brick_texture/bricks_color.png");
+    GLuint wood_texture = generate_texture("wood_texture/wood_color.png");
     
     int indexCount = 6;
 
@@ -88,6 +89,10 @@ int main(int argc, char *argv[]) {
     GLuint vao = create_vao(vbo, &ebo);
     Shader standard_shader = shader_create("shaders/vertex_shader.glsl", "shaders/fragment_shader.glsl");
 
+    shader_use(&standard_shader);
+    shader_set_int(&standard_shader, "texture1", 0);
+    shader_set_int(&standard_shader, "texture2", 1);
+
     
     int running = 1;
     SDL_Event event;
@@ -112,8 +117,10 @@ int main(int argc, char *argv[]) {
         GLint location = glGetUniformLocation(standard_shader.id, "ourTexture");
         
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, checkerboard_texture);
-        shader_set_int(&standard_shader, "ourTexture", 0);
+        glBindTexture(GL_TEXTURE_2D, bricks_texture);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, wood_texture);
+        
         glBindVertexArray(vao);
         glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);

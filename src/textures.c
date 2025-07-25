@@ -29,6 +29,7 @@ GLuint generate_texture(const char *path) {
     snprintf(full_path, sizeof(full_path), "textures/%s", path);
 
     unsigned char *curr_tex = stbi_load(full_path, &width, &height, &channels, 3);
+    stbi_set_flip_vertically_on_load(true);
     bool shouldFree = true;
 
     if (!curr_tex) {
@@ -46,8 +47,7 @@ GLuint generate_texture(const char *path) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0,
-                 GL_RGB, GL_UNSIGNED_BYTE, curr_tex);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, curr_tex);
     glGenerateMipmap(GL_TEXTURE_2D);
 
     if (stbi_failure_reason()) {
