@@ -2,7 +2,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debug game engine (inline)",
+            "name": "Build Game Engine",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/src/main.exe",
