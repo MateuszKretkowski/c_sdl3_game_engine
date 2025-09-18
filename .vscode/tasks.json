@@ -35,7 +35,7 @@
                 "-Igraphics",
                 "-Isrc/engine",
                 "-Isrc/graphics",
-                "-Isrc/Utils",
+                "-Isrc/utils",
                 "-lshlwapi",
 
                 

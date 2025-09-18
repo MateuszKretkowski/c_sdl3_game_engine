@@ -33,6 +33,12 @@ typedef struct {
 } Vertex;
 
 typedef struct {
+    Vector3 position;
+    Vector3 rotation;
+    Vector3 scale;
+} Transform;
+
+typedef struct {
     GLuint id;
 } Shader;
 
@@ -45,6 +51,16 @@ typedef struct {
 
     Shader *shader;
 } Material;
+
+typedef struct {
+    char *name;
+
+    GLuint VBO;
+    GLuint VAO;
+    GLuint EBO;
+
+    int indexCount;
+} Mesh;
 
 
 char *read_file(const char* filename);
