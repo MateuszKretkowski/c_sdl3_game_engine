@@ -55,9 +55,9 @@ typedef struct {
 typedef struct {
     char *name;
 
-    GLuint VBO;
-    GLuint VAO;
-    GLuint EBO;
+    GLuint vbo;
+    GLuint ebo;
+    GLuint vao;
 
     int indexCount;
 } Mesh;

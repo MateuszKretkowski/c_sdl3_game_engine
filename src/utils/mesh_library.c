@@ -22,6 +22,10 @@ void initialize_mesh_library(int meshCount) {
 }
 
 void free_mesh_library() {
+    for (int i=0; i<count; i++) {
+        DeleteBuffers(i);
+        free(mesh_library[i].name);
+    }
     free(mesh_library);
 }
 
@@ -59,19 +63,19 @@ Mesh *add_mesh_to_library(char* meshName, Vertex *vertices, GLuint *indices, int
 
     Mesh newMesh;
     newMesh.name = strdup(meshName);
-    newMesh.VBO = vbo;
-    newMesh.EBO = ebo;
-    newMesh.VAO = vao;
+    newMesh.vbo = vbo;
+    newMesh.ebo = ebo;
+    newMesh.vao = vao;
     newMesh.indexCount = indexCount;
 
     mesh_library[count] = newMesh;
 
     count++;
 
-    return &mesh_library[count];
+    return &mesh_library[count-1];
 }
 
-Mesh *remove_mesh_from_library(char *meshName) {
+void *remove_mesh_from_library(char *meshName) {
     if (!mesh_library) {
         fprintf(stderr, "Mesh library not initialized\n");
         return NULL;
@@ -81,11 +85,17 @@ Mesh *remove_mesh_from_library(char *meshName) {
 
     for (int i=0; i<=count-1; i++) {
         if (strcmp(mesh_library[i].name, meshName) == 0) {
+            DeleteBuffers(i);
+            removed_mesh = mesh_library[i];
             free(mesh_library[i].name);
             mesh_library[i] = mesh_library[count-1];
             count--;
         }
     }
+}
 
-    return &removed_mesh;
+void DeleteBuffers(int i) {
+    glDeleteBuffers(1, &mesh_library[i].vbo);
+    glDeleteBuffers(1, &mesh_library[i].ebo);
+    glDeleteVertexArrays(1, &mesh_library[i].vao);
 }
