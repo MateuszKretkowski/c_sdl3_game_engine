@@ -25,6 +25,7 @@
                 "src/graphics/resources.c",
 
                 // Utils
+                "src/utils/mesh_library.c",
                 "src/utils/utils.c",
 
                 // Ścieżki do nagłówków
