@@ -12,7 +12,18 @@ typedef struct {
     char *name;
     bool isActive;
 
-    void (*Start)(Component *self);
-    void (*Update)(Component *self);
-    void (*Exit)(Component *self);
+    void (*start)(Component *self);
+    void (*update)(Component *self);
+    void (*destroy)(Component *self);
 } Component;
+
+void local_destroy_component(Component *component) {
+    if (!component) {
+        return;
+    }
+    if (component->destroy != NULL) {
+        component->destroy(component);
+    }
+    free(component->name);
+    free(component);
+}

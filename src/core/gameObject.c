@@ -27,7 +27,7 @@ GameObject *instantiate_gameObject(char* name) {
 
 void free_gameObject(GameObject *gameObject) {
     for (int i=0; i<gameObject->components_length; i++) {
-        free(gameObject->components[i]);
+        global_destroy_component(gameObject->components[i]);
     }
     free(gameObject->components);
     free(gameObject->name);
@@ -45,6 +45,7 @@ void add_component(GameObject *gameObject, Component *component) {
     }
 
     gameObject->components[gameObject->components_length] = component;
+    gameObject->components_length++;
 }
 
 void remove_component(GameObject *gameObject, Component *component) {
@@ -53,12 +54,13 @@ void remove_component(GameObject *gameObject, Component *component) {
     }
     
     for (int i=0; i<gameObject->components_length; i++) {
-        if (strcmp(*gameObject->components[i].name, component->name) == 0) {
-            free(*gameObject->components[i].name);
-            gameObject->components[i] = gameObject->components[gameObject->components_length];
+        if (strcmp(gameObject->components[i]->name, component->name) == 0) {
+            global_destroy_component(gameObject->components[i]);
+            gameObject->components[i] = gameObject->components[gameObject->components_length-1];
             gameObject->components_length--;
+            return;
         }
     }
 
-    fprintf(stderr, "Could NOT find the Component to Remove: %s", &component);
+    fprintf(stderr, "Could NOT find the Component to Remove: %s", component->name);
 }

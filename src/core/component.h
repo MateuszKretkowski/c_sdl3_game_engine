@@ -20,4 +20,6 @@ typedef struct Component {
 
 } Component;
 
+void local_destroy_component(Component *component);
+
 #endif // COMPONENT_H
