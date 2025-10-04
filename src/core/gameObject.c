@@ -64,3 +64,7 @@ void remove_component(GameObject *gameObject, Component *component) {
 
     fprintf(stderr, "Could NOT find the Component to Remove: %s", component->name);
 }
+
+Component *get_components() {
+    
+}
