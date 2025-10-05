@@ -38,6 +38,7 @@ void engine_run(void) {
 
         game_update();
         render_frame();
+        // RENDER STACK DO ZROBIENIA NA JUTRO :)
         window_swap();
     }
 }

@@ -40,6 +40,8 @@ typedef struct {
 
 typedef struct {
     GLuint id;
+    char *vertex_path;
+    char *fragment_path;
 } Shader;
 
 typedef struct {
