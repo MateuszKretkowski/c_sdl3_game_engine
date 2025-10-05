@@ -2,56 +2,11 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "build SDL3 C",
+            "label": "build project",
             "type": "shell",
-            "command": "C:/msys64/ucrt64/bin/gcc.exe",
-            "args": [
-                // Główne źródła
-                "src/main.c",
-                "src/glad.c",
-                
-                // Pliki silnika
-                "src/engine/engine.c",
-                "src/engine/window.c",
-                "src/engine/input.c",
-                "src/engine/game.c",
-                
-                // Pliki grafiki
-                "src/graphics/graphics.c",
-                "src/graphics/mesh.c",
-                "src/graphics/shader.c",
-                "src/graphics/textures.c",
-                "src/graphics/render.c",
-                "src/graphics/resources.c",
-
-                // Libs
-                "src/libs/cJSON.c",
-
-                // Utils
-                "src/utils/mesh_library.c",
-                "src/utils/utils.c",
-
-                // Ścieżki do nagłówków
-                "-IC:/msys64/ucrt64/include",
-                "-IC:/msys64/ucrt64/include/SDL3",
-                "-Iinclude",
-                "-Iengine",
-                "-Igraphics",
-                "-Isrc/engine",
-                "-Isrc/graphics",
-                "-Isrc/utils",
-                "-lshlwapi",
-
-                
-                // Biblioteki
-                "-LC:/msys64/ucrt64/lib",
-                "-lSDL3",
-                "-lopengl32",
-
-                // Wyjście
-                "-o",
-                "build/main.exe"
-            ],
+            // Komenda to teraz 'make' (upewnij się, że masz go w MSYS64)
+            "command": "C:\\msys64\\usr\\bin\\make.exe",
+            "args": [],
             "options": {
                 "cwd": "${workspaceFolder}"
             },
@@ -59,7 +14,10 @@
                 "kind": "build",
                 "isDefault": true
             },
-            "problemMatcher": []
+            // To pomoże VS Code zrozumieć błędy kompilacji
+            "problemMatcher": [
+                "$gcc"
+            ]
         }
     ]
 }
