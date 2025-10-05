@@ -24,6 +24,9 @@
                 "src/graphics/render.c",
                 "src/graphics/resources.c",
 
+                // Libs
+                "src/libs/cJSON.c",
+
                 // Utils
                 "src/utils/mesh_library.c",
                 "src/utils/utils.c",

@@ -20,6 +20,7 @@ typedef struct Component {
 
 } Component;
 
+bool Component_equals(const Component *a, const Component *b);
 void local_destroy_component(Component *component);
 
 #endif // COMPONENT_H

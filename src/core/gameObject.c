@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "component.h"
+#include <libs/cJSON.h>
 
 typedef struct {
     char *name;
@@ -65,6 +66,12 @@ void remove_component(GameObject *gameObject, Component *component) {
     fprintf(stderr, "Could NOT find the Component to Remove: %s", component->name);
 }
 
-Component *get_components() {
-    
+Component *get_component(GameObject *gameObject, Component component) {
+    for (int i=0; i<gameObject->components_length; i++) {
+        if (Component_equals(gameObject->components[i], &component)) {
+            return gameObject->components[i];
+        }
+    }
+    fprintf(stderr, "ERROR: get_component(%s) coult NOT find the component.", component.name);
+    return NULL;
 }
