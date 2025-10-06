@@ -61,6 +61,7 @@ typedef struct {
     GLuint ebo;
     GLuint vao;
 
+    Material **materials;
     int indexCount;
 } Mesh;
 
