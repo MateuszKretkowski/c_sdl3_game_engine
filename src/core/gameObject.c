@@ -28,7 +28,7 @@ GameObject *instantiate_gameObject(char* name) {
 
 void free_gameObject(GameObject *gameObject) {
     for (int i=0; i<gameObject->components_length; i++) {
-        global_destroy_component(gameObject->components[i]);
+        local_destroy_component(gameObject->components[i]);
     }
     free(gameObject->components);
     free(gameObject->name);
@@ -56,7 +56,7 @@ void remove_component(GameObject *gameObject, Component *component) {
     
     for (int i=0; i<gameObject->components_length; i++) {
         if (strcmp(gameObject->components[i]->name, component->name) == 0) {
-            global_destroy_component(gameObject->components[i]);
+            local_destroy_component(gameObject->components[i]);
             gameObject->components[i] = gameObject->components[gameObject->components_length-1];
             gameObject->components_length--;
             return;

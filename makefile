@@ -1,40 +1,30 @@
-# Nazwa kompilatora
 CC = C:/msys64/ucrt64/bin/gcc.exe
-
-# Nazwa pliku wykonywalnego
 TARGET = build/main.exe
-
-# Flagi dla kompilatora (debugowanie, ostrzeżenia)
+ASSET_INDEXER = build/asset_indexer.exe
 CFLAGS = -g -Wall
 
-# Automatycznie znajdź wszystkie pliki .c w folderze src i podfolderach
-SRCS = $(shell find src -name "*.c")
+INCLUDES = -I. -Isrc -Iinclude -Ilibs -IC:/msys64/ucrt64/include -IC:/msys64/ucrt64/include/SDL3 -Isrc/engine -Isrc/graphics -Isrc/utils
+LIBS = -LC:/msys64/ucrt64/lib -lSDL3 -lopengl32 -lshlwapi
 
-# Ścieżki dołączania (include)
-INCLUDES = -Iinclude \
-           -IC:/msys64/ucrt64/include \
-           -IC:/msys64/ucrt64/include/SDL3 \
-           -Isrc/engine \
-           -Isrc/graphics \
-           -Isrc/utils
+# Znajdź wszystkie pliki .c OPRÓCZ build_tools
+SOURCES = $(filter-out src/build_tools/%, $(wildcard src/*.c src/*/*.c))
 
-# Ścieżki do bibliotek i same biblioteki
-LIBS = -LC:/msys64/ucrt64/lib \
-       -lSDL3 \
-       -lopengl32 \
-       -lshlwapi
+# Kompiluj asset_indexer, uruchom go, potem kompiluj main
+all: $(ASSET_INDEXER) run-indexer $(TARGET)
 
-# Główna reguła, która zostanie uruchomiona po wpisaniu 'make'
-all: $(TARGET)
+# Kompiluj asset_indexer z cJSON (zależy od plików źródłowych)
+$(ASSET_INDEXER): src/build_tools/asset_indexer.c libs/cJSON.c libs/cJSON.h
+	$(CC) $(CFLAGS) src/build_tools/asset_indexer.c libs/cJSON.c -o $(ASSET_INDEXER) $(INCLUDES)
 
-# Reguła opisująca, jak stworzyć plik wykonywalny $(TARGET)
-$(TARGET):
-	@echo "Building project..."
-	@mkdir -p build
-	$(CC) $(CFLAGS) $(SRCS) -o $(TARGET) $(INCLUDES) $(LIBS)
-	@echo "Build finished!"
+# Uruchom asset_indexer (zawsze uruchamiaj, nawet jeśli .exe się nie zmienił)
+run-indexer: $(ASSET_INDEXER)
+	$(ASSET_INDEXER)
 
-# Reguła do czyszczenia skompilowanych plików
+# Kompiluj main z cJSON (zależy od wszystkich plików źródłowych)
+$(TARGET): $(SOURCES) libs/cJSON.c libs/cJSON.h
+	$(CC) $(CFLAGS) $(SOURCES) libs/cJSON.c -o $(TARGET) $(INCLUDES) $(LIBS)
+
 clean:
-	@echo "Cleaning build files..."
-	rm -f $(TARGET)
+	del /Q build\main.exe build\asset_indexer.exe 2>nul || exit 0
+
+.PHONY: all run-indexer clean
