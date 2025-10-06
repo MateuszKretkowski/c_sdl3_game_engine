@@ -33,7 +33,6 @@ GLuint generate_texture(const char *path) {
 
     stbi_set_flip_vertically_on_load(true);
     unsigned char *curr_tex = stbi_load(full_path, &width, &height, &channels, 3);
-    bool shouldFree = true;
 
     if (!curr_tex) {
         printf("Failed to load image: %s. Reason: %s\n", full_path, stbi_failure_reason());

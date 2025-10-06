@@ -1,0 +1,14 @@
+{
+	"materials":	{
+		"material_bricks":	"src/assets/materials/material_bricks.json"
+	},
+	"meshes":	{
+		"primitive_rectangle":	"src/assets/meshes/rectangle2D.json"
+	},
+	"prefabs":	{
+		"player":	"src/assets/prefabs/player.json"
+	},
+	"shaders":	{
+		"standard_lit":	"src/assets/shaders/standard_shader.json"
+	}
+}

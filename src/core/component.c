@@ -1,25 +1,26 @@
 #include <stdio.h>
 #include <stdlib.h>
-
 #include <string.h>
 #include <stdbool.h>
 
 struct GameObject;
 
-typedef struct {
-    struct GameObject *gameObject;
-
-    char *name;
-    bool isActive;
-
-    component_standard_voids *standard_voids;
-} Component;
+typedef struct Component Component;
 
 typedef struct {
     void (*start)(Component *self);
     void (*update)(Component *self);
     void (*destroy)(Component *self);
 } component_standard_voids;
+
+typedef struct Component {
+    struct GameObject *gameObject;
+    
+    char *name;
+    bool isActive;
+    
+    component_standard_voids *standard_voids;
+} Component;
 
 bool Component_equals(const Component *a, const Component *b) {
     if (a->name == NULL || b->name == NULL) {

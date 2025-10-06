@@ -21,12 +21,10 @@ void initialize_mesh_library(int meshCount) {
     }
 }
 
-void free_mesh_library() {
-    for (int i=0; i<count; i++) {
-        DeleteBuffers(i);
-        free(mesh_library[i].name);
-    }
-    free(mesh_library);
+void DeleteBuffers(int i) {
+    glDeleteBuffers(1, &mesh_library[i].vbo);
+    glDeleteBuffers(1, &mesh_library[i].ebo);
+    glDeleteVertexArrays(1, &mesh_library[i].vao);
 }
 
 Mesh *try_get_mesh(char *meshName) {
@@ -34,7 +32,7 @@ Mesh *try_get_mesh(char *meshName) {
         fprintf(stderr, "Mesh library not initialized\n");
         return NULL;
     }
-
+    
     for (int i=0; i<=count-1; i++) {
         if (strcmp(mesh_library[i].name, meshName) == 0) {
             fprintf(stderr, "Found mesh %s in library\n", meshName);
@@ -42,7 +40,7 @@ Mesh *try_get_mesh(char *meshName) {
         }
     }
     fprintf(stderr, "Mesh %s not found in library\n", meshName);
-
+    
     return NULL;
 }
 
@@ -56,22 +54,22 @@ Mesh *add_mesh_to_library(char* meshName, Vertex *vertices, GLuint *indices, int
         capacity *= 2;
         mesh_library = realloc(mesh_library, capacity);
     }
-
+    
     GLuint vbo = create_vbo(vertices, indexCount);
     GLuint ebo = create_ebo(indices, indexCount);
-    GLuint vao = create_vao(vbo, ebo);
-
+    GLuint vao = create_vao(vbo, &ebo);
+    
     Mesh newMesh;
     newMesh.name = strdup(meshName);
     newMesh.vbo = vbo;
     newMesh.ebo = ebo;
     newMesh.vao = vao;
     newMesh.indexCount = indexCount;
-
+    
     mesh_library[count] = newMesh;
-
+    
     count++;
-
+    
     return &mesh_library[count-1];
 }
 
@@ -81,21 +79,22 @@ void *remove_mesh_from_library(char *meshName) {
         return NULL;
     }
     
-    Mesh removed_mesh;
-
     for (int i=0; i<=count-1; i++) {
         if (strcmp(mesh_library[i].name, meshName) == 0) {
             DeleteBuffers(i);
-            removed_mesh = mesh_library[i];
             free(mesh_library[i].name);
             mesh_library[i] = mesh_library[count-1];
             count--;
         }
     }
+    return NULL;
 }
 
-void DeleteBuffers(int i) {
-    glDeleteBuffers(1, &mesh_library[i].vbo);
-    glDeleteBuffers(1, &mesh_library[i].ebo);
-    glDeleteVertexArrays(1, &mesh_library[i].vao);
+
+void free_mesh_library() {
+    for (int i=0; i<count; i++) {
+        DeleteBuffers(i);
+        free(mesh_library[i].name);
+    }
+    free(mesh_library);
 }
