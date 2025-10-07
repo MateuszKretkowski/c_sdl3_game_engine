@@ -40,19 +40,33 @@ typedef struct {
 
 typedef struct {
     GLuint id;
-    char *vertex_path;
-    char *fragment_path;
+    char *name;
 } Shader;
 
+typedef struct PropertyValue {
+    enum { PROP_FLOAT, PROP_INT, PROP_STRING } type;
+    union {
+        float f;
+        int i;
+        char *s;
+    } value;
+} PropertyValue;
+
 typedef struct {
+    int id;
+    char *name;
+
+    Shader shader;
+    
     Texture diffuse_map;
     Texture specular_map;
     Texture normal_map;
 
-    float shininess;
-
-    Shader *shader;
+    PropertyValue *properties;
+    char **property_names;
+    int property_count;
 } Material;
+
 
 typedef struct {
     char *name;
