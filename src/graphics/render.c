@@ -13,20 +13,20 @@ static GLuint bricks_texture, wood_texture;
 
 void render_init(void) {
     // Załaduj shader
-    standard_shader = shader_create("shaders/vertex_shader.glsl", "shaders/fragment_shader.glsl");
+    standard_shader = shader_create("shaders/vertex_shader.glsl", "shaders/fragment_shader.glsl", "standard_shader");
     if (!standard_shader.id) {
         fprintf(stderr, "[render] Failed to load shader\n");
         exit(EXIT_FAILURE);
     }
 
     // Załaduj tekstury
-    bricks_texture = generate_texture("brick_texture/bricks_color.png");
+    bricks_texture = create_texture("brick_texture/bricks_color.png");
     if (!bricks_texture) {
         fprintf(stderr, "[render] Failed to load brick texture\n");
         exit(EXIT_FAILURE);
     }
 
-    wood_texture = generate_texture("wood_texture/wood_color.png");
+    wood_texture = create_texture("wood_texture/wood_color.png");
     if (!wood_texture) {
         fprintf(stderr, "[render] Failed to load wood texture\n");
         exit(EXIT_FAILURE);

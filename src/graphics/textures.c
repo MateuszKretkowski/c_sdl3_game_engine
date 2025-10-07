@@ -25,19 +25,21 @@ unsigned char *create_checkerboard_texture(int width, int height, int box_size) 
     return checkerboard_texture;
 }
 
-GLuint generate_texture(const char *path) {
+GLuint create_texture(const char *path) {
     int width, height, channels;
 
     char full_path[256];
     snprintf(full_path, sizeof(full_path), "textures/%s", path);
 
     stbi_set_flip_vertically_on_load(true);
-    unsigned char *curr_tex = stbi_load(full_path, &width, &height, &channels, 3);
+    unsigned char *curr_tex = stbi_load(full_path, &width, &height, &channels, 4);
 
+    bool is_checkerboard = false;
     if (!curr_tex) {
         printf("Failed to load image: %s. Reason: %s\n", full_path, stbi_failure_reason());
         width = height = 64;
         curr_tex = create_checkerboard_texture(width, height, 8);
+        is_checkerboard = true;
     }
 
     GLuint texture;
@@ -49,13 +51,13 @@ GLuint generate_texture(const char *path) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, curr_tex);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, curr_tex);
     glGenerateMipmap(GL_TEXTURE_2D);
 
-    if (stbi_failure_reason()) {
-        free(curr_tex);
-    } else {
-        stbi_image_free(curr_tex);
+    if (is_checkerboard) {        
+        free(curr_tex);          
+    } else {                       
+        stbi_image_free(curr_tex); 
     }
 
     return texture;

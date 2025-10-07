@@ -3,6 +3,7 @@
 
 #include "shader.h"
 #include "utils.h"
+#include "string.h"
 
 static GLuint compile_shader(const char* source_path, GLenum shader_type) {
     char* source = read_file(source_path);
@@ -26,9 +27,16 @@ static GLuint compile_shader(const char* source_path, GLenum shader_type) {
     return shader;
 }
 
-Shader shader_create(const char* vertex_path, const char* fragment_path) {
+Shader shader_create(const char* vertex_path, const char* fragment_path, char *name) {
     Shader shader;
     shader.id = glCreateProgram();
+    shader.name = malloc(sizeof(char) * strlen(name) + 1);
+    if (shader.name) {
+        strcpy(shader.name, name);
+    }
+    else {
+        printf("could not set name for shader");
+    }
 
     GLuint vertex = compile_shader(vertex_path, GL_VERTEX_SHADER);
     GLuint fragment = compile_shader(fragment_path, GL_FRAGMENT_SHADER);
@@ -71,5 +79,6 @@ void shader_destroy(Shader* shader) {
     if (shader && shader->id != 0) {
         glDeleteProgram(shader->id);
         shader->id = 0; // aby zaznaczyć, że program został usunięty
+        free(shader->name);
     }
 }

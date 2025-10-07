@@ -1,5 +1,6 @@
 {
   "id": "standard_lit",
-  "vertex": "shaders/vertex_shader.glsl",
-  "fragment": "shaders/fragment_shader.glsl"
+  "name": "standard_lit",
+  "vertex_path": "shaders/vertex_shader.glsl",
+  "fragment_path": "shaders/fragment_shader.glsl"
 }

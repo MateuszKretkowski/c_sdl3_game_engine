@@ -7,8 +7,8 @@ GLuint tex_bricks = 0;
 GLuint tex_wood = 0;
 
 bool resources_load(void) {
-    tex_bricks = generate_texture("brick_texture/bricks_color.png");
-    tex_wood   = generate_texture("wood_texture/wood_color.png");
+    tex_bricks = create_texture("brick_texture/bricks_color.png");
+    tex_wood   = create_texture("wood_texture/wood_color.png");
 
     if (!tex_bricks || !tex_wood) {
         fprintf(stderr, "FAILED TO LOAD TEX_BRICKS OR TEX_WOOD: RESOURCES.C");
