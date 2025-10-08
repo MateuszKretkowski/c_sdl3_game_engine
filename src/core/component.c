@@ -8,6 +8,7 @@ struct GameObject;
 typedef struct Component Component;
 
 typedef struct {
+    void (*awake)(Component *self);
     void (*start)(Component *self);
     void (*update)(Component *self);
     void (*destroy)(Component *self);
