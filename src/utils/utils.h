@@ -53,7 +53,7 @@ typedef struct PropertyValue {
 } PropertyValue;
 
 typedef struct {
-    int id;
+    char *id;
     char *name;
 
     Shader shader;
@@ -69,6 +69,7 @@ typedef struct {
 
 
 typedef struct {
+    char* id;
     char *name;
 
     GLuint vbo;
