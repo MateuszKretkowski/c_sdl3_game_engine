@@ -14,6 +14,7 @@ typedef struct Component {
     char *name;
     bool isActive;
 
+    void (*awake)(struct Component* self);
     void (*start)(struct Component* self);
     void (*update)(struct Component* self);
     void (*destroy)(struct Component* self);

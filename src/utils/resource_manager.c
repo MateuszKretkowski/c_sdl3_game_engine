@@ -10,6 +10,7 @@
 #include "json_utils.h"
 #include "hashmap.h"
 #include "mesh_library.h"
+#include "gameObject.h"
 
 HashMap *material_cache;
 HashMap *shader_cache;
@@ -209,6 +210,61 @@ Mesh *resource_get_mesh(char *mesh_id) {
     free(materials);
     
     return try_get_mesh(mesh_id);
+}
+
+void resource_load_prefab(char *prefab_id) {
+    if (!prefab_id) {
+        return;
+    }
+    if (!prefab_cache) {
+        initialize_resource_manager();
+    }
+    if (hashmap_contains(prefab_cache, (void*)prefab_id)) {
+        return;
+    }
+
+    char *path = get_path_from_id(prefab_id, "prefabs");
+    cJSON *prefab_json = open_json(path);
+    if (!prefab_json) {
+        printf("Could not cJSON_Parse() the buffer: %s\n", path);
+        return;
+    }
+
+    cJSON *name = cJSON_GetObjectItemCaseSensitive(prefab_json, "name");
+    if (!cJSON_IsString(name) || !name->valuestring) {
+        printf("ERROR: Invalid prefab JSON - missing name\n");
+        cJSON_Delete(prefab_json);
+        return;
+    }
+
+    GameObject *prefab = instantiate_gameObject(name->valuestring);
+
+    // TODO: Parse and add components to the prefab
+    cJSON *components_json = cJSON_GetObjectItemCaseSensitive(prefab_json, "components");
+    if (cJSON_IsArray(components_json)) {
+        cJSON *component_json = NULL;
+        cJSON_ArrayForEach(component_json, components_json) {
+            // Component parsing logic will go here
+            // For now, this is a placeholder for future component loading
+        }
+    }
+
+    cJSON_Delete(prefab_json);
+
+    hashmap_insert(prefab_cache, strdup(prefab_id), prefab);
+}
+
+GameObject *resource_get_prefab(char *prefab_id) {
+    if (!prefab_id) {
+        return NULL;
+    }
+    else if (!prefab_cache) {
+        initialize_resource_manager();
+    }
+    else if (hashmap_contains(prefab_cache, (void*)prefab_id)) {
+        return (GameObject*)hashmap_get(prefab_cache, (void*)prefab_id);
+    }
+    resource_load_prefab(prefab_id);
 }
 
 cJSON *open_json(const char *path) {
