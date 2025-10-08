@@ -27,49 +27,63 @@ void DeleteBuffers(int i) {
     glDeleteVertexArrays(1, &mesh_library[i].vao);
 }
 
-Mesh *try_get_mesh(char *meshName) {
+Mesh *try_get_mesh(char *mesh_id) {
     if (!mesh_library) {
         fprintf(stderr, "Mesh library not initialized\n");
         return NULL;
     }
     
     for (int i=0; i<=count-1; i++) {
-        if (strcmp(mesh_library[i].name, meshName) == 0) {
-            fprintf(stderr, "Found mesh %s in library\n", meshName);
+        if (strcmp(mesh_library[i].id, mesh_id) == 0) {
+            fprintf(stderr, "Found mesh %s in library\n", mesh_id);
             return &mesh_library[i];
         }
     }
-    fprintf(stderr, "Mesh %s not found in library\n", meshName);
+    fprintf(stderr, "Mesh %s not found in library\n", mesh_id);
     
     return NULL;
 }
 
-Mesh *add_mesh_to_library(char* meshName, Vertex *vertices, GLuint *indices, int indexCount) {
+Mesh *add_mesh_to_library(char* meshName, Vertex *vertices, GLuint *indices, int indexCount,
+                          char* meshId, Material **materials, int materialCount) {
     if (!mesh_library) {
         fprintf(stderr, "Mesh library not initialized\n");
-        return NULL;
+        initialize_mesh_library(8);
+        if (!mesh_library) {
+            return NULL;
+        }
     }
-    
+
     if (count == capacity) {
         capacity *= 2;
         mesh_library = realloc(mesh_library, capacity);
     }
-    
+
     GLuint vbo = create_vbo(vertices, indexCount);
     GLuint ebo = create_ebo(indices, indexCount);
     GLuint vao = create_vao(vbo, &ebo);
-    
+
     Mesh newMesh;
+    newMesh.id = meshId ? strdup(meshId) : strdup(meshName);
     newMesh.name = strdup(meshName);
     newMesh.vbo = vbo;
     newMesh.ebo = ebo;
     newMesh.vao = vao;
     newMesh.indexCount = indexCount;
-    
+
+    if (materials && materialCount > 0) {
+        newMesh.materials = malloc(sizeof(Material*) * materialCount);
+        for (int i = 0; i < materialCount; i++) {
+            newMesh.materials[i] = materials[i];
+        }
+    } else {
+        newMesh.materials = NULL;
+    }
+
     mesh_library[count] = newMesh;
-    
+
     count++;
-    
+
     return &mesh_library[count-1];
 }
 
@@ -78,11 +92,17 @@ void *remove_mesh_from_library(char *meshName) {
         fprintf(stderr, "Mesh library not initialized\n");
         return NULL;
     }
-    
+
     for (int i=0; i<=count-1; i++) {
         if (strcmp(mesh_library[i].name, meshName) == 0) {
             DeleteBuffers(i);
             free(mesh_library[i].name);
+            if (mesh_library[i].id) {
+                free(mesh_library[i].id);
+            }
+            if (mesh_library[i].materials) {
+                free(mesh_library[i].materials);
+            }
             mesh_library[i] = mesh_library[count-1];
             count--;
         }
@@ -95,6 +115,12 @@ void free_mesh_library() {
     for (int i=0; i<count; i++) {
         DeleteBuffers(i);
         free(mesh_library[i].name);
+        if (mesh_library[i].id) {
+            free(mesh_library[i].id);
+        }
+        if (mesh_library[i].materials) {
+            free(mesh_library[i].materials);  // Zwalnia tablicę wskaźników (nie same materiały!)
+        }
     }
     free(mesh_library);
 }

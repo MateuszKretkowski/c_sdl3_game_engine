@@ -6,11 +6,13 @@
 
 #include <graphics/textures.h>
 #include <graphics/shader.h>
+#include <graphics/graphics.h>
+#include "json_utils.h"
 #include "hashmap.h"
+#include "mesh_library.h"
 
 HashMap *material_cache;
 HashMap *shader_cache;
-HashMap *mesh_cache;
 HashMap *prefab_cache;
 
 const char *asset_index_path = "assets/asset_index.json";
@@ -19,7 +21,6 @@ cJSON *asset_index_json;
 void initialize_resource_manager() {
     material_cache = hashmap_create(hash_string, compare_string);
     shader_cache = hashmap_create(hash_string, compare_string);
-    mesh_cache = hashmap_create(hash_string, compare_string);
     prefab_cache = hashmap_create(hash_string, compare_string);
 }
 
@@ -151,7 +152,64 @@ Material *resource_get_material(const char* material_id) {
       hashmap_insert(shader_cache, strdup(shader_id), shader_copy);
 
       return shader;
-  }
+}
+
+Mesh *resource_get_mesh(char *mesh_id) {
+    if (!mesh_id) {
+        return NULL;
+    }
+    else if (!mesh_library) {
+        initialize_mesh_library(8);
+        if (!mesh_library) {
+            return NULL;
+        }
+    }
+    else if (try_get_mesh(mesh_id)) {
+        return try_get_mesh(mesh_id);
+    } 
+    char *path = get_path_from_id(mesh_id, "meshes");
+    cJSON *mesh_json = open_json(path);
+    cJSON *name = cJSON_GetObjectItemCaseSensitive(mesh_json, "name");
+    if (!cJSON_IsString(name) || !name->valuestring) {
+        printf("ERROR: Invalid mesh JSON\n");
+        cJSON_Delete(mesh_json);
+        return NULL;
+    }
+    cJSON *vertices_json = cJSON_GetObjectItemCaseSensitive(mesh_json, "vertices");
+    int i=0;
+    cJSON *iterator;
+    Vertex *vertices = malloc(sizeof(Vertex) * cJSON_GetArraySize(vertices_json));
+    cJSON_ArrayForEach(iterator, vertices_json) {
+        vertices[i].position = parse_vector3_array(cJSON_GetObjectItemCaseSensitive(iterator, "position"));
+        vertices[i].color = parse_vector4_array(cJSON_GetObjectItemCaseSensitive(iterator, "color"));
+        vertices[i].uv = parse_vector2_array(cJSON_GetObjectItemCaseSensitive(iterator, "uv"));
+        i++;
+    }
+    cJSON *indices_json = cJSON_GetObjectItemCaseSensitive(mesh_json, "indices");
+    i=0;
+    GLuint *indices = malloc(sizeof(GLuint) * cJSON_GetArraySize(indices_json));
+    cJSON_ArrayForEach(iterator, indices_json) {
+        indices[i] = iterator->valueint;
+        i++;
+    }
+    cJSON *materials_json = cJSON_GetObjectItemCaseSensitive(mesh_json, "materials");
+    Material **materials = malloc(sizeof(Material*) * cJSON_GetArraySize(materials_json));
+    int materialCount = 0;
+    cJSON_ArrayForEach(iterator, materials_json) {
+        if (cJSON_IsString(iterator) && (iterator->valuestring != NULL)) {
+            Material *mat = resource_get_material(iterator->valuestring);
+            if (mat) {
+                materials[materialCount] = mat;
+                materialCount++;
+            }
+        }
+    }
+    Mesh *mesh = add_mesh_to_library(strdup(name), vertices, indices, cJSON_GetArraySize(indices_json), mesh_id, materials, materialCount);
+    free(mesh);
+    free(materials);
+    
+    return try_get_mesh(mesh_id);
+}
 
 cJSON *open_json(const char *path) {
     FILE *file = fopen(path, "r");
