@@ -8,7 +8,7 @@
 /**
  * Powiększa pojemność hashmapy i przenosi wszystkie elementy
  */
-void Rehash(struct HashMap *hm) {
+void hashmap_rehash(HashMap *hm) {
     if (hm == NULL) {
         return;
     }
@@ -51,13 +51,13 @@ void Rehash(struct HashMap *hm) {
 /**
  * Tworzy nową hashmapę
  */
-struct HashMap* CreateHashMap(int (*hash_func)(void*), int (*compare_func)(void*, void*)) {
+HashMap* hashmap_create(int (*hash_func)(void*), int (*compare_func)(void*, void*)) {
     if (hash_func == NULL || compare_func == NULL) {
         fprintf(stderr, "Błąd: funkcje hash_func i compare_func nie mogą być NULL\n");
         return NULL;
     }
     
-    struct HashMap* newHm = malloc(sizeof(struct HashMap));
+    HashMap* newHm = malloc(sizeof(HashMap));
     if (newHm == NULL) {
         fprintf(stderr, "Błąd alokacji pamięci dla HashMap\n");
         return NULL;
@@ -81,14 +81,14 @@ struct HashMap* CreateHashMap(int (*hash_func)(void*), int (*compare_func)(void*
 /**
  * Wstawia parę klucz-wartość do hashmapy
  */
-void Insert(struct HashMap *hm, void *key, void *value) {
+void hashmap_insert(HashMap *hm, void *key, void *value) {
     if (hm == NULL || key == NULL) {
         return;
     }
-    
+
     // Sprawdź czy trzeba powiększyć
     if (hm->size >= hm->capacity * 0.75) {
-        Rehash(hm);
+        hashmap_rehash(hm);
     }
     
     int index = hm->hash_func(key) % hm->capacity;
@@ -121,7 +121,7 @@ void Insert(struct HashMap *hm, void *key, void *value) {
 /**
  * Usuwa element o podanym kluczu
  */
-void Remove(struct HashMap *hm, void *key) {
+void hashmap_remove(HashMap *hm, void *key) {
     if (hm == NULL || key == NULL) {
         return;
     }
@@ -153,7 +153,7 @@ void Remove(struct HashMap *hm, void *key) {
 /**
  * Pobiera wartość dla danego klucza
  */
-void* Get(struct HashMap *hm, void *key) {
+void* hashmap_get(HashMap *hm, void *key) {
     if (hm == NULL || key == NULL) {
         return NULL;
     }
@@ -174,18 +174,18 @@ void* Get(struct HashMap *hm, void *key) {
 /**
  * Sprawdza czy klucz istnieje w hashmapie
  */
-int Contains(struct HashMap *hm, void *key) {
+bool hashmap_contains(HashMap *hm, void *key) {
     if (hm == NULL || key == NULL) {
-        return 0;  // false
+        return false;
     }
-    
-    return Get(hm, key) != NULL;
+
+    return hashmap_get(hm, key) != NULL;
 }
 
 /**
  * Zwraca aktualną liczbę elementów w hashmapie
  */
-int Size(struct HashMap *hm) {
+int hashmap_size(HashMap *hm) {
     if (hm == NULL) {
         return 0;
     }
@@ -196,18 +196,18 @@ int Size(struct HashMap *hm) {
 /**
  * Sprawdza czy hashmapa jest pusta
  */
-int IsEmpty(struct HashMap *hm) {
+bool hashmap_is_empty(HashMap *hm) {
     if (hm == NULL) {
-        return 1;  // true - NULL jest "pusty"
+        return true;  // NULL jest "pusty"
     }
-    
+
     return hm->size == 0;
 }
 
 /**
  * Czyści całą hashmapę (usuwa wszystkie elementy)
  */
-void Clear(struct HashMap *hm) {
+void hashmap_clear(HashMap *hm) {
     if (hm == NULL) {
         return;
     }
@@ -229,13 +229,13 @@ void Clear(struct HashMap *hm) {
 /**
  * Zwalnia pamięć zajmowaną przez hashmapę
  */
-void FreeHashMap(struct HashMap *hm) {
+void hashmap_free(HashMap *hm) {
     if (hm == NULL) {
         return;
     }
-    
+
     // Najpierw wyczyść wszystkie elementy
-    Clear(hm);
+    hashmap_clear(hm);
     
     // Zwolnij tablicę bucketów
     free(hm->buckets);
@@ -247,7 +247,7 @@ void FreeHashMap(struct HashMap *hm) {
 /**
  * Wyświetla zawartość hashmapy (debug)
  */
-void PrintHashMap(struct HashMap *hm) {
+void hashmap_print(HashMap *hm) {
     if (hm == NULL) {
         printf("HashMap jest NULL\n");
         return;
@@ -275,7 +275,7 @@ void PrintHashMap(struct HashMap *hm) {
 /**
  * Wyświetla statystyki hashmapy
  */
-void PrintStats(struct HashMap *hm) {
+void hashmap_print_stats(HashMap *hm) {
     if (hm == NULL) {
         printf("HashMap jest NULL\n");
         return;
@@ -312,4 +312,26 @@ void PrintStats(struct HashMap *hm) {
     printf("Średnia długość łańcucha: %.2f\n", 
            used_buckets > 0 ? (double)total_chain_length / used_buckets : 0.0);
     printf("==========================\n");
+}
+
+// ===== FUNKCJE HASHUJĄCE DLA STRINGÓW =====
+
+/**
+ * Funkcja hashująca dla stringów (algorytm djb2 variant)
+ */
+int hash_string(void *key) {
+    char *str = (char*)key;
+    unsigned int hash = 0;
+    while (*str) {
+        hash = hash*31+(*str);
+        str++;
+    }
+    return (int)hash;
+}
+
+/**
+ * Funkcja porównująca dla stringów
+ */
+int compare_string(void *key1, void *key2) {
+    return strcmp((char*)key1, (char*)key2);
 }
