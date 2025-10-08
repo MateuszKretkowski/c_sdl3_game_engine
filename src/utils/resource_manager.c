@@ -6,11 +6,22 @@
 
 #include <graphics/textures.h>
 #include <graphics/shader.h>
+#include "hashmap.h"
 
-
+HashMap *material_cache;
+HashMap *shader_cache;
+HashMap *mesh_cache;
+HashMap *prefab_cache;
 
 const char *asset_index_path = "assets/asset_index.json";
 cJSON *asset_index_json;
+
+void initialize_resource_manager() {
+    material_cache = hashmap_create(hash_string, compare_string);
+    shader_cache = hashmap_create(hash_string, compare_string);
+    mesh_cache = hashmap_create(hash_string, compare_string);
+    prefab_cache = hashmap_create(hash_string, compare_string);
+}
 
 Material *resource_get_material(const char* material_id) {
     if (!asset_index_json) {
@@ -19,6 +30,12 @@ Material *resource_get_material(const char* material_id) {
             printf("Could not cJSON_Parse() path: %s", asset_index_path);
             return NULL;
         }
+    }
+    if (!material_cache) {
+        initialize_resource_manager();
+    }
+    else if (hashmap_contains(material_cache, (void*)material_id)) {
+        return (Material*)hashmap_get(material_cache, (void*)material_id);
     }
     char* path = get_path_from_id(material_id, "materials");
     cJSON *material_json = open_json(path);
@@ -89,6 +106,9 @@ Material *resource_get_material(const char* material_id) {
         i++;
     }
     cJSON_Delete(material_json);
+
+    hashmap_insert(material_cache, strdup(material_id), mat);
+
     return mat;
 }
 
@@ -96,6 +116,13 @@ Material *resource_get_material(const char* material_id) {
       Shader empty_shader = {0};
       if (!shader_id) {
           return empty_shader;
+      }
+      if (!shader_cache) {
+        initialize_resource_manager();
+      }
+      else if (hashmap_contains(shader_cache, (void*)shader_id)) {
+        Shader *cached_shader = (Shader*)hashmap_get(shader_cache, (void*)shader_id);
+        return *cached_shader;
       }
 
       char *shader_path = get_path_from_id(shader_id, "shaders");
@@ -118,6 +145,11 @@ Material *resource_get_material(const char* material_id) {
 
       Shader shader = shader_create(vertex_path->valuestring, fragment_path->valuestring, name->valuestring);
       cJSON_Delete(shader_json);
+
+      Shader *shader_copy = malloc(sizeof(Shader));
+      *shader_copy = shader;
+      hashmap_insert(shader_cache, strdup(shader_id), shader_copy);
+
       return shader;
   }
 
