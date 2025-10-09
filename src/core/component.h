@@ -8,17 +8,21 @@
 struct GameObject;
 struct Component;
 
+typedef struct {
+    void (*awake)(Component *self);
+    void (*start)(Component *self);
+    void (*update)(Component *self);
+    void (*destroy)(Component *self);
+} component_standard_voids;
+
 typedef struct Component {
     struct GameObject* gameObject;
     
+    char *id;
     char *name;
     bool isActive;
 
-    void (*awake)(struct Component* self);
-    void (*start)(struct Component* self);
-    void (*update)(struct Component* self);
-    void (*destroy)(struct Component* self);
-
+    component_standard_voids *standard_voids;
 } Component;
 
 bool Component_equals(const Component *a, const Component *b);

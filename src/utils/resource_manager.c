@@ -11,6 +11,7 @@
 #include "hashmap.h"
 #include "mesh_library.h"
 #include "gameObject.h"
+#include "components/component_registry.h"
 
 HashMap *material_cache;
 HashMap *shader_cache;
@@ -239,13 +240,27 @@ void resource_load_prefab(char *prefab_id) {
 
     GameObject *prefab = instantiate_gameObject(name->valuestring);
 
-    // TODO: Parse and add components to the prefab
+    // Parse and add components to the prefab
     cJSON *components_json = cJSON_GetObjectItemCaseSensitive(prefab_json, "components");
     if (cJSON_IsArray(components_json)) {
         cJSON *component_json = NULL;
         cJSON_ArrayForEach(component_json, components_json) {
-            // Component parsing logic will go here
-            // For now, this is a placeholder for future component loading
+            cJSON *component_id = cJSON_GetObjectItemCaseSensitive(component_json, "id");
+
+            if (!cJSON_IsString(component_id) || !component_id->valuestring) {
+                fprintf(stderr, "ERROR: Component missing 'id' field in prefab '%s'\n", prefab_id);
+                continue;
+            }
+
+            // Create component using registry
+            Component *component = component_registry_create(component_id->valuestring, component_json);
+            if (component) {
+                add_component(prefab, component);
+                printf("Added component '%s' to prefab '%s'\n", component_id->valuestring, prefab_id);
+            } else {
+                fprintf(stderr, "ERROR: Failed to create component '%s' for prefab '%s'\n",
+                        component_id->valuestring, prefab_id);
+            }
         }
     }
 
@@ -258,13 +273,22 @@ GameObject *resource_get_prefab(char *prefab_id) {
     if (!prefab_id) {
         return NULL;
     }
-    else if (!prefab_cache) {
+    if (!prefab_cache) {
         initialize_resource_manager();
     }
-    else if (hashmap_contains(prefab_cache, (void*)prefab_id)) {
+    if (hashmap_contains(prefab_cache, (void*)prefab_id)) {
         return (GameObject*)hashmap_get(prefab_cache, (void*)prefab_id);
     }
+
+    // Load the prefab if it's not in cache
     resource_load_prefab(prefab_id);
+
+    // Return it from cache (or NULL if loading failed)
+    if (hashmap_contains(prefab_cache, (void*)prefab_id)) {
+        return (GameObject*)hashmap_get(prefab_cache, (void*)prefab_id);
+    }
+
+    return NULL;
 }
 
 cJSON *open_json(const char *path) {
