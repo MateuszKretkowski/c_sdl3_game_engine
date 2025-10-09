@@ -17,6 +17,7 @@ typedef struct {
 typedef struct Component {
     struct GameObject *gameObject;
     
+    char *id;
     char *name;
     bool isActive;
     
