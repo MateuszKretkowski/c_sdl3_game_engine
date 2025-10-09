@@ -2,7 +2,7 @@
 #define TRANSFORM_COMPONENT_H
 
 #include "utils.h"
-#include "component.h"
+#include "core/component.h"
 
 typedef struct {
     Component base;

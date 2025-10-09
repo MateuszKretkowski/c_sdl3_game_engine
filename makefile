@@ -20,9 +20,9 @@ $(ASSET_INDEXER): src/build_tools/asset_indexer.c libs/cJSON.c libs/cJSON.h
 run-indexer: $(ASSET_INDEXER)
 	$(ASSET_INDEXER)
 
-# Kompiluj main z cJSON (zależy od wszystkich plików źródłowych)
-$(TARGET): $(SOURCES) libs/cJSON.c libs/cJSON.h
-	$(CC) $(CFLAGS) $(SOURCES) libs/cJSON.c -o $(TARGET) $(INCLUDES) $(LIBS)
+# Kompiluj main z cJSON i hashmap (zależy od wszystkich plików źródłowych)
+$(TARGET): $(SOURCES) libs/cJSON.c libs/cJSON.h libs/hashmap.c libs/hashmap.h
+	$(CC) $(CFLAGS) $(SOURCES) libs/cJSON.c libs/hashmap.c -o $(TARGET) $(INCLUDES) $(LIBS)
 
 clean:
 	del /Q build\main.exe build\asset_indexer.exe 2>nul || exit 0
