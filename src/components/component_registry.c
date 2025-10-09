@@ -55,7 +55,7 @@ void component_registry_cleanup() {
     if (component_registry) {
         // Note: We don't free the keys here as they might be string literals
         // In a production system, you'd track allocated keys separately
-        hashmap_destroy(component_registry);
+        hashmap_free(component_registry);
         component_registry = NULL;
     }
 }

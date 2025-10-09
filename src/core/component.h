@@ -6,7 +6,7 @@
 #include <stdbool.h>
 
 struct GameObject;
-struct Component;
+typedef struct Component Component;
 
 typedef struct {
     void (*awake)(Component *self);

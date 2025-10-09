@@ -10,8 +10,13 @@
 #include "json_utils.h"
 #include "hashmap.h"
 #include "mesh_library.h"
-#include "gameObject.h"
+#include "core/gameObject.h"
 #include "components/component_registry.h"
+
+// Forward declarations
+cJSON *open_json(const char *path);
+char *get_path_from_id(const char *id, const char *bookmark);
+Shader resource_get_shader(const char *shader_id);
 
 HashMap *material_cache;
 HashMap *shader_cache;
@@ -54,7 +59,7 @@ Material *resource_get_material(const char* material_id) {
     cJSON *shader_id = cJSON_GetObjectItemCaseSensitive(material_json, "shader");
     if (cJSON_IsString(shader_id) && (shader_id->valuestring != NULL)) {
         printf("got shader_id %s\n", shader_id->valuestring);
-        Shader shader = resource_get_shader(shader_id);
+        Shader shader = resource_get_shader(shader_id->valuestring);
         mat->shader = shader;
     }
     
@@ -206,7 +211,7 @@ Mesh *resource_get_mesh(char *mesh_id) {
             }
         }
     }
-    Mesh *mesh = add_mesh_to_library(strdup(name), vertices, indices, cJSON_GetArraySize(indices_json), mesh_id, materials, materialCount);
+    Mesh *mesh = add_mesh_to_library(strdup(name->valuestring), vertices, indices, cJSON_GetArraySize(indices_json), mesh_id, materials, materialCount);
     free(mesh);
     free(materials);
     
@@ -240,7 +245,6 @@ void resource_load_prefab(char *prefab_id) {
 
     GameObject *prefab = instantiate_gameObject(name->valuestring);
 
-    // Parse and add components to the prefab
     cJSON *components_json = cJSON_GetObjectItemCaseSensitive(prefab_json, "components");
     if (cJSON_IsArray(components_json)) {
         cJSON *component_json = NULL;
@@ -251,8 +255,6 @@ void resource_load_prefab(char *prefab_id) {
                 fprintf(stderr, "ERROR: Component missing 'id' field in prefab '%s'\n", prefab_id);
                 continue;
             }
-
-            // Create component using registry
             Component *component = component_registry_create(component_id->valuestring, component_json);
             if (component) {
                 add_component(prefab, component);
@@ -308,7 +310,7 @@ cJSON *open_json(const char *path) {
     return json;
 }
 
-char *get_path_from_id(char *id, char bookmark[64]) {
+char *get_path_from_id(const char *id, const char *bookmark) {
     cJSON *id_json = cJSON_GetObjectItemCaseSensitive(asset_index_json, bookmark);
     cJSON *path = cJSON_GetObjectItemCaseSensitive(id_json, id);
     return path ? path->valuestring : NULL;
