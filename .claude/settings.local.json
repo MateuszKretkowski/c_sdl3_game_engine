@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(mingw32-make:*)"
+      "Bash(mingw32-make:*)",
+      "Bash(git mv:*)"
     ],
     "deny": [],
     "ask": []
