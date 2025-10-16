@@ -5,6 +5,8 @@
 #include "component_registry.h"
 #include "json_utils.h"
 
+#include <cglm/cglm.h>
+
 void transform_awake(Component* self) {
     TransformComponent *t = (TransformComponent*)self;
 }
@@ -15,7 +17,20 @@ void transform_start(Component* self) {
 
 void transform_update(Component* self) {
     TransformComponent *t = (TransformComponent*)self;
+    glm_mat4_identity(t->model);
     
+    vec3 pos = {t->position.x, t->position.y, t->position.z};
+    glm_translate(t->model, pos);
+
+    vec3 x_axis = {1.0f, 0.0f, 0.0f};
+    vec3 y_axis = {0.0f, 1.0f, 0.0f};
+    vec3 z_axis = {0.0f, 0.0f, 1.0f};
+    glm_rotate(t->model, glm_rad(t->rotation.x), x_axis);
+    glm_rotate(t->model, glm_rad(t->rotation.y), y_axis);
+    glm_rotate(t->model, glm_rad(t->rotation.z), z_axis);
+
+    vec3 scale = {t->scale.x, t->scale.y, t->scale.z};
+    glm_scale(t->model, scale);
 }
 
 void transform_destroy(Component* self) {
@@ -39,6 +54,8 @@ TransformComponent *create_transform_component(Vector3 pos, Vector3 rot, Vector3
     t->position = pos;
     t->rotation = rot;
     t->scale = scale;
+    glm_mat4_identity(t->model);
+
     return t;
 }
 

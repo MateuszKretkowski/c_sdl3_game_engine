@@ -3,9 +3,13 @@
 
 #include "utils.h"
 #include "core/component.h"
+#include <cglm/cglm.h>
 
 typedef struct {
     Component base;
+
+    mat4 model;
+
     Vector3 position;
     Vector3 rotation;
     Vector3 scale;
