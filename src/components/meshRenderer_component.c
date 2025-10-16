@@ -5,6 +5,8 @@
 #include "utils/resource_manager.h"
 #include "component_registry.h"
 #include "json_utils.h"
+#include "graphics/render.h"
+#include <cglm/cglm.h>
 
 void meshRenderer_awake(Component* self) {
     MeshRendererComponent *t = (MeshRendererComponent*)self;
