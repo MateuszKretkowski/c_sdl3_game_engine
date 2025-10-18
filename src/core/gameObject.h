@@ -5,6 +5,7 @@
 #include "component.h"
 
 typedef struct {
+    char *id;
     char *name;
 
     Component **components;
