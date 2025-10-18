@@ -44,6 +44,7 @@ TransformComponent *create_transform_component(Vector3 pos, Vector3 rot, Vector3
     t->base.name = "Transform";
     t->base.isActive = true;
     t->base.gameObject = NULL;
+    t->base.size = sizeof(TransformComponent);
     t->base.standard_voids = malloc(sizeof(component_standard_voids));
     t->base.standard_voids->awake = transform_awake;
     t->base.standard_voids->start = transform_start;

@@ -17,10 +17,11 @@ typedef struct {
 
 typedef struct Component {
     struct GameObject* gameObject;
-    
+
     char *id;
     char *name;
     bool isActive;
+    size_t size;
 
     component_standard_voids *standard_voids;
 } Component;
