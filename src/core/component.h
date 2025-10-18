@@ -5,7 +5,7 @@
 
 #include <stdbool.h>
 
-struct GameObject;
+typedef struct GameObject GameObject;
 typedef struct Component Component;
 
 typedef struct {
@@ -16,7 +16,7 @@ typedef struct {
 } component_standard_voids;
 
 typedef struct Component {
-    struct GameObject* gameObject;
+    GameObject* gameObject;
 
     char *id;
     char *name;
