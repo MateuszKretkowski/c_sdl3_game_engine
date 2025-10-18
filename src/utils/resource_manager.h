@@ -3,7 +3,7 @@
 
 #include "cJSON.h"
 #include <utils.h>
-#include "gameObject.h"
+#include "core/gameObject.h"
 
 void initialize_resource_manager();
 Material *resource_get_material(const char* material_id);
