@@ -6,6 +6,9 @@
 #include "graphics.h"
 #include "textures.h"
 #include "utils.h"
+#include "core/gameObject.h"
+#include "core/component.h"
+#include "resource_manager.h"
 
 static Shader standard_shader;
 static GLuint vao, vbo, ebo;

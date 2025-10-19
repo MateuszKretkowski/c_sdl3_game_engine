@@ -9,25 +9,25 @@
 #include <cglm/cglm.h>
 
 void meshRenderer_awake(Component* self) {
-    MeshRendererComponent *t = (MeshRendererComponent*)self;
+    mesh_renderer_component *t = (mesh_renderer_component*)self;
 }
 
 void meshRenderer_start(Component* self) {
-    MeshRendererComponent *t = (MeshRendererComponent*)self;
+    mesh_renderer_component *t = (mesh_renderer_component*)self;
 }
 
 void meshRenderer_update(Component* self) {
-    MeshRendererComponent *t = (MeshRendererComponent*)self;
-    
+    mesh_renderer_component *t = (mesh_renderer_component*)self;
+
 }
 
 void meshRenderer_destroy(Component* self) {
-    MeshRendererComponent *t = (MeshRendererComponent*)self;
+    mesh_renderer_component *t = (mesh_renderer_component*)self;
 
 }
 
-MeshRendererComponent *create_meshRenderer_component(Mesh *mesh) {
-    MeshRendererComponent* t = malloc(sizeof(MeshRendererComponent));
+mesh_renderer_component *create_mesh_renderer_component(Mesh *mesh) {
+    mesh_renderer_component* t = malloc(sizeof(mesh_renderer_component));
     t->base.id = "meshrenderer_component";
     t->base.name = "MeshRenderer";
     t->base.isActive = true;
@@ -56,7 +56,7 @@ Component* meshRenderer_from_json(cJSON *json) {
         mesh = resource_get_mesh(mesh_json->valuestring);
     }
 
-    return (Component*)create_meshRenderer_component(mesh);
+    return (Component*)create_mesh_renderer_component(mesh);
 }
 
 __attribute__((constructor))
