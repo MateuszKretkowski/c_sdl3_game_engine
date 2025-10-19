@@ -80,7 +80,6 @@ typedef struct {
     int indexCount;
 } Mesh;
 
-
 char *read_file(const char* filename);
 
 #endif // UTILS_H
