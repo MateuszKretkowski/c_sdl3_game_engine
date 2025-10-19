@@ -13,8 +13,8 @@ typedef struct {
     Vector3 position;
     Vector3 rotation;
     Vector3 scale;
-} TransformComponent;
+} transform_component;
 
-TransformComponent *create_transform_component(Vector3 pos, Vector3 rot, Vector3 scale);
+transform_component *create_transform_component(Vector3 pos, Vector3 rot, Vector3 scale);
 
 #endif

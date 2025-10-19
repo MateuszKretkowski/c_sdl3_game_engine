@@ -7,8 +7,8 @@
 typedef struct {
     Component base;
     Mesh *mesh;
-} MeshRendererComponent;
+} mesh_renderer_component;
 
-MeshRendererComponent *create_meshRenderer_component(Mesh *mesh);
+mesh_renderer_component *create_mesh_renderer_component(Mesh *mesh);
 
 #endif

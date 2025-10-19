@@ -8,15 +8,15 @@
 #include <cglm/cglm.h>
 
 void transform_awake(Component* self) {
-    TransformComponent *t = (TransformComponent*)self;
+    transform_component *t = (transform_component*)self;
 }
 
 void transform_start(Component* self) {
-    TransformComponent *t = (TransformComponent*)self;
+    transform_component *t = (transform_component*)self;
 }
 
 void transform_update(Component* self) {
-    TransformComponent *t = (TransformComponent*)self;
+    transform_component *t = (transform_component*)self;
     glm_mat4_identity(t->model);
     
     vec3 scale = {t->scale.x, t->scale.y, t->scale.z};
@@ -34,17 +34,17 @@ void transform_update(Component* self) {
 }
 
 void transform_destroy(Component* self) {
-    TransformComponent *t = (TransformComponent*)self;
+    transform_component *t = (transform_component*)self;
 
 }
 
-TransformComponent *create_transform_component(Vector3 pos, Vector3 rot, Vector3 scale) {
-    TransformComponent* t = malloc(sizeof(TransformComponent));
+transform_component *create_transform_component(Vector3 pos, Vector3 rot, Vector3 scale) {
+    transform_component* t = malloc(sizeof(transform_component));
     t->base.id = "transform_component";
     t->base.name = "Transform";
     t->base.isActive = true;
     t->base.gameObject = NULL;
-    t->base.size = sizeof(TransformComponent);
+    t->base.size = sizeof(transform_component);
     t->base.standard_voids = malloc(sizeof(component_standard_voids));
     t->base.standard_voids->awake = transform_awake;
     t->base.standard_voids->start = transform_start;
