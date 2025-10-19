@@ -12,6 +12,7 @@ const char *materials_path = "src/assets/materials/";
 const char *meshes_path = "src/assets/meshes/";
 const char *prefabs_path = "src/assets/prefabs/";
 const char *shaders_path = "src/assets/shaders/";
+const char *scenes_path = "src/assets/scenes/";
 
 void id_json(cJSON *asset_index_json, const char *path, const char *category) {
     struct dirent *entry;
@@ -109,6 +110,7 @@ cJSON *set_up_asset_index_json() {
     cJSON_AddObjectToObject(json, "meshes");
     cJSON_AddObjectToObject(json, "prefabs");
     cJSON_AddObjectToObject(json, "shaders");
+    cJSON_AddObjectToObject(json, "scenes");
     return json;
 }
 
@@ -138,6 +140,7 @@ int main() {
     id_json(asset_index_json, meshes_path, "meshes");
     id_json(asset_index_json, prefabs_path, "prefabs");
     id_json(asset_index_json, shaders_path, "shaders");
+    id_json(asset_index_json, scenes_path, "scenes");
     
     upload_asset_index_json(asset_index_json);
     

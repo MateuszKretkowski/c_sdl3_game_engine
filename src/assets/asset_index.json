@@ -10,5 +10,8 @@
 	},
 	"shaders":	{
 		"standard_lit":	"src/assets/shaders/standard_shader.json"
+	},
+	"scenes":	{
+		"sample_scene":	"src/assets/scenes/sample_scene.json"
 	}
 }
