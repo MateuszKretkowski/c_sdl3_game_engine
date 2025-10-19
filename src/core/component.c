@@ -35,9 +35,11 @@ void local_destroy_component(Component *component) {
     if (!component) {
         return;
     }
-    if (component->standard_voids->destroy != NULL) {
+    if (component->standard_voids && component->standard_voids->destroy != NULL) {
         component->standard_voids->destroy(component);
     }
+    free(component->id);
     free(component->name);
+    free(component->standard_voids);
     free(component);
 }
