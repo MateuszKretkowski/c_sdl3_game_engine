@@ -18,10 +18,14 @@ GameObject *instantiate_gameObject(char* name) {
 }
 
 void free_gameObject(GameObject *gameObject) {
+    if (!gameObject) {
+        return;
+    }
     for (int i=0; i<gameObject->components_length; i++) {
         local_destroy_component(gameObject->components[i]);
     }
     free(gameObject->components);
+    free(gameObject->id);
     free(gameObject->name);
     free(gameObject);
 }
