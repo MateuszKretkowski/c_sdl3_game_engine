@@ -8,6 +8,7 @@
 typedef struct {
     char *id;
     GameObject *gameObjects;
+    int gameObjects_length;
 } Scene;
 
 #endif // SCENE_MANAGER_H
