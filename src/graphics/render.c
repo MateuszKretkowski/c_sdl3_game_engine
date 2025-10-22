@@ -79,10 +79,12 @@ void render_frame(void) {
 }
 
 void render_shutdown(void) {
-    glDeleteTextures(1, &bricks_texture);
-    glDeleteTextures(1, &wood_texture);
-    glDeleteBuffers(1, &vbo);
-    glDeleteBuffers(1, &ebo);
-    glDeleteVertexArrays(1, &vao);
-    shader_destroy(&standard_shader);
+    for (int i=0; i<render_stack_count; i++) {
+        mesh_renderer_component *mesh_renderer = get_component(render_stack[i], mesh_renderer_component, "mesh_renderer_component");
+        glDeleteTextures(1, &mesh_renderer->mesh->materials[0]->diffuse_map.id);
+        glDeleteBuffers(1, &mesh_renderer->mesh->vbo);
+        glDeleteBuffers(1, &mesh_renderer->mesh->ebo);
+        glDeleteVertexArrays(1, &mesh_renderer->mesh->vao);
+        shader_destroy(&mesh_renderer->mesh->materials[0]->shader);
+    }
 }
