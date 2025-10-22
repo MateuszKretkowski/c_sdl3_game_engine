@@ -62,18 +62,20 @@ void render_init() {
 void render_frame(void) {
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
+    
+    for (int i=0; i<render_stack_count; i++) {
+        mesh_renderer_component *mesh_renderer = get_component(render_stack[i], mesh_renderer_component, "mesh_renderer_component");
+        if (!mesh_renderer) {
+            continue;
+        }
+        shader_use(&mesh_renderer->mesh->materials[0]->shader);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, mesh_renderer->mesh->materials[0]->diffuse_map.id);
 
-    shader_use(&standard_shader);
-    shader_set_float(&standard_shader, "horizontal_offset", 0.5f);
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, bricks_texture);
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, wood_texture);
-
-    glBindVertexArray(vao);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-    glBindVertexArray(0);
+        glBindVertexArray(mesh_renderer->mesh->vao);
+        glDrawElements(GL_TRIANGLES, mesh_renderer->mesh->indexCount, GL_UNSIGNED_INT, 0);
+        glBindVertexArray(0);
+    }
 }
 
 void render_shutdown(void) {
