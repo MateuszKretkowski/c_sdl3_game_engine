@@ -9,63 +9,54 @@
 #include "core/gameObject.h"
 #include "core/component.h"
 #include "resource_manager.h"
+#include "components/components.h"
 
-static Shader standard_shader;
-static GLuint vao, vbo, ebo;
-static GLuint bricks_texture, wood_texture;
+static GameObject *render_stack[MAX_OBJECTS];
+static int render_stack_count;
 
-void render_init(void) {
-    // Załaduj shader
-    standard_shader = shader_create("shaders/vertex_shader.glsl", "shaders/fragment_shader.glsl", "standard_shader");
-    if (!standard_shader.id) {
-        fprintf(stderr, "[render] Failed to load shader\n");
-        exit(EXIT_FAILURE);
+void render_load_scene(Scene *scene) {
+    if (render_stack_count == MAX_OBJECTS) {
+        return;
     }
-
-    // Załaduj tekstury
-    bricks_texture = create_texture("brick_texture/bricks_color.png");
-    if (!bricks_texture) {
-        fprintf(stderr, "[render] Failed to load brick texture\n");
-        exit(EXIT_FAILURE);
+    if (!scene->gameObjects || scene || scene->id) {
+        return;
     }
-
-    wood_texture = create_texture("wood_texture/wood_color.png");
-    if (!wood_texture) {
-        fprintf(stderr, "[render] Failed to load wood texture\n");
-        exit(EXIT_FAILURE);
+    for (int i=0; i<render_stack_count; i++) {
+        free_gameObject(&scene->gameObjects[i]);
     }
-
-    // Dane do siatki
-    Vertex vertices[] = {
-        { { 0.5f,  0.5f, 0.0f }, { 1.0f, 0.0f, 0.0f, 1.0f }, { 1.0f, 1.0f } },
-        { { 0.5f, -0.5f, 0.0f }, { 0.0f, 1.0f, 0.0f, 1.0f }, { 1.0f, 0.0f } },
-        { {-0.5f, -0.5f, 0.0f }, { 0.0f, 0.0f, 1.0f, 1.0f }, { 0.0f, 0.0f } },
-        { {-0.5f,  0.5f, 0.0f }, { 1.0f, 1.0f, 0.0f, 1.0f }, { 0.0f, 1.0f } }
-    };
-
-    GLuint indices[] = {
-        0, 1, 3,
-        1, 2, 3
-    };
-
-    // Tworzenie buforów
-    vbo = create_vbo(vertices, sizeof(vertices) / sizeof(Vertex));
-    if (!vbo) {
-        fprintf(stderr, "[render] Failed to create VBO\n");
-        exit(EXIT_FAILURE);
+    for (int i=0; i<scene->gameObjects_length; i++) {
+        render_stack[i] = &scene->gameObjects[i];
     }
+}
 
-    ebo = create_ebo(indices, sizeof(indices) / sizeof(GLuint));
-    if (!ebo) {
-        fprintf(stderr, "[render] Failed to create EBO\n");
-        exit(EXIT_FAILURE);
+void render_add_object(GameObject *gameObject) {
+    if (render_stack_count == MAX_OBJECTS) {
+        return;
     }
+    if (!gameObject) {
+        return;
+    }
+    render_stack_count++;
+    render_stack[render_stack_count] = gameObject;
+}
 
-    vao = create_vao(vbo, &ebo);
-    if (!vao) {
-        fprintf(stderr, "[render] Failed to create VAO\n");
-        exit(EXIT_FAILURE);
+void render_remove_object(GameObject *gameObject) {
+    if (render_stack_count == 0) {
+        return;
     }
+    if (!gameObject) {
+        return;
+    }
+    for (int i=0; i<render_stack_count; i++) {
+        if (render_stack[i] == gameObject) {
+            render_stack[i] = render_stack[render_stack_count-1];
+            render_stack_count--;
+        }
+    }
+}
+
+void render_init() {
+    
 }
 
 void render_frame(void) {
