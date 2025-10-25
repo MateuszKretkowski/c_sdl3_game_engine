@@ -8,4 +8,5 @@ void load_scene(char *id) {
         return;
     }
     Scene *scene = resource_get_scene(id);
+    render_load_scene(scene);
 }

@@ -16,7 +16,9 @@
 #include "mesh_library.h"
 #include "core/gameObject.h"
 #include "components/component_registry.h"
-#include "engine/scene_manager.h"
+
+// Forward declaration to avoid circular dependency
+typedef struct Scene Scene;
 
 void initialize_resource_manager();
 Material *resource_get_material(const char* material_id);

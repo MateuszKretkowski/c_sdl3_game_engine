@@ -3,6 +3,8 @@
 
 #include <SDL3/SDL.h>
 #include <stdbool.h>
+#include "scene_manager.h"
+#include "render.h"
 
 bool game_init(void);
 void game_shutdown(void);
