@@ -31,7 +31,7 @@ mesh_renderer_component *create_mesh_renderer_component(Mesh *mesh) {
         fprintf(stderr, "create_mesh_renderer_component: failed to allocate memory for component\n");
         return NULL;
     }
-    t->base.id = "meshrenderer_component";
+    t->base.id = "mesh_renderer_component";
     t->base.name = "MeshRenderer";
     t->base.isActive = true;
     t->base.gameObject = NULL;
@@ -52,6 +52,8 @@ mesh_renderer_component *create_mesh_renderer_component(Mesh *mesh) {
 }
 
 Component* meshRenderer_from_json(cJSON *json) {
+    fprintf(stderr, "meshRenderer_from_json: Starting...\n");
+
     if (!json) {
         fprintf(stderr, "meshRenderer_from_json: json is NULL\n");
         return NULL;
@@ -61,23 +63,36 @@ Component* meshRenderer_from_json(cJSON *json) {
 
     cJSON *mesh_json = cJSON_GetObjectItemCaseSensitive(json, "mesh");
     if (mesh_json) {
+        fprintf(stderr, "meshRenderer_from_json: Found mesh field in JSON\n");
         if (!cJSON_IsString(mesh_json) || !mesh_json->valuestring) {
             fprintf(stderr, "meshRenderer_from_json: mesh field is not a valid string\n");
             return NULL;
         }
+        fprintf(stderr, "meshRenderer_from_json: Attempting to load mesh: %s\n", mesh_json->valuestring);
         mesh = resource_get_mesh(mesh_json->valuestring);
         if (!mesh) {
-            fprintf(stderr, "meshRenderer_from_json: failed to load mesh: %s\n", mesh_json->valuestring);
+            fprintf(stderr, "meshRenderer_from_json: failed to load mesh: %s, continuing anyway...\n", mesh_json->valuestring);
+        } else {
+            fprintf(stderr, "meshRenderer_from_json: Successfully loaded mesh: %s\n", mesh_json->valuestring);
         }
     }
     else {
         fprintf(stderr, "meshRenderer_from_json: mesh field not found in JSON\n");
     }
 
-    return (Component*)create_mesh_renderer_component(mesh);
+    fprintf(stderr, "meshRenderer_from_json: Creating mesh_renderer_component with mesh: %p\n", (void*)mesh);
+    Component *component = (Component*)create_mesh_renderer_component(mesh);
+
+    if (!component) {
+        fprintf(stderr, "meshRenderer_from_json: create_mesh_renderer_component returned NULL\n");
+    } else {
+        fprintf(stderr, "meshRenderer_from_json: Successfully created component\n");
+    }
+
+    return component;
 }
 
 __attribute__((constructor))
-static void register_meshrenderer_component() {
-    component_registry_register("meshrenderer_component", meshRenderer_from_json);
+static void register_mesh_renderer_component() {
+    component_registry_register("mesh_renderer_component", meshRenderer_from_json);
 }

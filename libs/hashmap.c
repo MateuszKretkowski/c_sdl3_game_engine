@@ -157,17 +157,22 @@ void* hashmap_get(HashMap *hm, void *key) {
     if (hm == NULL || key == NULL) {
         return NULL;
     }
-    
+
     int index = hm->hash_func(key) % hm->capacity;
+    fprintf(stderr, "[hashmap_get] key=%s, index=%d, buckets[%d]=%p\n",
+            (char*)key, index, index, (void*)hm->buckets[index]);
+    fflush(stderr);
     struct Node *curr = hm->buckets[index];
-    
+
     while (curr != NULL) {
+        fprintf(stderr, "[hashmap_get] curr=%p, curr->key=%p\n", (void*)curr, curr->key);
+        fflush(stderr);
         if (hm->compare_func(curr->key, key) == 0) {
             return curr->value;
         }
         curr = curr->next;
     }
-    
+
     return NULL;  // klucz nie znaleziony
 }
 
@@ -326,7 +331,8 @@ int hash_string(void *key) {
         hash = hash*31+(*str);
         str++;
     }
-    return (int)hash;
+    // Ensure positive value by masking sign bit
+    return (int)(hash & 0x7FFFFFFF);
 }
 
 /**
