@@ -14,9 +14,18 @@ static bool running = true;
 
 bool engine_init(const char *title, int width, int height) {
     set_cwd_to_project_root();
-    if (!window_init(title, width, height)) return false;
-    if (!resources_load()) return false;
-    if (!game_init()) return false;
+    if (!window_init(title, width, height)) {
+        fprintf(stderr, "engine_init: window_init failed\n");
+        return false;
+    }
+    if (!resources_load()) {
+        fprintf(stderr, "engine_init: resources_load failed\n");
+        return false;
+    }
+    if (!game_init()) {
+        fprintf(stderr, "engine_init: game_init failed\n");
+        return false;
+    }
     render_init();
     return true;
 }

@@ -11,7 +11,7 @@ bool resources_load(void) {
     tex_wood   = create_texture("wood_texture/wood_color.png");
 
     if (!tex_bricks || !tex_wood) {
-        fprintf(stderr, "FAILED TO LOAD TEX_BRICKS OR TEX_WOOD: RESOURCES.C");
+        fprintf(stderr, "resources_load: failed to load textures - tex_bricks: %u, tex_wood: %u\n", tex_bricks, tex_wood);
         return false;
     }
 

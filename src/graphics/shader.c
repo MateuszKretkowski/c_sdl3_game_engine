@@ -7,7 +7,10 @@
 
 static GLuint compile_shader(const char* source_path, GLenum shader_type) {
     char* source = read_file(source_path);
-    if (!source) return 0;
+    if (!source) {
+        fprintf(stderr, "compile_shader: failed to read shader file: %s\n", source_path);
+        return 0;
+    }
 
     GLuint shader = glCreateShader(shader_type);
     glShaderSource(shader, 1, (const char* const*)&source, NULL);
@@ -35,7 +38,7 @@ Shader shader_create(const char* vertex_path, const char* fragment_path, char *n
         strcpy(shader.name, name);
     }
     else {
-        printf("could not set name for shader");
+        fprintf(stderr, "shader_create: could not allocate memory for shader name: %s\n", name);
     }
 
     GLuint vertex = compile_shader(vertex_path, GL_VERTEX_SHADER);

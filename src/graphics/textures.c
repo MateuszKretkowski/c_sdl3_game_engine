@@ -11,6 +11,10 @@
 
 unsigned char *create_checkerboard_texture(int width, int height, int box_size) {
     unsigned char *checkerboard_texture = malloc(width * height * 3 *sizeof(unsigned char));
+    if (!checkerboard_texture) {
+        fprintf(stderr, "create_checkerboard_texture: failed to allocate memory for %dx%d texture\n", width, height);
+        return NULL;
+    }
     
     for (int y=0; y<height; y++) {
         for (int x=0; x<width; x++) {
@@ -36,9 +40,13 @@ GLuint create_texture(const char *path) {
 
     bool is_checkerboard = false;
     if (!curr_tex) {
-        printf("Failed to load image: %s. Reason: %s\n", full_path, stbi_failure_reason());
+        fprintf(stderr, "create_texture: failed to load image: %s. Reason: %s\n", full_path, stbi_failure_reason());
         width = height = 64;
         curr_tex = create_checkerboard_texture(width, height, 8);
+        if (!curr_tex) {
+            fprintf(stderr, "create_texture: failed to create fallback checkerboard texture\n");
+            return 0;
+        }
         is_checkerboard = true;
     }
 

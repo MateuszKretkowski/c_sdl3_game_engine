@@ -8,9 +8,24 @@
 
 GameObject *instantiate_gameObject(char* name) {
     GameObject *gameObject = malloc(sizeof(GameObject));
+    if (!gameObject) {
+        fprintf(stderr, "instantiate_gameObject: failed to allocate memory for GameObject\n");
+        return NULL;
+    }
     gameObject->name = malloc(strlen(name) * sizeof(char) + sizeof(char));
+    if (!gameObject->name) {
+        fprintf(stderr, "instantiate_gameObject: failed to allocate memory for name: %s\n", name);
+        free(gameObject);
+        return NULL;
+    }
     strcpy(gameObject->name, name);
     gameObject->components = malloc(sizeof(Component*) * 8);
+    if (!gameObject->components) {
+        fprintf(stderr, "instantiate_gameObject: failed to allocate memory for components array\n");
+        free(gameObject->name);
+        free(gameObject);
+        return NULL;
+    }
     gameObject->components_capacity = 8;
     gameObject->components_length = 0;
 
@@ -19,6 +34,7 @@ GameObject *instantiate_gameObject(char* name) {
 
 void free_gameObject(GameObject *gameObject) {
     if (!gameObject) {
+        fprintf(stderr, "free_gameObject: gameObject is NULL\n");
         return;
     }
     for (int i=0; i<gameObject->components_length; i++) {
@@ -32,11 +48,17 @@ void free_gameObject(GameObject *gameObject) {
 
 void add_component(GameObject *gameObject, Component *component) {
     if (!gameObject || !component || gameObject->components == NULL || !component) {
+        fprintf(stderr, "add_component: invalid parameters - gameObject: %p, component: %p\n", (void*)gameObject, (void*)component);
         return;
     }
 
     if (gameObject->components_length == gameObject->components_capacity) {
-        gameObject->components = realloc(gameObject->components, sizeof(Component*) * gameObject->components_capacity * 2);
+        Component **new_components = realloc(gameObject->components, sizeof(Component*) * gameObject->components_capacity * 2);
+        if (!new_components) {
+            fprintf(stderr, "add_component: failed to reallocate components array\n");
+            return;
+        }
+        gameObject->components = new_components;
         gameObject->components_capacity *= 2;
     }
 
@@ -46,6 +68,7 @@ void add_component(GameObject *gameObject, Component *component) {
 
 void remove_component(GameObject *gameObject, Component *component) {
     if (!gameObject || !component || gameObject->components == NULL || !component) {
+        fprintf(stderr, "remove_component: invalid parameters - gameObject: %p, component: %p\n", (void*)gameObject, (void*)component);
         return;
     }
     
@@ -58,11 +81,12 @@ void remove_component(GameObject *gameObject, Component *component) {
         }
     }
 
-    fprintf(stderr, "Could NOT find the Component to Remove: %s", component->name);
+    fprintf(stderr, "remove_component: could not find component to remove: %s\n", component->name);
 }
 
 Component *get_component_base(GameObject *gameObject, const char *id) {
     if (!gameObject || !id) {
+        fprintf(stderr, "get_component_base: invalid parameters - gameObject: %p, id: %p\n", (void*)gameObject, (void*)id);
         return NULL;
     }
     for (int i = 0; i < gameObject->components_length; i++) {
@@ -75,11 +99,15 @@ Component *get_component_base(GameObject *gameObject, const char *id) {
 
 GameObject *instantiate_prefab(GameObject *prefab) {
     if (!prefab) {
-        fprintf(stderr, "ERROR: instantiate_prefab received NULL prefab\n");
+        fprintf(stderr, "instantiate_prefab: prefab is NULL\n");
         return NULL;
     }
 
     GameObject *instance = instantiate_gameObject(prefab->name);
+    if (!instance) {
+        fprintf(stderr, "instantiate_prefab: failed to instantiate gameObject\n");
+        return NULL;
+    }
     if (prefab->id) {
         instance->id = strdup(prefab->id);
     }
