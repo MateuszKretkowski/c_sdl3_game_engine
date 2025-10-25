@@ -86,6 +86,14 @@ void render_frame(void) {
             fprintf(stderr, "render_frame: GameObject '%s' has no mesh_renderer_component\n", render_stack[i]->name);
             continue;
         }
+        if (!mesh_renderer->mesh) {
+            fprintf(stderr, "render_frame: GameObject '%s' has mesh_renderer but mesh is NULL\n", render_stack[i]->name);
+            continue;
+        }
+        if (!mesh_renderer->mesh->materials || mesh_renderer->mesh->materials[0] == NULL) {
+            fprintf(stderr, "render_frame: GameObject '%s' mesh has no materials\n", render_stack[i]->name);
+            continue;
+        }
         shader_use(&mesh_renderer->mesh->materials[0]->shader);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, mesh_renderer->mesh->materials[0]->diffuse_map.id);

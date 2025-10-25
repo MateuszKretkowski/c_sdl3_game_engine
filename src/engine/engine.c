@@ -13,24 +13,32 @@
 static bool running = true;
 
 bool engine_init(const char *title, int width, int height) {
+    fprintf(stderr, "engine_init: Starting engine initialization\n");
     set_cwd_to_project_root();
+    fprintf(stderr, "engine_init: Calling window_init\n");
     if (!window_init(title, width, height)) {
         fprintf(stderr, "engine_init: window_init failed\n");
         return false;
     }
+    fprintf(stderr, "engine_init: window_init succeeded, calling resources_load\n");
     if (!resources_load()) {
         fprintf(stderr, "engine_init: resources_load failed\n");
         return false;
     }
+    fprintf(stderr, "engine_init: resources_load succeeded, calling game_init\n");
     if (!game_init()) {
         fprintf(stderr, "engine_init: game_init failed\n");
         return false;
     }
+    fprintf(stderr, "engine_init: game_init succeeded, calling render_init\n");
     render_init();
+    fprintf(stderr, "engine_init: Engine initialization complete\n");
     return true;
 }
 
 void engine_run(void) {
+    fprintf(stderr, "engine_run: Starting main loop\n");
+    fflush(stderr);
     SDL_Event event;
 
     while (running) {
@@ -49,6 +57,8 @@ void engine_run(void) {
         render_frame();
         window_swap();
     }
+    fprintf(stderr, "engine_run: Main loop ended\n");
+    fflush(stderr);
 }
 
 void engine_shutdown(void) {
