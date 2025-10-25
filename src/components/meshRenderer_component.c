@@ -23,7 +23,6 @@ void meshRenderer_update(Component* self) {
 
 void meshRenderer_destroy(Component* self) {
     mesh_renderer_component *t = (mesh_renderer_component*)self;
-
 }
 
 mesh_renderer_component *create_mesh_renderer_component(Mesh *mesh) {

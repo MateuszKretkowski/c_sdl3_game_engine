@@ -1,10 +1,12 @@
 #ifndef RENDER_H
 #define RENDER_H
 
-#include "resource_manager.h"
 #include "core/gameObject.h"
 
 #define MAX_OBJECTS 2048
+
+// Forward declaration - full definition in scene_manager.h
+typedef struct Scene Scene;
 
 void render_init(void);
 void render_frame(void);

@@ -1,16 +1,17 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "resource_manager.h"
+#include "engine/scene_manager.h"
 
 cJSON *open_json(const char *path);
-char *get_path_from_id(const char *id, const char bookmark[64]);
+char *get_path_from_id(const char *id, const char *bookmark);
 Shader resource_get_shader(const char *shader_id);
 
 HashMap *material_cache;
 HashMap *shader_cache;
 HashMap *prefab_cache;
 
-const char *asset_index_path = "assets/asset_index.json";
+const char *asset_index_path = "src/assets/asset_index.json";
 cJSON *asset_index_json;
 
 void initialize_resource_manager()
@@ -67,7 +68,7 @@ Material *resource_get_material(const char *material_id)
         printf("got diffuse %s\n", diffuse->valuestring);
         Texture texture;
         texture.id = create_texture(diffuse->valuestring);
-        texture.path = diffuse->valuestring;
+        texture.path = strdup(diffuse->valuestring);
         mat->diffuse_map = texture;
     }
     cJSON *specular = cJSON_GetObjectItemCaseSensitive(maps_json, "specular");
@@ -76,7 +77,7 @@ Material *resource_get_material(const char *material_id)
         printf("got specular %s\n", specular->valuestring);
         Texture texture;
         texture.id = create_texture(specular->valuestring);
-        texture.path = specular->valuestring;
+        texture.path = strdup(specular->valuestring);
         mat->specular_map = texture;
     }
     cJSON *normal = cJSON_GetObjectItemCaseSensitive(maps_json, "normal");
@@ -85,7 +86,7 @@ Material *resource_get_material(const char *material_id)
         printf("got normal %s\n", normal->valuestring);
         Texture texture;
         texture.id = create_texture(normal->valuestring);
-        texture.path = normal->valuestring;
+        texture.path = strdup(normal->valuestring);
         mat->normal_map = texture;
     }
     cJSON *properties = cJSON_GetObjectItemCaseSensitive(material_json, "properties");
@@ -184,13 +185,38 @@ Scene *resource_get_scene(char *id) {
         fprintf(stderr, "ERROR: cannot read scene_json in resource_get_scene(); scene_id: %s", id);
         return NULL;
     }
-    cJSON *gameObjects = cJSON_GetObjectItemCaseSensitive(scene_json, "gameObjects");
-    if (!gameObjects) {
+    cJSON *gameObjects_json = cJSON_GetObjectItemCaseSensitive(scene_json, "gameObjects");
+    if (!gameObjects_json) {
         fprintf(stderr, "ERROR: no gameObjects in scene: %s", id);
+        cJSON_Delete(scene_json);
+        return NULL;
     }
-    Scene *scene = malloc(sizeof(scene));
-    scene->id = id;
-    scene->gameObjects = gameObjects;
+
+    int gameObjects_count = cJSON_GetArraySize(gameObjects_json);
+    Scene *scene = malloc(sizeof(Scene));
+    scene->id = strdup(id);
+    scene->gameObjects_length = gameObjects_count;
+    scene->gameObjects = malloc(sizeof(GameObject) * gameObjects_count);
+
+    // Parse each GameObject from JSON
+    int i = 0;
+    cJSON *gameObject_json = NULL;
+    cJSON_ArrayForEach(gameObject_json, gameObjects_json) {
+        cJSON *name_json = cJSON_GetObjectItemCaseSensitive(gameObject_json, "name");
+        const char *name_const = (name_json && cJSON_IsString(name_json)) ? name_json->valuestring : "GameObject";
+        char *name = strdup(name_const);
+
+        GameObject *go = instantiate_gameObject(name);
+        if (go) {
+            // Copy the GameObject data into the scene array
+            scene->gameObjects[i] = *go;
+            free(go); // Free the original allocation since we copied it
+            i++;
+        }
+        free(name);
+    }
+
+    cJSON_Delete(scene_json);
     return scene;
 }
 
@@ -374,9 +400,28 @@ cJSON *open_json(const char *path)
     return json;
 }
 
-char *get_path_from_id(const char *id, const char bookmark[64])
+char *get_path_from_id(const char *id, const char *bookmark)
 {
+    if (!asset_index_json)
+    {
+        asset_index_json = open_json(asset_index_path);
+        if (!asset_index_json)
+        {
+            printf("ERROR: Could not load asset_index.json from path: %s\n", asset_index_path);
+            return NULL;
+        }
+    }
     cJSON *id_json = cJSON_GetObjectItemCaseSensitive(asset_index_json, bookmark);
+    if (!id_json)
+    {
+        printf("ERROR: Could not find bookmark '%s' in asset_index.json\n", bookmark);
+        return NULL;
+    }
     cJSON *path = cJSON_GetObjectItemCaseSensitive(id_json, id);
-    return path ? path->valuestring : NULL;
+    if (!path)
+    {
+        printf("ERROR: Could not find id '%s' under bookmark '%s' in asset_index.json\n", id, bookmark);
+        return NULL;
+    }
+    return path->valuestring;
 }
