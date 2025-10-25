@@ -10,7 +10,7 @@ void component_registry_init() {
     if (!component_registry) {
         component_registry = hashmap_create(hash_string, compare_string);
         if (!component_registry) {
-            fprintf(stderr, "ERROR: Failed to create component registry\n");
+            fprintf(stderr, "component_registry_init: failed to create component registry\n");
         }
     }
 }
@@ -20,14 +20,13 @@ void component_registry_register(const char *id, ComponentCreateFunc create_func
         component_registry_init();
     }
     if (!id || !create_func) {
-        fprintf(stderr, "ERROR: Cannot register component with NULL id or function\n");
+        fprintf(stderr, "component_registry_register: cannot register component with NULL id or function\n");
         return;
     }
     if (hashmap_contains(component_registry, (void*)id)) {
-        fprintf(stderr, "WARNING: Component '%s' already registered, overwriting\n", id);
+        fprintf(stderr, "component_registry_register: component '%s' already registered, overwriting\n", id);
     }
     hashmap_insert(component_registry, strdup(id), (void*)create_func);
-    printf("Registered component: %s\n", id);
 }
 
 Component* component_registry_create(const char *id, cJSON *json) {
@@ -35,20 +34,24 @@ Component* component_registry_create(const char *id, cJSON *json) {
         component_registry_init();
     }
     if (!id) {
-        fprintf(stderr, "ERROR: Cannot create component with NULL id\n");
+        fprintf(stderr, "component_registry_create: id is NULL\n");
         return NULL;
     }
     if (!hashmap_contains(component_registry, (void*)id)) {
-        fprintf(stderr, "ERROR: Unknown component type: %s\n", id);
+        fprintf(stderr, "component_registry_create: unknown component type: %s\n", id);
         return NULL;
     }
 
     ComponentCreateFunc create_func = (ComponentCreateFunc)hashmap_get(component_registry, (void*)id);
     if (!create_func) {
-        fprintf(stderr, "ERROR: Component '%s' has NULL creation function\n", id);
+        fprintf(stderr, "component_registry_create: component '%s' has NULL creation function\n", id);
         return NULL;
     }
-    return create_func(json);
+    Component *comp = create_func(json);
+    if (!comp) {
+        fprintf(stderr, "component_registry_create: failed to create component: %s\n", id);
+    }
+    return comp;
 }
 
 void component_registry_cleanup() {

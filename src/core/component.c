@@ -25,6 +25,10 @@ typedef struct Component {
 } Component;
 
 bool Component_equals(const Component *a, const Component *b) {
+    if (!a || !b) {
+        fprintf(stderr, "Component_equals: invalid parameters - a: %p, b: %p\n", (void*)a, (void*)b);
+        return false;
+    }
     if (a->name == NULL || b->name == NULL) {
         return a->name == b->name;
     }
@@ -33,6 +37,7 @@ bool Component_equals(const Component *a, const Component *b) {
 
 void local_destroy_component(Component *component) {
     if (!component) {
+        fprintf(stderr, "local_destroy_component: component is NULL\n");
         return;
     }
     if (component->standard_voids && component->standard_voids->destroy != NULL) {

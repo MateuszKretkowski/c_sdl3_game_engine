@@ -28,7 +28,7 @@ Material *resource_get_material(const char *material_id)
         asset_index_json = open_json(asset_index_path);
         if (!asset_index_json)
         {
-            printf("Could not cJSON_Parse() path: %s", asset_index_path);
+            fprintf(stderr, "resource_get_material: could not parse asset_index.json at path: %s\n", asset_index_path);
             return NULL;
         }
     }
@@ -44,28 +44,42 @@ Material *resource_get_material(const char *material_id)
     cJSON *material_json = open_json(path);
     if (!material_json)
     {
-        printf("Could not cJSON_Parse() the buffer: %s\n", path);
+        fprintf(stderr, "resource_get_material: could not parse material JSON at path: %s\n", path);
+        return NULL;
     }
     Material *mat = malloc(sizeof(Material));
+    if (!mat) {
+        fprintf(stderr, "resource_get_material: failed to allocate memory for material\n");
+        cJSON_Delete(material_json);
+        return NULL;
+    }
     cJSON *name = cJSON_GetObjectItemCaseSensitive(material_json, "name");
     if (cJSON_IsString(name) && (name->valuestring != NULL))
     {
-        printf("got name %s\n", name->valuestring);
         mat->name = strdup(name->valuestring);
+    }
+    else
+    {
+        fprintf(stderr, "resource_get_material: material missing name field\n");
     }
     cJSON *shader_id = cJSON_GetObjectItemCaseSensitive(material_json, "shader");
     if (cJSON_IsString(shader_id) && (shader_id->valuestring != NULL))
     {
-        printf("got shader_id %s\n", shader_id->valuestring);
         Shader shader = resource_get_shader(shader_id->valuestring);
         mat->shader = shader;
     }
+    else
+    {
+        fprintf(stderr, "resource_get_material: material missing shader field\n");
+    }
 
     cJSON *maps_json = cJSON_GetObjectItemCaseSensitive(material_json, "maps");
+    if (!maps_json) {
+        fprintf(stderr, "resource_get_material: material missing maps field\n");
+    }
     cJSON *diffuse = cJSON_GetObjectItemCaseSensitive(maps_json, "diffuse");
     if (cJSON_IsString(diffuse) && (diffuse->valuestring != NULL))
     {
-        printf("got diffuse %s\n", diffuse->valuestring);
         Texture texture;
         texture.id = create_texture(diffuse->valuestring);
         texture.path = strdup(diffuse->valuestring);
@@ -74,7 +88,6 @@ Material *resource_get_material(const char *material_id)
     cJSON *specular = cJSON_GetObjectItemCaseSensitive(maps_json, "specular");
     if (cJSON_IsString(specular) && (specular->valuestring != NULL))
     {
-        printf("got specular %s\n", specular->valuestring);
         Texture texture;
         texture.id = create_texture(specular->valuestring);
         texture.path = strdup(specular->valuestring);
@@ -83,7 +96,6 @@ Material *resource_get_material(const char *material_id)
     cJSON *normal = cJSON_GetObjectItemCaseSensitive(maps_json, "normal");
     if (cJSON_IsString(normal) && (normal->valuestring != NULL))
     {
-        printf("got normal %s\n", normal->valuestring);
         Texture texture;
         texture.id = create_texture(normal->valuestring);
         texture.path = strdup(normal->valuestring);
@@ -131,6 +143,7 @@ Shader resource_get_shader(const char *shader_id)
     Shader empty_shader = {0};
     if (!shader_id)
     {
+        fprintf(stderr, "resource_get_shader: shader_id is NULL\n");
         return empty_shader;
     }
     if (!shader_cache)
@@ -144,9 +157,14 @@ Shader resource_get_shader(const char *shader_id)
     }
 
     char *shader_path = get_path_from_id(shader_id, "shaders");
+    if (!shader_path) {
+        fprintf(stderr, "resource_get_shader: could not get path for shader_id: %s\n", shader_id);
+        return empty_shader;
+    }
     cJSON *shader_json = open_json(shader_path);
     if (!shader_json)
     {
+        fprintf(stderr, "resource_get_shader: could not open shader JSON at path: %s\n", shader_path);
         return empty_shader;
     }
 
@@ -158,7 +176,7 @@ Shader resource_get_shader(const char *shader_id)
         !cJSON_IsString(vertex_path) || !vertex_path->valuestring ||
         !cJSON_IsString(fragment_path) || !fragment_path->valuestring)
     {
-        printf("ERROR: Invalid shader JSON\n");
+        fprintf(stderr, "resource_get_shader: invalid shader JSON for shader_id: %s\n", shader_id);
         cJSON_Delete(shader_json);
         return empty_shader;
     }
@@ -167,6 +185,10 @@ Shader resource_get_shader(const char *shader_id)
     cJSON_Delete(shader_json);
 
     Shader *shader_copy = malloc(sizeof(Shader));
+    if (!shader_copy) {
+        fprintf(stderr, "resource_get_shader: failed to allocate memory for shader copy\n");
+        return shader;
+    }
     *shader_copy = shader;
     hashmap_insert(shader_cache, strdup(shader_id), shader_copy);
 
@@ -175,28 +197,43 @@ Shader resource_get_shader(const char *shader_id)
 
 Scene *resource_get_scene(char *id) {
     if (!id) {
-        fprintf(stderr, "ERROR: no id when trying to resource_get_scene();");
+        fprintf(stderr, "resource_get_scene: id is NULL\n");
         return NULL;
     }
     char *scene_path = get_path_from_id(id, "scenes");
+    if (!scene_path) {
+        fprintf(stderr, "resource_get_scene: could not get path for scene_id: %s\n", id);
+        return NULL;
+    }
     cJSON *scene_json = open_json(scene_path);
     if (!scene_json)
     {
-        fprintf(stderr, "ERROR: cannot read scene_json in resource_get_scene(); scene_id: %s", id);
+        fprintf(stderr, "resource_get_scene: cannot read scene_json for scene_id: %s\n", id);
         return NULL;
     }
     cJSON *gameObjects_json = cJSON_GetObjectItemCaseSensitive(scene_json, "gameObjects");
     if (!gameObjects_json) {
-        fprintf(stderr, "ERROR: no gameObjects in scene: %s", id);
+        fprintf(stderr, "resource_get_scene: no gameObjects in scene: %s\n", id);
         cJSON_Delete(scene_json);
         return NULL;
     }
 
     int gameObjects_count = cJSON_GetArraySize(gameObjects_json);
     Scene *scene = malloc(sizeof(Scene));
+    if (!scene) {
+        fprintf(stderr, "resource_get_scene: failed to allocate memory for scene\n");
+        cJSON_Delete(scene_json);
+        return NULL;
+    }
     scene->id = strdup(id);
     scene->gameObjects_length = gameObjects_count;
     scene->gameObjects = malloc(sizeof(GameObject) * gameObjects_count);
+    if (!scene->gameObjects) {
+        fprintf(stderr, "resource_get_scene: failed to allocate memory for gameObjects array\n");
+        free(scene);
+        cJSON_Delete(scene_json);
+        return NULL;
+    }
 
     // Parse each GameObject from JSON
     int i = 0;
@@ -208,10 +245,17 @@ Scene *resource_get_scene(char *id) {
 
         GameObject *go = instantiate_gameObject(name);
         if (go) {
+            fprintf(stderr, "resource_get_scene: Created GameObject - name: %s, id: %s, components: %d\n",
+                    go->name ? go->name : "NULL",
+                    go->id ? go->id : "NULL",
+                    go->components_length);
             // Copy the GameObject data into the scene array
             scene->gameObjects[i] = *go;
             free(go); // Free the original allocation since we copied it
             i++;
+        }
+        else {
+            fprintf(stderr, "resource_get_scene: failed to instantiate gameObject with name: %s\n", name);
         }
         free(name);
     }
@@ -224,6 +268,7 @@ Mesh *resource_get_mesh(char *mesh_id)
 {
     if (!mesh_id)
     {
+        fprintf(stderr, "resource_get_mesh: mesh_id is NULL\n");
         return NULL;
     }
     else if (!mesh_library)
@@ -231,6 +276,7 @@ Mesh *resource_get_mesh(char *mesh_id)
         initialize_mesh_library(8);
         if (!mesh_library)
         {
+            fprintf(stderr, "resource_get_mesh: failed to initialize mesh_library\n");
             return NULL;
         }
     }
@@ -239,11 +285,19 @@ Mesh *resource_get_mesh(char *mesh_id)
         return try_get_mesh(mesh_id);
     }
     char *path = get_path_from_id(mesh_id, "meshes");
+    if (!path) {
+        fprintf(stderr, "resource_get_mesh: could not get path for mesh_id: %s\n", mesh_id);
+        return NULL;
+    }
     cJSON *mesh_json = open_json(path);
+    if (!mesh_json) {
+        fprintf(stderr, "resource_get_mesh: could not open mesh JSON at path: %s\n", path);
+        return NULL;
+    }
     cJSON *name = cJSON_GetObjectItemCaseSensitive(mesh_json, "name");
     if (!cJSON_IsString(name) || !name->valuestring)
     {
-        printf("ERROR: Invalid mesh JSON\n");
+        fprintf(stderr, "resource_get_mesh: invalid mesh JSON for mesh_id: %s\n", mesh_id);
         cJSON_Delete(mesh_json);
         return NULL;
     }
@@ -292,6 +346,7 @@ void resource_load_prefab(char *prefab_id)
 {
     if (!prefab_id)
     {
+        fprintf(stderr, "resource_load_prefab: prefab_id is NULL\n");
         return;
     }
     if (!prefab_cache)
@@ -304,22 +359,31 @@ void resource_load_prefab(char *prefab_id)
     }
 
     char *path = get_path_from_id(prefab_id, "prefabs");
+    if (!path) {
+        fprintf(stderr, "resource_load_prefab: could not get path for prefab_id: %s\n", prefab_id);
+        return;
+    }
     cJSON *prefab_json = open_json(path);
     if (!prefab_json)
     {
-        printf("Could not cJSON_Parse() the buffer: %s\n", path);
+        fprintf(stderr, "resource_load_prefab: could not parse prefab JSON at path: %s\n", path);
         return;
     }
 
     cJSON *name = cJSON_GetObjectItemCaseSensitive(prefab_json, "name");
     if (!cJSON_IsString(name) || !name->valuestring)
     {
-        printf("ERROR: Invalid prefab JSON - missing name\n");
+        fprintf(stderr, "resource_load_prefab: invalid prefab JSON - missing name for prefab_id: %s\n", prefab_id);
         cJSON_Delete(prefab_json);
         return;
     }
 
     GameObject *prefab = instantiate_gameObject(name->valuestring);
+    if (!prefab) {
+        fprintf(stderr, "resource_load_prefab: failed to instantiate gameObject for prefab: %s\n", prefab_id);
+        cJSON_Delete(prefab_json);
+        return;
+    }
 
     cJSON *components_json = cJSON_GetObjectItemCaseSensitive(prefab_json, "components");
     if (cJSON_IsArray(components_json))
@@ -338,7 +402,6 @@ void resource_load_prefab(char *prefab_id)
             if (component)
             {
                 add_component(prefab, component);
-                printf("Added component '%s' to prefab '%s'\n", component_id->valuestring, prefab_id);
             }
             else
             {
@@ -350,6 +413,11 @@ void resource_load_prefab(char *prefab_id)
 
     cJSON_Delete(prefab_json);
 
+    fprintf(stderr, "resource_load_prefab: Loaded prefab - id: %s, name: %s, components: %d\n",
+            prefab_id,
+            prefab->name ? prefab->name : "NULL",
+            prefab->components_length);
+
     hashmap_insert(prefab_cache, strdup(prefab_id), prefab);
 }
 
@@ -357,6 +425,7 @@ GameObject *resource_get_prefab(char *prefab_id)
 {
     if (!prefab_id)
     {
+        fprintf(stderr, "resource_get_prefab: prefab_id is NULL\n");
         return NULL;
     }
     if (!prefab_cache)
@@ -365,7 +434,12 @@ GameObject *resource_get_prefab(char *prefab_id)
     }
     if (hashmap_contains(prefab_cache, (void *)prefab_id))
     {
-        return (GameObject *)hashmap_get(prefab_cache, (void *)prefab_id);
+        GameObject *prefab = (GameObject *)hashmap_get(prefab_cache, (void *)prefab_id);
+        fprintf(stderr, "resource_get_prefab: Retrieved from cache - id: %s, name: %s, components: %d\n",
+                prefab_id,
+                prefab->name ? prefab->name : "NULL",
+                prefab->components_length);
+        return prefab;
     }
 
     // Load the prefab if it's not in cache
@@ -374,9 +448,15 @@ GameObject *resource_get_prefab(char *prefab_id)
     // Return it from cache (or NULL if loading failed)
     if (hashmap_contains(prefab_cache, (void *)prefab_id))
     {
-        return (GameObject *)hashmap_get(prefab_cache, (void *)prefab_id);
+        GameObject *prefab = (GameObject *)hashmap_get(prefab_cache, (void *)prefab_id);
+        fprintf(stderr, "resource_get_prefab: Retrieved after loading - id: %s, name: %s, components: %d\n",
+                prefab_id,
+                prefab->name ? prefab->name : "NULL",
+                prefab->components_length);
+        return prefab;
     }
-    
+
+    fprintf(stderr, "resource_get_prefab: failed to load prefab: %s\n", prefab_id);
     return NULL;
 }
 
@@ -385,7 +465,7 @@ cJSON *open_json(const char *path)
     FILE *file = fopen(path, "r");
     if (!file)
     {
-        printf("Could not open the file: %s", path);
+        fprintf(stderr, "open_json: could not open file: %s\n", path);
         return NULL;
     }
     char buffer[1024];
@@ -395,7 +475,7 @@ cJSON *open_json(const char *path)
     cJSON *json = cJSON_Parse(buffer);
     if (!json)
     {
-        printf("cannot parse buffer into json\n");
+        fprintf(stderr, "open_json: cannot parse buffer into JSON from file: %s\n", path);
     }
     return json;
 }
@@ -407,20 +487,20 @@ char *get_path_from_id(const char *id, const char *bookmark)
         asset_index_json = open_json(asset_index_path);
         if (!asset_index_json)
         {
-            printf("ERROR: Could not load asset_index.json from path: %s\n", asset_index_path);
+            fprintf(stderr, "get_path_from_id: could not load asset_index.json from path: %s\n", asset_index_path);
             return NULL;
         }
     }
     cJSON *id_json = cJSON_GetObjectItemCaseSensitive(asset_index_json, bookmark);
     if (!id_json)
     {
-        printf("ERROR: Could not find bookmark '%s' in asset_index.json\n", bookmark);
+        fprintf(stderr, "get_path_from_id: could not find bookmark '%s' in asset_index.json\n", bookmark);
         return NULL;
     }
     cJSON *path = cJSON_GetObjectItemCaseSensitive(id_json, id);
     if (!path)
     {
-        printf("ERROR: Could not find id '%s' under bookmark '%s' in asset_index.json\n", id, bookmark);
+        fprintf(stderr, "get_path_from_id: could not find id '%s' under bookmark '%s' in asset_index.json\n", id, bookmark);
         return NULL;
     }
     return path->valuestring;

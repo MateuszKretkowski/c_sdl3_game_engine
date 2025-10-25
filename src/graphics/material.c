@@ -6,6 +6,10 @@
 #include "shader.h"
 
 void material_bind(Material *mat) {
+    if (!mat) {
+        fprintf(stderr, "material_bind: mat is NULL\n");
+        return;
+    }
     shader_use(&mat->shader);
 
     glActiveTexture(GL_TEXTURE0);
