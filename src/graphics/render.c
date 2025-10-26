@@ -37,6 +37,7 @@ void render_load_scene(Scene *scene) {
         fprintf(stderr, "Loading GameObject: %s\n", scene->gameObjects[i].name);
         render_stack[i] = &scene->gameObjects[i];
         render_stack_count++;
+        fprintf(stderr, "renderstackcount: %d\n", render_stack_count);
     }
 }
 
@@ -94,7 +95,16 @@ void render_frame(void) {
             fprintf(stderr, "render_frame: GameObject '%s' mesh has no materials\n", render_stack[i]->name);
             continue;
         }
+        transform_component *transform = get_component(render_stack[i], transform_component, "transform_component");
+        if (!transform) {
+            fprintf(stderr, "render_frame: GameObject '%s' has no transform_component\n", render_stack[i]->name);
+            continue;
+        }
         shader_use(&mesh_renderer->mesh->materials[0]->shader);
+
+        GLuint transformLoc = glGetUniformLocation(mesh_renderer->mesh->materials[0]->shader.id, "transform");
+        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, (float*)transform->model);
+
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, mesh_renderer->mesh->materials[0]->diffuse_map.id);
 

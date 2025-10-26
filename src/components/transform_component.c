@@ -3,6 +3,8 @@
 #include <string.h>
 #include "transform_component.h"
 #include "component_registry.h"
+#include "components.h"
+#include "core/gameObject.h"
 #include "json_utils.h"
 
 #include <cglm/cglm.h>
@@ -22,9 +24,9 @@ void transform_update(Component* self) {
     vec3 scale = {t->scale.x, t->scale.y, t->scale.z};
     glm_scale(t->model, scale);
     
-    vec3 x_axis = {1.0f, 0.0f, 0.0f};
-    vec3 y_axis = {0.0f, 1.0f, 0.0f};
-    vec3 z_axis = {0.0f, 0.0f, 1.0f};
+    vec3 x_axis = {0.0f, 0.0f, 0.0f};
+    vec3 y_axis = {0.0f, 0.0f, 0.0f};
+    vec3 z_axis = {0.0f, 0.0f, 0.0f};
     glm_rotate(t->model, glm_rad(t->rotation.x), x_axis);
     glm_rotate(t->model, glm_rad(t->rotation.y), y_axis);
     glm_rotate(t->model, glm_rad(t->rotation.z), z_axis);
