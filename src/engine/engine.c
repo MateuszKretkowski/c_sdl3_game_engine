@@ -25,13 +25,13 @@ bool engine_init(const char *title, int width, int height) {
         fprintf(stderr, "engine_init: resources_load failed\n");
         return false;
     }
-    fprintf(stderr, "engine_init: resources_load succeeded, calling game_init\n");
+    fprintf(stderr, "engine_init: resources_load succeeded, calling render_init\n");
+    render_init();
     if (!game_init()) {
         fprintf(stderr, "engine_init: game_init failed\n");
         return false;
     }
-    fprintf(stderr, "engine_init: game_init succeeded, calling render_init\n");
-    render_init();
+    fprintf(stderr, "engine_init: game_init succeeded\n");
     fprintf(stderr, "engine_init: Engine initialization complete\n");
     return true;
 }
