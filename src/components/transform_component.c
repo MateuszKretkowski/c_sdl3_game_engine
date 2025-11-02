@@ -24,9 +24,9 @@ void transform_update(Component* self) {
     vec3 scale = {t->scale.x, t->scale.y, t->scale.z};
     glm_scale(t->model, scale);
     
-    vec3 x_axis = {0.0f, 0.0f, 0.0f};
-    vec3 y_axis = {0.0f, 0.0f, 0.0f};
-    vec3 z_axis = {0.0f, 0.0f, 0.0f};
+    vec3 x_axis = {1.0f, 0.0f, 0.0f};
+    vec3 y_axis = {0.0f, 1.0f, 0.0f};
+    vec3 z_axis = {0.0f, 0.0f, 1.0f};
     glm_rotate(t->model, glm_rad(t->rotation.x), x_axis);
     glm_rotate(t->model, glm_rad(t->rotation.y), y_axis);
     glm_rotate(t->model, glm_rad(t->rotation.z), z_axis);
@@ -38,6 +38,36 @@ void transform_update(Component* self) {
 void transform_destroy(Component* self) {
     transform_component *t = (transform_component*)self;
 
+}
+
+void transform_set_position(transform_component *t, Vector3 pos) {
+    if (!t) return;
+    t->position = pos;
+}
+
+void transform_set_rotation(transform_component *t, Vector3 rot) {
+    if (!t) return;
+    t->rotation = rot;
+}
+
+void transform_set_scale(transform_component *t, Vector3 scale) {
+    if (!t) return;
+    t->scale = scale;
+}
+
+Vector3 transform_get_position(transform_component *t) {
+    if (!t) return (Vector3){0, 0, 0};
+    return t->position;
+}
+
+Vector3 transform_get_rotation(transform_component *t) {
+    if (!t) return (Vector3){0, 0, 0};
+    return t->rotation;
+}
+
+Vector3 transform_get_scale(transform_component *t) {
+    if (!t) return (Vector3){1, 1, 1};
+    return t->scale;
 }
 
 transform_component *create_transform_component(Vector3 pos, Vector3 rot, Vector3 scale) {
@@ -89,6 +119,7 @@ Component* transform_from_json(cJSON *json) {
 
     return (Component*)create_transform_component(position, rotation, scale);
 }
+
 
 __attribute__((constructor))
 static void register_transform_component() {
