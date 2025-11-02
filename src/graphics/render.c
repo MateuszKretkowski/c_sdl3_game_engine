@@ -110,6 +110,16 @@ void render_frame(void) {
         glDrawElements(GL_TRIANGLES, mesh_renderer->mesh->indexCount, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
     }
+
+    for (int i=0; i<render_stack_count; i++) {
+        GameObject *gameObject = render_stack[i];
+        for (int j=0; j<gameObject->components_length; j++) {
+            Component *comp = gameObject->components[j];
+            if (comp && comp->standard_voids && comp->standard_voids->update) {
+                comp->standard_voids->update((Component*)comp);
+            }
+        }
+    }
 }
 
 void render_shutdown(void) {
