@@ -1,0 +1,22 @@
+{
+    "id": "camera",
+    "name": "Camera",
+    "components": [
+        {
+            "id": "transform_component",
+            "position": [0, 0, 5],
+            "rotation": [0, 0, 0],
+            "scale": [1, 1, 1]
+        },
+        {
+            "id": "camera_component",
+            "target": [0, 0, 0],
+            "up": [0, 1, 0],
+            "fov": 45,
+            "aspect_ratio": 1.777,
+            "near_plane": 0.1,
+            "far_plane": 100,
+            "is_orthographic": false
+        }
+    ]
+}
