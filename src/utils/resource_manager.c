@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include "resource_manager.h"
 #include "engine/scene_manager.h"
+#include "components/transform_component.h"
 
 cJSON *open_json(const char *path);
 char *get_path_from_id(const char *id, const char *bookmark);
@@ -280,6 +281,28 @@ Scene *resource_get_scene(char *id) {
             continue;
         }
         scene->gameObjects[i] = *gameObject;
+
+        transform_component *transform = get_component(&scene->gameObjects[i], transform_component, "transform_component");
+        if (transform) {
+            cJSON *position_json = cJSON_GetObjectItemCaseSensitive(gameObject_json, "position");
+            if (position_json) {
+                Vector3 position = parse_vector3_array(position_json);
+                transform_set_position(transform, position);
+            }
+
+            cJSON *rotation_json = cJSON_GetObjectItemCaseSensitive(gameObject_json, "rotation");
+            if (rotation_json) {
+                Vector3 rotation = parse_vector3_array(rotation_json);
+                transform_set_rotation(transform, rotation);
+            }
+
+            cJSON *scale_json = cJSON_GetObjectItemCaseSensitive(gameObject_json, "scale");
+            if (scale_json) {
+                Vector3 scale = parse_vector3_array(scale_json);
+                transform_set_scale(transform, scale);
+            }
+        }
+
         free(id);
         i++;  // CRITICAL: increment i!
     }
@@ -505,11 +528,26 @@ cJSON *open_json(const char *path)
         fprintf(stderr, "open_json: could not open file: %s\n", path);
         return NULL;
     }
-    char buffer[1024];
-    size_t bytes_read = fread(buffer, 1, sizeof(buffer) - 1, file);
+
+    fseek(file, 0, SEEK_END);
+    long file_size = ftell(file);
+    fseek(file, 0, SEEK_SET);
+
+    char *buffer = malloc(file_size + 1);
+    if (!buffer)
+    {
+        fprintf(stderr, "open_json: could not allocate memory for file: %s\n", path);
+        fclose(file);
+        return NULL;
+    }
+
+    size_t bytes_read = fread(buffer, 1, file_size, file);
     buffer[bytes_read] = '\0';
     fclose(file);
+
     cJSON *json = cJSON_Parse(buffer);
+    free(buffer);
+
     if (!json)
     {
         fprintf(stderr, "open_json: cannot parse buffer into JSON from file: %s\n", path);
