@@ -83,7 +83,6 @@ void render_frame(void) {
     for (int i=0; i<render_stack_count; i++) {
         mesh_renderer_component *mesh_renderer = get_component(render_stack[i], mesh_renderer_component, "mesh_renderer_component");
         if (!mesh_renderer) {
-            fprintf(stderr, "render_frame: GameObject '%s' has no mesh_renderer_component\n", render_stack[i]->name);
             continue;
         }
         if (!mesh_renderer->mesh) {
