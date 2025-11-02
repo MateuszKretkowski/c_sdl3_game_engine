@@ -11,6 +11,9 @@
         {
             "id": "mesh_renderer_component",
             "mesh": "primitive_rectangle"
+        },
+        {
+            "id": "sample_component"
         }
     ]
 }
