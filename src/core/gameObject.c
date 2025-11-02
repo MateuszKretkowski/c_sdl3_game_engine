@@ -62,6 +62,7 @@ void add_component(GameObject *gameObject, Component *component) {
         gameObject->components_capacity *= 2;
     }
 
+    component->gameObject = gameObject;
     gameObject->components[gameObject->components_length] = component;
     gameObject->components_length++;
 }
