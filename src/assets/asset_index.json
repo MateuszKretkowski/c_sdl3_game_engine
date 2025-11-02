@@ -6,6 +6,7 @@
 		"primitive_rectangle":	"src/assets/meshes/rectangle2D.json"
 	},
 	"prefabs":	{
+		"camera":	"src/assets/prefabs/camera.json",
 		"player":	"src/assets/prefabs/player.json"
 	},
 	"shaders":	{
