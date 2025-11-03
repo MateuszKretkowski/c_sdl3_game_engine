@@ -74,11 +74,12 @@ void render_remove_object(GameObject *gameObject) {
 
 void render_init() {
     render_stack_count = 0;
+    glEnable(GL_DEPTH_TEST);
 }
 
 void render_frame(void) {
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
     for (int i=0; i<render_stack_count; i++) {
         mesh_renderer_component *mesh_renderer = get_component(render_stack[i], mesh_renderer_component, "mesh_renderer_component");
