@@ -5,6 +5,7 @@
 #include "utils/resource_manager.h"
 #include "component_registry.h"
 #include "json_utils.h"
+#include "utils.h"
 #include "graphics/render.h"
 #include <cglm/cglm.h>
 

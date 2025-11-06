@@ -4,6 +4,7 @@
 #include "utils/resource_manager.h"
 #include "graphics/render.h"
 #include "core/gameObject.h"
+#include "components/components.h"
 
 typedef struct Scene {
     char *id;

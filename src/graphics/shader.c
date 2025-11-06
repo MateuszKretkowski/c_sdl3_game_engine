@@ -44,6 +44,12 @@ Shader shader_create(const char* vertex_path, const char* fragment_path, char *n
     GLuint vertex = compile_shader(vertex_path, GL_VERTEX_SHADER);
     GLuint fragment = compile_shader(fragment_path, GL_FRAGMENT_SHADER);
 
+    if (vertex == 0 || fragment == 0) {
+        fprintf(stderr, "ERROR: Shader compilation failed for '%s'\n", name);
+        shader.id = 0;
+        return shader;
+    }
+
     glAttachShader(shader.id, vertex);
     glAttachShader(shader.id, fragment);
     glLinkProgram(shader.id);
@@ -53,7 +59,9 @@ Shader shader_create(const char* vertex_path, const char* fragment_path, char *n
     if (!success) {
         char infoLog[512];
         glGetProgramInfoLog(shader.id, 512, NULL, infoLog);
-        fprintf(stderr, "SHADER LINKING FAILED:\n%s\n", infoLog);
+        fprintf(stderr, "ERROR: Shader linking failed for '%s':\n%s\n", name, infoLog);
+    } else {
+        fprintf(stderr, "Shader compiled: %s (ID: %d)\n", name, shader.id);
     }
 
     glDeleteShader(vertex);

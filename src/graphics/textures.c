@@ -62,10 +62,14 @@ GLuint create_texture(const char *path) {
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, curr_tex);
     glGenerateMipmap(GL_TEXTURE_2D);
 
-    if (is_checkerboard) {        
-        free(curr_tex);          
-    } else {                       
-        stbi_image_free(curr_tex); 
+    if (!is_checkerboard) {
+        fprintf(stderr, "Texture loaded: %s (%dx%d, ID: %d)\n", path, width, height, texture);
+    }
+
+    if (is_checkerboard) {
+        free(curr_tex);
+    } else {
+        stbi_image_free(curr_tex);
     }
 
     return texture;

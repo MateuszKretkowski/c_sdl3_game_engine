@@ -6,6 +6,8 @@ static SDL_Window *window = NULL;
 static SDL_GLContext gl_context = NULL;
 
 bool window_init(const char *title, int width, int height) {
+    fprintf(stderr, "=== Window Initialization ===\n");
+
     if (SDL_Init(SDL_INIT_VIDEO) != 1) {
         fprintf(stderr, "SDL_Init failed: %s\n", SDL_GetError());
         return false;
@@ -32,6 +34,12 @@ bool window_init(const char *title, int width, int height) {
         fprintf(stderr, "Failed to load OpenGL functions with GLAD\n");
         return false;
     }
+
+    // Log OpenGL info
+    fprintf(stderr, "OpenGL Version: %s\n", glGetString(GL_VERSION));
+    fprintf(stderr, "OpenGL Renderer: %s\n", glGetString(GL_RENDERER));
+    fprintf(stderr, "GLSL Version: %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
+    fprintf(stderr, "Window: %dx%d (VSync: ON)\n", width, height);
 
     SDL_GL_SetSwapInterval(1); // VSync ON
 

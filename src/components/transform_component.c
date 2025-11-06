@@ -15,8 +15,6 @@ void transform_awake(Component* self) {
     vec3 pos = {t->position.x, t->position.y, t->position.z};
 
     glm_translate(t->model, pos);
-    printf("position: %f, %f, %f at transform_awake()\n", t->position.x, t->position.y, t->position.z);
-    printf("scale: %f, %f, %f", t->scale.x, t->scale.y, t->scale.z);
 
     vec3 x_axis = {1.0f, 0.0f, 0.0f};
     vec3 y_axis = {0.0f, 1.0f, 0.0f};
@@ -121,7 +119,6 @@ Component* transform_from_json(cJSON *json) {
     cJSON *pos_json = cJSON_GetObjectItemCaseSensitive(json, "position");
     if (pos_json) {
         position = parse_vector3_array(pos_json);
-        printf("\ntransform_from_json position: %f %f %f\n", position.x, position.y, position.z);
     }
 
     cJSON *rot_json = cJSON_GetObjectItemCaseSensitive(json, "rotation");

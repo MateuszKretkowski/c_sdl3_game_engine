@@ -96,18 +96,6 @@ bool hashmap_is_empty(HashMap *hm);
  */
 void hashmap_clear(HashMap *hm);
 
-// ===== FUNKCJE DEBUG =====
-
-/**
- * Wyświetla zawartość hashmapy (debug)
- */
-void hashmap_print(HashMap *hm);
-
-/**
- * Wyświetla statystyki hashmapy (debug)
- */
-void hashmap_print_stats(HashMap *hm);
-
 // ===== FUNKCJE HASHUJĄCE DLA STRINGÓW =====
 
 /**

@@ -159,14 +159,9 @@ void* hashmap_get(HashMap *hm, void *key) {
     }
 
     int index = hm->hash_func(key) % hm->capacity;
-    fprintf(stderr, "[hashmap_get] key=%s, index=%d, buckets[%d]=%p\n",
-            (char*)key, index, index, (void*)hm->buckets[index]);
-    fflush(stderr);
     struct Node *curr = hm->buckets[index];
 
     while (curr != NULL) {
-        fprintf(stderr, "[hashmap_get] curr=%p, curr->key=%p\n", (void*)curr, curr->key);
-        fflush(stderr);
         if (hm->compare_func(curr->key, key) == 0) {
             return curr->value;
         }
@@ -249,75 +244,6 @@ void hashmap_free(HashMap *hm) {
     free(hm);
 }
 
-/**
- * Wyświetla zawartość hashmapy (debug)
- */
-void hashmap_print(HashMap *hm) {
-    if (hm == NULL) {
-        printf("HashMap jest NULL\n");
-        return;
-    }
-    
-    printf("=== HashMap Debug ===\n");
-    printf("Size: %d, Capacity: %d, Load Factor: %.2f\n", 
-           hm->size, hm->capacity, (double)hm->size / hm->capacity);
-    
-    for (int i = 0; i < hm->capacity; i++) {
-        if (hm->buckets[i] != NULL) {
-            printf("Bucket[%d]: ", i);
-            struct Node *curr = hm->buckets[i];
-            int count = 0;
-            while (curr != NULL) {
-                count++;
-                curr = curr->next;
-            }
-            printf("%d elementów\n", count);
-        }
-    }
-    printf("====================\n");
-}
-
-/**
- * Wyświetla statystyki hashmapy
- */
-void hashmap_print_stats(HashMap *hm) {
-    if (hm == NULL) {
-        printf("HashMap jest NULL\n");
-        return;
-    }
-    
-    int used_buckets = 0;
-    int max_chain_length = 0;
-    int total_chain_length = 0;
-    
-    for (int i = 0; i < hm->capacity; i++) {
-        if (hm->buckets[i] != NULL) {
-            used_buckets++;
-            int chain_length = 0;
-            struct Node *curr = hm->buckets[i];
-            while (curr != NULL) {
-                chain_length++;
-                curr = curr->next;
-            }
-            total_chain_length += chain_length;
-            if (chain_length > max_chain_length) {
-                max_chain_length = chain_length;
-            }
-        }
-    }
-    
-    printf("=== HashMap Statistics ===\n");
-    printf("Elementy: %d\n", hm->size);
-    printf("Pojemność: %d\n", hm->capacity);
-    printf("Load Factor: %.2f%%\n", (double)hm->size / hm->capacity * 100);
-    printf("Użyte buckety: %d / %d (%.2f%%)\n", 
-           used_buckets, hm->capacity, 
-           (double)used_buckets / hm->capacity * 100);
-    printf("Najdłuższy łańcuch: %d\n", max_chain_length);
-    printf("Średnia długość łańcucha: %.2f\n", 
-           used_buckets > 0 ? (double)total_chain_length / used_buckets : 0.0);
-    printf("==========================\n");
-}
 
 // ===== FUNKCJE HASHUJĄCE DLA STRINGÓW =====
 

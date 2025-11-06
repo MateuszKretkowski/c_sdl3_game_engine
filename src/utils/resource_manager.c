@@ -17,55 +17,32 @@ cJSON *asset_index_json = NULL;
 
 void initialize_resource_manager()
 {
-    fprintf(stderr, "initialize_resource_manager: Creating hashmaps\n");
-    fflush(stderr);
     material_cache = hashmap_create(hash_string, compare_string);
-    fprintf(stderr, "initialize_resource_manager: material_cache=%p\n", (void*)material_cache);
     shader_cache = hashmap_create(hash_string, compare_string);
-    fprintf(stderr, "initialize_resource_manager: shader_cache=%p\n", (void*)shader_cache);
     prefab_cache = hashmap_create(hash_string, compare_string);
-    fprintf(stderr, "initialize_resource_manager: prefab_cache=%p\n", (void*)prefab_cache);
-    fflush(stderr);
 }
 
 Material *resource_get_material(const char *material_id)
 {
-    fprintf(stderr, "resource_get_material: Starting for material_id: %s\n", material_id ? material_id : "NULL");
-    fflush(stderr);
     if (!asset_index_json)
     {
-        fprintf(stderr, "resource_get_material: Loading asset_index.json\n");
-        fflush(stderr);
         asset_index_json = open_json(asset_index_path);
         if (!asset_index_json)
         {
             fprintf(stderr, "resource_get_material: could not parse asset_index.json at path: %s\n", asset_index_path);
             return NULL;
         }
-        fprintf(stderr, "resource_get_material: asset_index.json loaded\n");
-        fflush(stderr);
     }
     if (!material_cache)
     {
-        fprintf(stderr, "resource_get_material: Initializing resource manager\n");
-        fflush(stderr);
         initialize_resource_manager();
-        fprintf(stderr, "resource_get_material: Resource manager initialized\n");
-        fflush(stderr);
     }
     else if (hashmap_contains(material_cache, (void *)material_id))
     {
-        fprintf(stderr, "resource_get_material: Found in cache\n");
         return (Material *)hashmap_get(material_cache, (void *)material_id);
     }
-    fprintf(stderr, "resource_get_material: Getting path from asset_index\n");
-    fflush(stderr);
     char *path = get_path_from_id(material_id, "materials");
-    fprintf(stderr, "resource_get_material: Path: %s\n", path ? path : "NULL");
-    fflush(stderr);
     cJSON *material_json = open_json(path);
-    fprintf(stderr, "resource_get_material: Opened JSON\n");
-    fflush(stderr);
     if (!material_json)
     {
         fprintf(stderr, "resource_get_material: could not parse material JSON at path: %s\n", path);
@@ -77,8 +54,6 @@ Material *resource_get_material(const char *material_id)
         cJSON_Delete(material_json);
         return NULL;
     }
-    fprintf(stderr, "resource_get_material: Parsing name\n");
-    fflush(stderr);
     cJSON *name = cJSON_GetObjectItemCaseSensitive(material_json, "name");
     if (cJSON_IsString(name) && (name->valuestring != NULL))
     {
@@ -89,16 +64,10 @@ Material *resource_get_material(const char *material_id)
         fprintf(stderr, "resource_get_material: material missing name field\n");
         mat->name = strdup("Unnamed Material");
     }
-    fprintf(stderr, "resource_get_material: Parsing shader\n");
-    fflush(stderr);
     cJSON *shader_id = cJSON_GetObjectItemCaseSensitive(material_json, "shader");
     if (cJSON_IsString(shader_id) && (shader_id->valuestring != NULL))
     {
-        fprintf(stderr, "resource_get_material: Loading shader: %s\n", shader_id->valuestring);
-        fflush(stderr);
         Shader shader = resource_get_shader(shader_id->valuestring);
-        fprintf(stderr, "resource_get_material: Shader loaded\n");
-        fflush(stderr);
         mat->shader = shader;
     }
     else
@@ -134,6 +103,8 @@ Material *resource_get_material(const char *material_id)
         texture.path = strdup(normal->valuestring);
         mat->normal_map = texture;
     }
+
+    fprintf(stderr, "Material loaded: %s (shader: %s)\n", mat->name, mat->shader.name ? mat->shader.name : "unknown");
     cJSON *properties = cJSON_GetObjectItemCaseSensitive(material_json, "properties");
     mat->property_count = cJSON_GetArraySize(properties);
     mat->properties = malloc(sizeof(PropertyValue) * mat->property_count);
@@ -233,6 +204,9 @@ Scene *resource_get_scene(char *id) {
         fprintf(stderr, "resource_get_scene: id is NULL\n");
         return NULL;
     }
+
+    fprintf(stderr, "Loading scene: %s\n", id);
+
     char *scene_path = get_path_from_id(id, "scenes");
     if (!scene_path) {
         fprintf(stderr, "resource_get_scene: could not get path for scene_id: %s\n", id);
@@ -252,6 +226,8 @@ Scene *resource_get_scene(char *id) {
     }
 
     int gameObjects_count = cJSON_GetArraySize(gameObjects_json);
+    fprintf(stderr, "Scene has %d GameObjects\n", gameObjects_count);
+
     Scene *scene = malloc(sizeof(Scene));
     if (!scene) {
         fprintf(stderr, "resource_get_scene: failed to allocate memory for scene\n");
@@ -286,10 +262,8 @@ Scene *resource_get_scene(char *id) {
         if (transform) {
             cJSON *position_json = cJSON_GetObjectItemCaseSensitive(gameObject_json, "position");
             if (position_json) {
-                printf("parsing vec3 array of floats from gameObject %s", gameObject->name);
                 Vector3 position = parse_vector3_array(position_json);
                 transform_set_position(transform, position);
-                printf("\n\n\n transform.position in resrouce_manager.c: %f, %f, %f \n\n\n", position.x, position.y, position.z);
             }
 
             cJSON *rotation_json = cJSON_GetObjectItemCaseSensitive(gameObject_json, "rotation");
@@ -351,9 +325,10 @@ Mesh *resource_get_mesh(char *mesh_id)
         return NULL;
     }
     cJSON *vertices_json = cJSON_GetObjectItemCaseSensitive(mesh_json, "vertices");
+    int vertex_count = cJSON_GetArraySize(vertices_json);
     int i = 0;
     cJSON *iterator;
-    Vertex *vertices = malloc(sizeof(Vertex) * cJSON_GetArraySize(vertices_json));
+    Vertex *vertices = malloc(sizeof(Vertex) * vertex_count);
     cJSON_ArrayForEach(iterator, vertices_json)
     {
         vertices[i].position = parse_vector3_array(cJSON_GetObjectItemCaseSensitive(iterator, "position"));
@@ -362,14 +337,16 @@ Mesh *resource_get_mesh(char *mesh_id)
         i++;
     }
     cJSON *indices_json = cJSON_GetObjectItemCaseSensitive(mesh_json, "indices");
+    int index_count = cJSON_GetArraySize(indices_json);
     i = 0;
-    GLuint *indices = malloc(sizeof(GLuint) * cJSON_GetArraySize(indices_json));
+    GLuint *indices = malloc(sizeof(GLuint) * index_count);
     cJSON_ArrayForEach(iterator, indices_json)
     {
         indices[i] = iterator->valueint;
         i++;
     }
-    fprintf(stderr, "resource_get_mesh: Loading materials for mesh: %s\n", mesh_id);
+
+    fprintf(stderr, "Mesh loaded: %s (%d vertices, %d indices)\n", name->valuestring, vertex_count, index_count);
     cJSON *materials_json = cJSON_GetObjectItemCaseSensitive(mesh_json, "materials");
     Material **materials = malloc(sizeof(Material *) * cJSON_GetArraySize(materials_json));
     int materialCount = 0;
@@ -377,11 +354,9 @@ Mesh *resource_get_mesh(char *mesh_id)
     {
         if (cJSON_IsString(iterator) && (iterator->valuestring != NULL))
         {
-            fprintf(stderr, "resource_get_mesh: Loading material: %s\n", iterator->valuestring);
             Material *mat = resource_get_material(iterator->valuestring);
             if (mat)
             {
-                fprintf(stderr, "resource_get_mesh: Material loaded successfully\n");
                 materials[materialCount] = mat;
                 materialCount++;
             }
@@ -391,7 +366,6 @@ Mesh *resource_get_mesh(char *mesh_id)
             }
         }
     }
-    fprintf(stderr, "resource_get_mesh: All materials loaded, adding mesh to library\n");
 
     add_mesh_to_library(strdup(name->valuestring), vertices, indices, cJSON_GetArraySize(indices_json), mesh_id, materials, materialCount);
 
@@ -474,18 +448,11 @@ void resource_load_prefab(char *prefab_id)
     }
 
     cJSON_Delete(prefab_json);
-
-    fprintf(stderr, "resource_load_prefab: Loaded prefab - id: %s, name: %s, components: %d\n",
-            prefab_id,
-            prefab->name ? prefab->name : "NULL",
-            prefab->components_length);
-
     hashmap_insert(prefab_cache, strdup(prefab_id), prefab);
 }
 
 GameObject *resource_get_prefab(char *prefab_id)
 {
-    fprintf(stderr, "resource_get_prefab: Called with prefab_id: %s\n", prefab_id ? prefab_id : "NULL");
     if (!prefab_id)
     {
         fprintf(stderr, "resource_get_prefab: prefab_id is NULL\n");
@@ -493,30 +460,16 @@ GameObject *resource_get_prefab(char *prefab_id)
     }
     if (!prefab_cache)
     {
-        fprintf(stderr, "resource_get_prefab: Initializing prefab_cache\n");
         initialize_resource_manager();
     }
-    fprintf(stderr, "resource_get_prefab: Checking if prefab_id '%s' is in cache (prefab_cache=%p, size=%d)\n",
-            prefab_id, (void*)prefab_cache, prefab_cache ? prefab_cache->size : -1);
-    fflush(stderr);
     if (prefab_cache && hashmap_contains(prefab_cache, (void *)prefab_id))
     {
-        GameObject *prefab = (GameObject *)hashmap_get(prefab_cache, (void *)prefab_id);
-        fprintf(stderr, "resource_get_prefab: Retrieved from cache - id: %s, name: %s, components: %d\n",
-                prefab_id,
-                prefab->name ? prefab->name : "NULL",
-                prefab->components_length);
-        return prefab;
+        return (GameObject *)hashmap_get(prefab_cache, (void *)prefab_id);
     }
     resource_load_prefab(prefab_id);
     if (hashmap_contains(prefab_cache, (void *)prefab_id))
     {
-        GameObject *prefab = (GameObject *)hashmap_get(prefab_cache, (void *)prefab_id);
-        fprintf(stderr, "resource_get_prefab: Retrieved after loading - id: %s, name: %s, components: %d\n",
-                prefab_id,
-                prefab->name ? prefab->name : "NULL",
-                prefab->components_length);
-        return prefab;
+        return (GameObject *)hashmap_get(prefab_cache, (void *)prefab_id);
     }
     fprintf(stderr, "resource_get_prefab: failed to load prefab: %s\n", prefab_id);
     return NULL;
