@@ -32,15 +32,13 @@ Mesh *try_get_mesh(char *mesh_id) {
         fprintf(stderr, "Mesh library not initialized\n");
         return NULL;
     }
-    
+
     for (int i=0; i<=count-1; i++) {
         if (strcmp(mesh_library[i].id, mesh_id) == 0) {
-            fprintf(stderr, "Found mesh %s in library\n", mesh_id);
             return &mesh_library[i];
         }
     }
-    fprintf(stderr, "Mesh %s not found in library\n", mesh_id);
-    
+
     return NULL;
 }
 
