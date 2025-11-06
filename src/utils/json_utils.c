@@ -114,12 +114,15 @@ Vector3 parse_vector3_array(cJSON *json) {
 
         if (cJSON_IsNumber(item0)) {
             v.x = (float)item0->valuedouble;
+            printf("\nv.x value: %f \n", v.x);
         }
         if (cJSON_IsNumber(item1)) {
             v.y = (float)item1->valuedouble;
+            printf("\nv.y value: %f \n", v.y);
         }
         if (cJSON_IsNumber(item2)) {
             v.z = (float)item2->valuedouble;
+            printf("\nv.z value: %f \n", v.z);
         }
     }
 
