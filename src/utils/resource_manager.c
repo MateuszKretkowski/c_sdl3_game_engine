@@ -286,8 +286,10 @@ Scene *resource_get_scene(char *id) {
         if (transform) {
             cJSON *position_json = cJSON_GetObjectItemCaseSensitive(gameObject_json, "position");
             if (position_json) {
+                printf("parsing vec3 array of floats from gameObject %s", gameObject->name);
                 Vector3 position = parse_vector3_array(position_json);
                 transform_set_position(transform, position);
+                printf("\n\n\n transform.position in resrouce_manager.c: %f, %f, %f \n\n\n", position.x, position.y, position.z);
             }
 
             cJSON *rotation_json = cJSON_GetObjectItemCaseSensitive(gameObject_json, "rotation");

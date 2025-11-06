@@ -11,6 +11,22 @@
 
 void transform_awake(Component* self) {
     transform_component *t = (transform_component*)self;
+
+    vec3 pos = {t->position.x, t->position.y, t->position.z};
+
+    glm_translate(t->model, pos);
+    printf("position: %f, %f, %f at transform_awake()\n", t->position.x, t->position.y, t->position.z);
+    printf("scale: %f, %f, %f", t->scale.x, t->scale.y, t->scale.z);
+
+    vec3 x_axis = {1.0f, 0.0f, 0.0f};
+    vec3 y_axis = {0.0f, 1.0f, 0.0f};
+    vec3 z_axis = {0.0f, 0.0f, 1.0f};
+    glm_rotate(t->model, glm_rad(t->rotation.x), x_axis);
+    glm_rotate(t->model, glm_rad(t->rotation.y), y_axis);
+    glm_rotate(t->model, glm_rad(t->rotation.z), z_axis);
+    
+    vec3 scale = {t->scale.x, t->scale.y, t->scale.z};
+    glm_scale(t->model, scale);
 }
 
 void transform_start(Component* self) {
@@ -21,8 +37,8 @@ void transform_update(Component* self) {
     transform_component *t = (transform_component*)self;
     glm_mat4_identity(t->model);
     
-    vec3 scale = {t->scale.x, t->scale.y, t->scale.z};
-    glm_scale(t->model, scale);
+    vec3 pos = {t->position.x, t->position.y, t->position.z};
+    glm_translate(t->model, pos);
     
     vec3 x_axis = {1.0f, 0.0f, 0.0f};
     vec3 y_axis = {0.0f, 1.0f, 0.0f};
@@ -31,8 +47,8 @@ void transform_update(Component* self) {
     glm_rotate(t->model, glm_rad(t->rotation.y), y_axis);
     glm_rotate(t->model, glm_rad(t->rotation.z), z_axis);
     
-    vec3 pos = {t->position.x, t->position.y, t->position.z};
-    glm_translate(t->model, pos);
+    vec3 scale = {t->scale.x, t->scale.y, t->scale.z};
+    glm_scale(t->model, scale);
 }
 
 void transform_destroy(Component* self) {
@@ -105,6 +121,7 @@ Component* transform_from_json(cJSON *json) {
     cJSON *pos_json = cJSON_GetObjectItemCaseSensitive(json, "position");
     if (pos_json) {
         position = parse_vector3_array(pos_json);
+        printf("\ntransform_from_json position: %f %f %f\n", position.x, position.y, position.z);
     }
 
     cJSON *rot_json = cJSON_GetObjectItemCaseSensitive(json, "rotation");

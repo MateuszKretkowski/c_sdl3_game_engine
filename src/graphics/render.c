@@ -39,6 +39,28 @@ void render_load_scene(Scene *scene) {
         render_stack_count++;
         fprintf(stderr, "renderstackcount: %d\n", render_stack_count);
     }
+
+    // Call awake() for all components
+    for (int i=0; i<render_stack_count; i++) {
+        GameObject *gameObject = render_stack[i];
+        for (int j=0; j<gameObject->components_length; j++) {
+            Component *comp = gameObject->components[j];
+            if (comp && comp->standard_voids && comp->standard_voids->awake) {
+                comp->standard_voids->awake((Component*)comp);
+            }
+        }
+    }
+
+    // Call start() for all components after all awake() calls
+    for (int i=0; i<render_stack_count; i++) {
+        GameObject *gameObject = render_stack[i];
+        for (int j=0; j<gameObject->components_length; j++) {
+            Component *comp = gameObject->components[j];
+            if (comp && comp->standard_voids && comp->standard_voids->start) {
+                comp->standard_voids->start((Component*)comp);
+            }
+        }
+    }
 }
 
 void render_add_object(GameObject *gameObject) {
@@ -52,6 +74,22 @@ void render_add_object(GameObject *gameObject) {
     }
     render_stack[render_stack_count] = gameObject;
     render_stack_count++;
+
+    // Call awake() for all components
+    for (int j=0; j<gameObject->components_length; j++) {
+        Component *comp = gameObject->components[j];
+        if (comp && comp->standard_voids && comp->standard_voids->awake) {
+            comp->standard_voids->awake((Component*)comp);
+        }
+    }
+
+    // Call start() for all components after awake()
+    for (int j=0; j<gameObject->components_length; j++) {
+        Component *comp = gameObject->components[j];
+        if (comp && comp->standard_voids && comp->standard_voids->start) {
+            comp->standard_voids->start((Component*)comp);
+        }
+    }
 }
 
 void render_remove_object(GameObject *gameObject) {
@@ -72,7 +110,7 @@ void render_remove_object(GameObject *gameObject) {
     }
 }
 
-void render_init() {
+void render_init(void) {
     render_stack_count = 0;
     glEnable(GL_DEPTH_TEST);
 }
@@ -80,6 +118,10 @@ void render_init() {
 void render_frame(void) {
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    if (render_stack_count < 1 || !render_stack) {
+        return;
+    }
     
     for (int i=0; i<render_stack_count; i++) {
         mesh_renderer_component *mesh_renderer = get_component(render_stack[i], mesh_renderer_component, "mesh_renderer_component");
@@ -124,6 +166,16 @@ void render_frame(void) {
 }
 
 void render_shutdown(void) {
+    for (int i=0; i<render_stack_count; i++) {
+        GameObject *gameObject = render_stack[i];
+        for (int j=0; j<gameObject->components_length; j++) {
+            Component *comp = gameObject->components[j];
+            if (comp && comp->standard_voids && comp->standard_voids->destroy) {
+                comp->standard_voids->destroy((Component*)comp);
+            }
+        }
+    }
+    
     for (int i=0; i<render_stack_count; i++) {
         mesh_renderer_component *mesh_renderer = get_component(render_stack[i], mesh_renderer_component, "mesh_renderer_component");
         if (!mesh_renderer || !mesh_renderer->mesh->materials) {
