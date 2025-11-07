@@ -414,7 +414,7 @@ void resource_load_prefab(char *prefab_id)
         return;
     }
 
-    GameObject *prefab = instantiate_gameObject(name->valuestring);
+    GameObject *prefab = instantiate_gameObject(prefab_id, name->valuestring);
     if (!prefab) {
         fprintf(stderr, "resource_load_prefab: failed to instantiate gameObject for prefab: %s\n", prefab_id);
         cJSON_Delete(prefab_json);

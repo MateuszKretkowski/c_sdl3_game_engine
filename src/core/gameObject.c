@@ -6,23 +6,25 @@
 #include "component.h"
 #include <libs/cJSON.h>
 
-GameObject *instantiate_gameObject(char* name) {
+GameObject *instantiate_gameObject(char* id) {
     GameObject *gameObject = malloc(sizeof(GameObject));
     if (!gameObject) {
         fprintf(stderr, "instantiate_gameObject: failed to allocate memory for GameObject\n");
         return NULL;
     }
-    gameObject->name = malloc(strlen(name) * sizeof(char) + sizeof(char));
-    if (!gameObject->name) {
+    gameObject->id = malloc(strlen(id) * sizeof(char) + sizeof(char));
+    if (!gameObject->id) {
         fprintf(stderr, "instantiate_gameObject: failed to allocate memory for name: %s\n", name);
         free(gameObject);
         return NULL;
     }
-    strcpy(gameObject->name, name);
+    
+
+    strcpy(gameObject->id, id);
     gameObject->components = malloc(sizeof(Component*) * 8);
     if (!gameObject->components) {
         fprintf(stderr, "instantiate_gameObject: failed to allocate memory for components array\n");
-        free(gameObject->name);
+        free(gameObject->id);
         free(gameObject);
         return NULL;
     }
