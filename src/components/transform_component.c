@@ -86,8 +86,8 @@ Vector3 transform_get_scale(transform_component *t) {
 
 transform_component *create_transform_component(Vector3 pos, Vector3 rot, Vector3 scale) {
     transform_component* t = malloc(sizeof(transform_component));
-    t->base.id = "transform_component";
-    t->base.name = "Transform";
+    t->base.id = strdup("transform_component");
+    t->base.name = strdup("Transform");
     t->base.isActive = true;
     t->base.gameObject = NULL;
     t->base.size = sizeof(transform_component);
