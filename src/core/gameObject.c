@@ -14,10 +14,11 @@ GameObject *instantiate_gameObject(char* id) {
     }
     gameObject->id = malloc(strlen(id) * sizeof(char) + sizeof(char));
     if (!gameObject->id) {
-        fprintf(stderr, "instantiate_gameObject: failed to allocate memory for name: %s\n", name);
+        fprintf(stderr, "instantiate_gameObject: failed to allocate memory for id: %s\n", id);
         free(gameObject);
         return NULL;
     }
+    gameObject->name = NULL;
     
 
     strcpy(gameObject->id, id);
