@@ -414,20 +414,15 @@ void resource_load_prefab(char *prefab_id)
         return;
     }
 
-    GameObject *prefab = instantiate_gameObject(prefab_id, name->valuestring);
+    GameObject *prefab = instantiate_gameObject(prefab_id);
     if (!prefab) {
         fprintf(stderr, "resource_load_prefab: failed to instantiate gameObject for prefab: %s\n", prefab_id);
         cJSON_Delete(prefab_json);
         return;
     }
 
-    // Set the id from the JSON
-    cJSON *id_json = cJSON_GetObjectItemCaseSensitive(prefab_json, "id");
-    if (cJSON_IsString(id_json) && id_json->valuestring) {
-        prefab->id = strdup(id_json->valuestring);
-    } else {
-        prefab->id = NULL;
-    }
+    // Set the name from JSON
+    prefab->name = strdup(name->valuestring);
 
     cJSON *components_json = cJSON_GetObjectItemCaseSensitive(prefab_json, "components");
     if (cJSON_IsArray(components_json))
