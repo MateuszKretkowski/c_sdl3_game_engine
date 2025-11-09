@@ -43,8 +43,8 @@ void sample_destroy(Component* self) {
 
 sample_component *create_sample_component() {
     sample_component* comp = malloc(sizeof(sample_component));
-    comp->base.id = "sample_component";
-    comp->base.name = "Sample";
+    comp->base.id = strdup("sample_component");
+    comp->base.name = strdup("Sample");
     comp->base.isActive = true;
     comp->base.gameObject = NULL;
     comp->base.size = sizeof(sample_component);

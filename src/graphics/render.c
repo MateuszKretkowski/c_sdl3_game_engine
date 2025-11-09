@@ -48,10 +48,16 @@ void render_load_scene(Scene *scene) {
 
     fprintf(stderr, "=== Loading Scene: %s ===\n", scene->id);
 
-    for (int i=0; i<render_stack_count; i++) {
-        free_gameObject(&scene->gameObjects[i]);
+    // Free old GameObjects from previous scene
+    for (int i = 0; i < render_stack_count; i++) {
+        if (render_stack[i]) {
+            free_gameObject(render_stack[i]);
+            render_stack[i] = NULL;
+        }
     }
     render_stack_count = 0;
+
+    // Load new GameObjects from the scene
     for (int i=0; i<scene->gameObjects_length; i++) {
         render_stack[i] = &scene->gameObjects[i];
         render_stack_count++;
@@ -177,7 +183,11 @@ void render_frame(void) {
         shader_use(&mesh_renderer->mesh->materials[0]->shader);
 
         if (!active_camera) {
-            render_get_active_camera();
+            active_camera = render_get_active_camera();
+            if (!active_camera) {
+                fprintf(stderr, "render_frame: No active camera found, skipping rendering for '%s'\n", render_stack[i]->name);
+                continue;
+            }
         }
 
         GLuint transformLoc = glGetUniformLocation(mesh_renderer->mesh->materials[0]->shader.id, "transform");
