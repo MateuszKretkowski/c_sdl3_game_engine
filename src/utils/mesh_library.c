@@ -54,7 +54,7 @@ Mesh *add_mesh_to_library(char* meshName, Vertex *vertices, GLuint *indices, int
 
     if (count == capacity) {
         capacity *= 2;
-        mesh_library = realloc(mesh_library, capacity);
+        mesh_library = realloc(mesh_library, sizeof(Mesh) * capacity);
     }
 
     GLuint vbo = create_vbo(vertices, indexCount);

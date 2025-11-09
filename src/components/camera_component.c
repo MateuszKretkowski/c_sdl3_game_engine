@@ -48,8 +48,8 @@ void camera_destroy(Component* self) {
 
 camera_component *create_camera_component(Vector3 target, Vector3 up, float fov, float aspect_ratio, float near_plane, float far_plane, bool is_orthographic) {
     camera_component* cam = malloc(sizeof(camera_component));
-    cam->base.id = "camera_component";
-    cam->base.name = "Camera";
+    cam->base.id = strdup("camera_component");
+    cam->base.name = strdup("Camera");
     cam->base.isActive = true;
     cam->base.gameObject = NULL;
     cam->base.size = sizeof(camera_component);

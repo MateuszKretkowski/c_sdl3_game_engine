@@ -32,8 +32,8 @@ mesh_renderer_component *create_mesh_renderer_component(Mesh *mesh) {
         fprintf(stderr, "create_mesh_renderer_component: failed to allocate memory for component\n");
         return NULL;
     }
-    t->base.id = "mesh_renderer_component";
-    t->base.name = "MeshRenderer";
+    t->base.id = strdup("mesh_renderer_component");
+    t->base.name = strdup("MeshRenderer");
     t->base.isActive = true;
     t->base.gameObject = NULL;
     t->base.standard_voids = malloc(sizeof(component_standard_voids));
