@@ -11,7 +11,7 @@ typedef struct {
     mat4 view;
     mat4 projection;
 
-    Vector3 target;
+    transform_component *target;
     Vector3 up;
 
     float fov;
@@ -22,7 +22,7 @@ typedef struct {
     bool is_orthographic;
 } camera_component;
 
-camera_component *create_camera_component(Vector3 target, Vector3 up, float fov, float aspect_ratio, float near_plane, float far_plane, bool is_orthographic);
+camera_component *create_camera_component(transform_component *target, Vector3 up, float fov, float aspect_ratio, float near_plane, float far_plane, bool is_orthographic);
 
 void camera_get_view_matrix(camera_component *cam, mat4 out);
 void camera_get_projection_matrix(camera_component *cam, mat4 out);
