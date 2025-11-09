@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include "resource_manager.h"
 #include "engine/scene_manager.h"
+#include "components/components.h"
 #include "components/transform_component.h"
 
 cJSON *open_json(const char *path);
@@ -258,29 +259,34 @@ Scene *resource_get_scene(char *id) {
         }
         scene->gameObjects[i] = *gameObject;
 
-        transform_component *transform = get_component(&scene->gameObjects[i], transform_component, "transform_component");
-        if (transform) {
-            cJSON *position_json = cJSON_GetObjectItemCaseSensitive(gameObject_json, "position");
-            if (position_json) {
-                Vector3 position = parse_vector3_array(position_json);
-                transform_set_position(transform, position);
-            }
-
-            cJSON *rotation_json = cJSON_GetObjectItemCaseSensitive(gameObject_json, "rotation");
-            if (rotation_json) {
-                Vector3 rotation = parse_vector3_array(rotation_json);
-                transform_set_rotation(transform, rotation);
-            }
-
-            cJSON *scale_json = cJSON_GetObjectItemCaseSensitive(gameObject_json, "scale");
-            if (scale_json) {
-                Vector3 scale = parse_vector3_array(scale_json);
-                transform_set_scale(transform, scale);
+        if (cJSON_IsArray(cJSON_GetObjectItemCaseSensitive(gameObject_json, "components"))) {
+            cJSON *component_json = NULL;
+            cJSON_ArrayForEach(component_json, cJSON_GetObjectItemCaseSensitive(gameObject_json, "components")) {
+                cJSON *component_id = cJSON_GetObjectItemCaseSensitive(component_json, "id");
+                if (!component_id || !component_id->valuestring) {
+                    fprintf(stderr, "No component_id in %s scene json.\n", id);
+                    break;
+                }
+                Component *component = component_registry_create(component_id->valuestring, component_json);
+                if (!component) {
+                    fprintf(stderr, "No component when trying to component_registry_create() in resource_get_scene()");
+                    break;
+                }
+                remove_component(&scene->gameObjects[i], component);
+                add_component(&scene->gameObjects[i], component);
             }
         }
 
         free(id);
-        i++;  // CRITICAL: increment i!
+        i++;
+    }
+    scene->gameObjects_length = i;
+    GameObject *temp = realloc(scene->gameObjects, sizeof(GameObject)*scene->gameObjects_length);
+    if (temp) {
+        scene->gameObjects = temp;
+    }
+    else {
+        fprintf(stderr, "Failded to realloc memory after getting gameObject components when loading scene: scene: %s", scene->id);
     }
 
     cJSON_Delete(scene_json);
