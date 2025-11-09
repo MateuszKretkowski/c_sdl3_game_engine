@@ -28,10 +28,10 @@ void camera_update(Component* self) {
     }
 
     vec3 position = {transform->position.x, transform->position.y, transform->position.z};
-    vec3 target = {cam->target.x, cam->target.y, cam->target.z};
+    vec3 target_pos = {cam->target->position.x, cam->target->position.y, cam->target->position.z};
     vec3 up = {cam->up.x, cam->up.y, cam->up.z};
 
-    glm_lookat(position, target, up, cam->view);
+    glm_lookat(position, target_pos, up, cam->view);
 
     if (cam->is_orthographic) {
         float half_width = 10.0f;
@@ -46,7 +46,7 @@ void camera_destroy(Component* self) {
     camera_component *cam = (camera_component*)self;
 }
 
-camera_component *create_camera_component(Vector3 target, Vector3 up, float fov, float aspect_ratio, float near_plane, float far_plane, bool is_orthographic) {
+camera_component *create_camera_component(transform_component *target, Vector3 up, float fov, float aspect_ratio, float near_plane, float far_plane, bool is_orthographic) {
     camera_component* cam = malloc(sizeof(camera_component));
     cam->base.id = strdup("camera_component");
     cam->base.name = strdup("Camera");
@@ -79,7 +79,7 @@ Component* camera_from_json(cJSON *json) {
         return NULL;
     }
 
-    Vector3 target = {0.0f, 0.0f, 0.0f};
+    transform_component *target = NULL;
     Vector3 up = {0.0f, 1.0f, 0.0f};
     float fov = 45.0f;
     float aspect_ratio = 16.0f / 9.0f;
@@ -89,7 +89,21 @@ Component* camera_from_json(cJSON *json) {
 
     cJSON *target_json = cJSON_GetObjectItemCaseSensitive(json, "target");
     if (target_json) {
-        target = parse_vector3_array(target_json);
+        if (cJSON_GetObjectItemCaseSensitive(target_json, "id")) {
+            target = component_registry_create("transform_component", target_json);
+        }
+        else {
+            Vector3 rot = {0, 0, 0};
+            Vector3 scale = {0, 0, 0};
+            transform_component *tc = create_transform_component(parse_vector3_array(target_json), rot, scale);
+            target = tc;
+        }
+    }
+    else {
+      Vector3 origin = {0, 0, 0};
+      Vector3 rot = {0, 0, 0};
+      Vector3 scale = {1, 1, 1};
+      target = create_transform_component(origin, rot, scale);
     }
 
     cJSON *up_json = cJSON_GetObjectItemCaseSensitive(json, "up");
