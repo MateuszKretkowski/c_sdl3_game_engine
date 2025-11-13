@@ -48,9 +48,6 @@ Component* component_registry_create(const char *id, cJSON *json) {
         return NULL;
     }
     Component *comp = create_func(json);
-    if (!comp) {
-        fprintf(stderr, "component_registry_create: failed to create component: %s\n", id);
-    }
     return comp;
 }
 
