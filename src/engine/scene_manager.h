@@ -13,5 +13,6 @@ typedef struct Scene {
 } Scene;
 
 void load_scene(char *id);
+camera_component *render_get_active_camera();
 
 #endif // SCENE_MANAGER_H
