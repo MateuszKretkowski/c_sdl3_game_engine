@@ -237,7 +237,9 @@ Scene *resource_get_scene(char *id) {
     }
     scene->id = strdup(id);
     scene->gameObjects_length = gameObjects_count;
+    
     scene->gameObjects = malloc(sizeof(GameObject) * gameObjects_count);
+    
     if (!scene->gameObjects) {
         fprintf(stderr, "resource_get_scene: failed to allocate memory for gameObjects array\n");
         free(scene);
@@ -272,7 +274,6 @@ Scene *resource_get_scene(char *id) {
                     fprintf(stderr, "No component when trying to component_registry_create() in resource_get_scene()");
                     break;
                 }
-                remove_component(&scene->gameObjects[i], component);
                 add_component(&scene->gameObjects[i], component);
             }
         }

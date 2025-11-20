@@ -71,13 +71,22 @@ void add_component(GameObject *gameObject, Component *component) {
 }
 
 void remove_component(GameObject *gameObject, Component *component) {
-    if (!gameObject || !component || gameObject->components == NULL || !component) {
+    if (!gameObject || !component || gameObject->components == NULL || !component || strcmp(component->id, "transform_component") == 0) {
         fprintf(stderr, "remove_component: invalid parameters - gameObject: %p, component: %p\n", (void*)gameObject, (void*)component);
         return;
     }
+    Component *test = get_component_base(gameObject, component->id);
+    printf("chcemy wyrzucic: %s", component->id);
+    printf("wyrzucamy: %s", test->id);
+    if (!test) {
+        printf("\ncould not get component base: %s\n", test->id);
+        return;
+    }
+        printf("\nCOULD get component base\n");
     
     for (int i=0; i<gameObject->components_length; i++) {
         if (strcmp(gameObject->components[i]->name, component->name) == 0) {
+            printf("\ngameobject.components[i]: %s", *gameObject->components[i]->id);
             local_destroy_component(gameObject->components[i]);
             gameObject->components[i] = gameObject->components[gameObject->components_length-1];
             gameObject->components_length--;
