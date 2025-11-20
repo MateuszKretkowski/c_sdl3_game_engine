@@ -123,7 +123,8 @@ Component* camera_from_json(cJSON *json) {
     }
     else {
       Vector3 origin = {0, 0, 0};
-      Vector3 rot = {0, 0, 0};
+      Vector3 rot = {0, 0, 0};            // Store the target ID string to resolve later
+
       Vector3 scale = {1, 1, 1};
       target = create_transform_component(origin, rot, scale);
     }
