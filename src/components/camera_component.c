@@ -27,11 +27,26 @@ void camera_update(Component* self) {
         return;
     }
 
-    vec3 position = {transform->position.x, transform->position.y, transform->position.z};
-    vec3 target_pos = {cam->target->position.x, cam->target->position.y, cam->target->position.z};
-    vec3 up = {cam->up.x, cam->up.y, cam->up.z};
-
-    glm_lookat(position, target_pos, up, cam->view);
+    if (!cam->target) {
+        // Only log once per frame to avoid spam
+        static bool logged = false;
+        if (!logged) {
+            fprintf(stderr, "camera_update: Camera has no target (this message will only show once)\n");
+            logged = true;
+        }
+        // Use default forward-looking camera if no target
+        vec3 position = {transform->position.x, transform->position.y, transform->position.z};
+        vec3 forward = {0.0f, 0.0f, -1.0f};
+        vec3 target_pos;
+        glm_vec3_add(position, forward, target_pos);
+        vec3 up = {cam->up.x, cam->up.y, cam->up.z};
+        glm_lookat(position, target_pos, up, cam->view);
+    } else {
+        vec3 position = {transform->position.x, transform->position.y, transform->position.z};
+        vec3 target_pos = {cam->target->position.x, cam->target->position.y, cam->target->position.z};
+        vec3 up = {cam->up.x, cam->up.y, cam->up.z};
+        glm_lookat(position, target_pos, up, cam->view);
+    }
 
     if (cam->is_orthographic) {
         float half_width = 10.0f;
@@ -44,6 +59,10 @@ void camera_update(Component* self) {
 
 void camera_destroy(Component* self) {
     camera_component *cam = (camera_component*)self;
+    if (cam->target_id) {
+        free(cam->target_id);
+        cam->target_id = NULL;
+    }
 }
 
 camera_component *create_camera_component(transform_component *target, Vector3 up, float fov, float aspect_ratio, float near_plane, float far_plane, bool is_orthographic) {
@@ -63,6 +82,7 @@ camera_component *create_camera_component(transform_component *target, Vector3 u
     glm_mat4_identity(cam->projection);
 
     cam->target = target;
+    cam->target_id = NULL;
     cam->up = up;
     cam->fov = fov;
     cam->aspect_ratio = aspect_ratio;
@@ -87,14 +107,16 @@ Component* camera_from_json(cJSON *json) {
     float far_plane = 100.0f;
     bool is_orthographic = false;
 
+    char *target_id_str = NULL;
     cJSON *target_json = cJSON_GetObjectItemCaseSensitive(json, "target");
     if (target_json) {
-        if (cJSON_GetObjectItemCaseSensitive(target_json, "id")) {
-            target = component_registry_create("transform_component", target_json);
+        if (target_json->valuestring) {
+            target_id_str = strdup(target_json->valuestring);
+            fprintf(stderr, "camera_from_json: Storing target_id '%s' for later resolution\n", target_id_str);
         }
-        else {
+        else if (cJSON_IsArray(target_json)) {
             Vector3 rot = {0, 0, 0};
-            Vector3 scale = {0, 0, 0};
+            Vector3 scale = {1, 1, 1};
             transform_component *tc = create_transform_component(parse_vector3_array(target_json), rot, scale);
             target = tc;
         }
@@ -136,7 +158,9 @@ Component* camera_from_json(cJSON *json) {
         is_orthographic = cJSON_IsTrue(ortho_json);
     }
 
-    return (Component*)create_camera_component(target, up, fov, aspect_ratio, near_plane, far_plane, is_orthographic);
+    camera_component *cam = create_camera_component(target, up, fov, aspect_ratio, near_plane, far_plane, is_orthographic);
+    cam->target_id = target_id_str;
+    return (Component*)cam;
 }
 
 void camera_get_view_matrix(camera_component *cam, mat4 out) {

@@ -274,7 +274,7 @@ Scene *resource_get_scene(char *id) {
                     fprintf(stderr, "No component when trying to component_registry_create() in resource_get_scene()");
                     break;
                 }
-                add_component(&scene->gameObjects[i], component);
+                    add_component(&scene->gameObjects[i], component);
             }
         }
 
