@@ -4,6 +4,7 @@
 #include "utils.h"
 #include "core/component.h"
 #include <cglm/cglm.h>
+#include "transform_component.h"
 
 typedef struct {
     Component base;
@@ -12,6 +13,7 @@ typedef struct {
     mat4 projection;
 
     transform_component *target;
+    char *target_id;  // ID of GameObject to target (resolved after scene load)
     Vector3 up;
 
     float fov;
