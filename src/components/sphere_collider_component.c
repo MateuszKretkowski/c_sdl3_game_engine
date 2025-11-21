@@ -26,6 +26,15 @@ void sphere_collider_destroy(Component* self) {
     sphere_collider_component *comp = (sphere_collider_component*)self;
 }
 
+bool is_point_inside_sphere(sphere_collider_component *comp, Vector3 point) {
+    const distance = sqrt(
+        (point.x - comp->pos.x)*(point.x - comp->pos.x) +
+        (point.y- comp->pos.y)*(point.y- comp->pos.y) +
+        (point.z - comp->pos.z)*(point.z - comp->pos.z)
+    );
+    return distance < comp->radius;
+}
+
 sphere_collider_component *create_sphere_collider_component(Vector3 pos, float radius) {
     sphere_collider_component* comp = malloc(sizeof(sphere_collider_component));
     comp->base.id = strdup("sphere_collider_component");
