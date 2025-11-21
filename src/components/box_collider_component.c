@@ -26,7 +26,7 @@ void box_collider_destroy(Component* self) {
     box_collider_component *comp = (box_collider_component*)self;
 }
 
-bool is_point_inside_AABB(box_collider_component *comp, Vector3 pos) {
+bool is_point_inside_box_collider(box_collider_component *comp, Vector3 pos) {
     Vector3 half = {
         comp->scale.x * 0.5f,
         comp->scale.y * 0.5f,
@@ -43,7 +43,7 @@ bool is_point_inside_AABB(box_collider_component *comp, Vector3 pos) {
     );
 }
 
-bool intersect(box_collider_component *compA, box_collider_component *compB) {
+bool intersect_AABB_AABB(box_collider_component *compA, box_collider_component *compB) {
     Vector3 halfA = {
         compA->scale.x * 0.5f,
         compA->scale.y * 0.5f,

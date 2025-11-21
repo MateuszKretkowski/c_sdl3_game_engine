@@ -1,5 +1,5 @@
-#ifndef BOX_COLLIDER_COMPONENT_H
-#define BOX_COLLIDER_COMPONENT_H
+#ifndef SPHERE_COLLIDER_COMPONENT_H
+#define SPHERE_COLLIDER_COMPONENT_H
 
 #include "utils.h"
 #include "core/component.h"
