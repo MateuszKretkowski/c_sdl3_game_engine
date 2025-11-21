@@ -5,5 +5,7 @@
 #include "meshRenderer_component.h"
 #include "sample_component.h"
 #include "transform_component.h"
+#include "box_collider_component.h"
+#include "sphere_collider_component.h"
 
 #endif

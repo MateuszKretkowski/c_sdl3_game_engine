@@ -29,10 +29,38 @@ void sphere_collider_destroy(Component* self) {
 bool is_point_inside_sphere(sphere_collider_component *comp, Vector3 point) {
     const distance = sqrt(
         (point.x - comp->pos.x)*(point.x - comp->pos.x) +
-        (point.y- comp->pos.y)*(point.y- comp->pos.y) +
+        (point.y - comp->pos.y)*(point.y - comp->pos.y) +
         (point.z - comp->pos.z)*(point.z - comp->pos.z)
     );
     return distance < comp->radius;
+}
+
+bool intersect_sphere_sphere(sphere_collider_component *compA, sphere_collider_component *compB) {
+    const distance = sqrt(
+        (compA->pos.x - compB->pos.x)*(compA->pos.x - compB->pos.x)+
+        (compA->pos.y - compB->pos.y)*(compA->pos.y - compB->pos.y)+
+        (compA->pos.z - compB->pos.z)*(compA->pos.z - compB->pos.z)
+    );
+    return distance <= compA->radius + compB->radius;
+}
+
+bool intersect_AABB_sphere(box_collider_component *compA, sphere_collider_component *compB) {
+    Vector3 halfA = {
+        compA->scale.x * 0.5f,
+        compA->scale.y * 0.5f,
+        compA->scale.z * 0.5f,
+    };
+    const x = glm_max(compA->pos.x - halfA.x, glm_min(compB->pos.x, compA->pos.x + halfA.x));
+    const y = glm_max(compA->pos.y - halfA.y, glm_min(compB->pos.y, compA->pos.y + halfA.y));
+    const z = glm_max(compA->pos.z - halfA.z, glm_min(compB->pos.z, compA->pos.z + halfA.z));
+
+    const distance = sqrt(
+        (x - compB->pos.x)*(x - compB->pos.x)+
+        (y - compB->pos.y)*(y - compB->pos.y)+
+        (z - compB->pos.z)*(z - compB->pos.z)
+    );
+
+    return distance < compB->radius;
 }
 
 sphere_collider_component *create_sphere_collider_component(Vector3 pos, float radius) {
