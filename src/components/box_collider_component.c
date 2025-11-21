@@ -85,8 +85,19 @@ Component* box_collider_from_json(cJSON *json) {
         fprintf(stderr, "ERROR: box_collider_from_json received NULL json\n");
         return NULL;
     }
-
-    return (Component*)create_box_collider_component();
+    cJSON *pos_json = cJSON_GetObjectItemCaseSensitive(json, "position");
+    if (!pos_json) {
+        printf("Could not get position_json from box_collider_component json.\n");
+        return NULL;
+    }
+    Vector3 pos = parse_vector3_array(pos_json);
+    cJSON *scale_json = cJSON_GetObjectItemCaseSensitive(json, "scale");
+    if (!scale_json) {
+        printf("Could not get scale_json from box_collider_component json.\n");
+        return NULL;
+    }
+    Vector3 scale = parse_vector3_array(scale_json);
+    return (Component*)create_box_collider_component(pos, scale);
 }
 
 __attribute__((constructor))
