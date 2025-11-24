@@ -67,5 +67,5 @@ Component* box_collider_from_json(cJSON *json) {
 
 __attribute__((constructor))
 static void register_box_collider_component() {
-    component_registry_register("sample_component", box_collider_from_json);
+    component_registry_register("box_collider_component", box_collider_from_json);
 }
