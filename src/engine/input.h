@@ -30,6 +30,8 @@ typedef struct {
 // API
 // ─────────────────────────────────────────────────────────────
 
+void input_process_event(SDL_Event *event);
+
 // Inicjalizuje gamepada — zwraca true jeśli znaleziono
 bool Gamepad_Init(Gamepad *pad, float deadzone);
 

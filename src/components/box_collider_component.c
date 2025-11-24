@@ -26,41 +26,6 @@ void box_collider_destroy(Component* self) {
     box_collider_component *comp = (box_collider_component*)self;
 }
 
-bool is_point_inside_box_collider(box_collider_component *comp, Vector3 pos) {
-    Vector3 half = {
-        comp->scale.x * 0.5f,
-        comp->scale.y * 0.5f,
-        comp->scale.z * 0.5f
-    };
-
-    return (
-        pos.x >= comp->pos.x - half.x &&
-        pos.x <= comp->pos.x + half.x  &&
-        pos.y >= comp->pos.y - half.y  &&
-        pos.y <= comp->pos.y + half.y  &&
-        pos.z >= comp->pos.z - half.z  &&
-        pos.z <= comp->pos.z + half.z 
-    );
-}
-
-bool intersect_AABB_AABB(box_collider_component *compA, box_collider_component *compB) {
-    Vector3 halfA = {
-        compA->scale.x * 0.5f,
-        compA->scale.y * 0.5f,
-        compA->scale.z * 0.5f
-    };
-    Vector3 halfB = {
-        compB->scale.x * 0.5f,
-        compB->scale.y * 0.5f,
-        compB->scale.z * 0.5f
-    };
-    return (
-        (compA->pos.x - halfA.x <= compB->pos.x + halfB.x && compA->pos.x + halfA.x >= compB->pos.x - halfB.x) &&
-        (compA->pos.y - halfA.y <= compB->pos.y + halfB.y && compA->pos.y + halfA.y >= compB->pos.y - halfB.y) &&
-        (compA->pos.z - halfA.z <= compB->pos.z + halfB.z && compA->pos.z + halfA.z >= compB->pos.z - halfB.z)    
-    );
-}
-
 box_collider_component *create_box_collider_component(Vector3 pos, Vector3 scale) {
     box_collider_component* comp = malloc(sizeof(box_collider_component));
     comp->base.id = strdup("box_collider_component");

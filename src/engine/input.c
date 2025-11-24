@@ -22,14 +22,13 @@ void input_init(void) {
     SDL_JoystickID *pads = SDL_GetGamepads(&count);
 
     if (count > 0) {
-        gamepad = SDL_OpenGamepad(pads[0]); // otwórz pierwszy pad
+        gamepad = SDL_OpenGamepad(pads[0]);
     }
 
     SDL_free(pads);
 
     memset(currentButtons, 0, sizeof(currentButtons));
     memset(previousButtons, 0, sizeof(previousButtons));
-    // Używamy sizeof(currentAxis)
     memset(currentAxis, 0, sizeof(currentAxis)); 
 }
 
@@ -66,16 +65,12 @@ void input_update_state(void) {
 
     if (!gamepad) return;
 
-    // Zapisz poprzednie przyciski
     memcpy(previousButtons, currentButtons, sizeof(previousButtons));
 
-    // Pobierz aktualny stan przycisków
     for (int i = 0; i < SDL_GAMEPAD_BUTTON_COUNT; i++) {
         currentButtons[i] = SDL_GetGamepadButton(gamepad, (SDL_GamepadButton)i);
     }
 
-    // Pobierz osie
-    // Używamy SDL_GAMEPAD_AXIS_COUNT dla iteracji po osiach
     for (int i = 0; i < SDL_GAMEPAD_AXIS_COUNT; i++) { 
         float v = SDL_GetGamepadAxis(gamepad, (SDL_GamepadAxis)i);
         currentAxis[i] = v / 32767.0f; // normalizacja do -1..1
@@ -102,7 +97,6 @@ float gamepad_get_axis(SDL_GamepadAxis axis) {
 
 float gamepad_get_axis_deadzone(SDL_GamepadAxis axis, float deadzone) {
     float v = currentAxis[axis];
-    // Funkcja fabsf jest teraz dostępna dzięki <math.h>
     if (fabsf(v) < deadzone) return 0.0f; 
     return v;
 }

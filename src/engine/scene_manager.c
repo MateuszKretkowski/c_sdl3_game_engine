@@ -16,7 +16,6 @@ camera_component *render_get_active_camera() {
             camera_component *cc = get_component(&current_scene->gameObjects[i], camera_component, "camera_component");
             if (cc) {
                 active_camera = cc;
-                fprintf(stderr, "Active camera found: %s\n", current_scene->gameObjects[i].name);
                 return cc;
             }
         }
