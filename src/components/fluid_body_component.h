@@ -1,5 +1,5 @@
-#ifndef BOX_COLLIDER_COMPONENT_H
-#define BOX_COLLIDER_COMPONENT_H
+#ifndef FLUID_BODY_COMPONENT
+#define FLUID_BODY_COMPONENT
 
 #include "utils.h"
 #include "core/component.h"
