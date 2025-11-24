@@ -41,7 +41,6 @@ Component* component_registry_create(const char *id, cJSON *json) {
         fprintf(stderr, "component_registry_create: unknown component type: %s\n", id);
         return NULL;
     }
-
     ComponentCreateFunc create_func = (ComponentCreateFunc)hashmap_get(component_registry, (void*)id);
     if (!create_func) {
         fprintf(stderr, "component_registry_create: component '%s' has NULL creation function\n", id);
