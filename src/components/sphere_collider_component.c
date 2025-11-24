@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h> 
+
 #include "sphere_collider_component.h"
 #include "component_registry.h"
 #include "components.h"
@@ -27,21 +29,23 @@ void sphere_collider_destroy(Component* self) {
 }
 
 bool is_point_inside_sphere(sphere_collider_component *comp, Vector3 point) {
-    const distance = sqrt(
+    float distance = 
         (point.x - comp->pos.x)*(point.x - comp->pos.x) +
         (point.y - comp->pos.y)*(point.y - comp->pos.y) +
-        (point.z - comp->pos.z)*(point.z - comp->pos.z)
-    );
-    return distance < comp->radius;
+        (point.z - comp->pos.z)*(point.z - comp->pos.z);
+        
+    return distance < comp->radius * comp->radius;
 }
 
 bool intersect_sphere_sphere(sphere_collider_component *compA, sphere_collider_component *compB) {
-    const distance = sqrt(
+    float distance = 
         (compA->pos.x - compB->pos.x)*(compA->pos.x - compB->pos.x)+
         (compA->pos.y - compB->pos.y)*(compA->pos.y - compB->pos.y)+
-        (compA->pos.z - compB->pos.z)*(compA->pos.z - compB->pos.z)
-    );
-    return distance <= compA->radius + compB->radius;
+        (compA->pos.z - compB->pos.z)*(compA->pos.z - compB->pos.z);
+    
+    float radiusSum = compA->radius + compB->radius;
+    
+    return distance <= radiusSum * radiusSum;
 }
 
 bool intersect_AABB_sphere(box_collider_component *compA, sphere_collider_component *compB) {
@@ -50,27 +54,37 @@ bool intersect_AABB_sphere(box_collider_component *compA, sphere_collider_compon
         compA->scale.y * 0.5f,
         compA->scale.z * 0.5f,
     };
-    const x = glm_max(compA->pos.x - halfA.x, glm_min(compB->pos.x, compA->pos.x + halfA.x));
-    const y = glm_max(compA->pos.y - halfA.y, glm_min(compB->pos.y, compA->pos.y + halfA.y));
-    const z = glm_max(compA->pos.z - halfA.z, glm_min(compB->pos.z, compA->pos.z + halfA.z));
+    
+    float x = glm_max(compA->pos.x - halfA.x, glm_min(compB->pos.x, compA->pos.x + halfA.x));
+    float y = glm_max(compA->pos.y - halfA.y, glm_min(compB->pos.y, compA->pos.y + halfA.y));
+    float z = glm_max(compA->pos.z - halfA.z, glm_min(compB->pos.z, compA->pos.z + halfA.z));
 
-    const distance = sqrt(
+    float distance = 
         (x - compB->pos.x)*(x - compB->pos.x)+
         (y - compB->pos.y)*(y - compB->pos.y)+
-        (z - compB->pos.z)*(z - compB->pos.z)
-    );
+        (z - compB->pos.z)*(z - compB->pos.z);
 
-    return distance < compB->radius;
+    return distance < compB->radius * compB->radius;
 }
 
 sphere_collider_component *create_sphere_collider_component(Vector3 pos, float radius) {
     sphere_collider_component* comp = malloc(sizeof(sphere_collider_component));
+    if (!comp) return NULL; 
+    
     comp->base.id = strdup("sphere_collider_component");
     comp->base.name = strdup("sphere_collider");
     comp->base.isActive = true;
     comp->base.gameObject = NULL;
     comp->base.size = sizeof(sphere_collider_component);
     comp->base.standard_voids = malloc(sizeof(component_standard_voids));
+    
+    if (!comp->base.standard_voids) {
+        free(comp->base.id);
+        free(comp->base.name);
+        free(comp);
+        return NULL;
+    }
+    
     comp->base.standard_voids->awake = sphere_collider_awake;
     comp->base.standard_voids->start = sphere_collider_start;
     comp->base.standard_voids->update = sphere_collider_update;
@@ -98,7 +112,7 @@ Component* sphere_collider_from_json(cJSON *json) {
         printf("Could not get radius from sphere_collider_component json.\n");
         return NULL;
     }
-    return (Component*)create_sphere_collider_component(pos, radius->valuedouble);
+    return (Component*)create_sphere_collider_component(pos, (float)radius->valuedouble);
 }
 
 __attribute__((constructor))

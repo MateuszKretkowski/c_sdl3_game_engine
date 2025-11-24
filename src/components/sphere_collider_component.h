@@ -4,6 +4,7 @@
 #include "utils.h"
 #include "core/component.h"
 #include "components.h"
+#include "box_collider_component.h"
 
 typedef struct {
     Component base;
@@ -11,11 +12,11 @@ typedef struct {
     Vector3 pos;
     float radius;
 } sphere_collider_component;
-
+        
 bool is_point_inside_sphere(sphere_collider_component *comp, Vector3 point);
 bool intersect_sphere_sphere(sphere_collider_component *compA, sphere_collider_component *compB);
 bool intersect_AABB_sphere(box_collider_component *compA, sphere_collider_component *compB);
 
-sphere_collider_component *create_sphere_collider_component();
+sphere_collider_component *create_sphere_collider_component(Vector3 pos, float radius);
 
 #endif
