@@ -9,6 +9,15 @@
 
 typedef struct {
     float cell_size;
+    int grid_width;
+    int grid_height;
+    int grid_depth;
 } spatial_system_config;
+
+typedef struct {
+    GameObject *objects;
+    int count;
+    int capacity;
+} grid_cell;
 
 #endif
