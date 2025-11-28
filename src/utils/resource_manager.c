@@ -200,6 +200,28 @@ Shader resource_get_shader(const char *shader_id)
     return shader;
 }
 
+cJSON *resource_get_scene_config(char *id) {
+    if (!id) {
+        fprintf(stderr, "resource_get_scene: id is NULL\n");
+        return NULL;
+    }
+
+    fprintf(stderr, "Loading scene: %s\n", id);
+
+    char *scene_path = get_path_from_id(id, "scenes");
+    if (!scene_path) {
+        fprintf(stderr, "resource_get_scene: could not get path for scene_id: %s\n", id);
+        return NULL;
+    }
+    cJSON *scene_json = open_json(scene_path);
+    if (!scene_json)
+    {
+        fprintf(stderr, "resource_get_scene: cannot read scene_json for scene_id: %s\n", id);
+        return NULL;
+    }
+    return scene_json;
+}
+
 Scene *resource_get_scene(char *id) {
     if (!id) {
         fprintf(stderr, "resource_get_scene: id is NULL\n");

@@ -1,14 +1,33 @@
 {
     "id": "sample_scene",
-    "gameObjects": [
-        {"id": "camera",
-        "components": [
-            {"id": "transform_component", "position": [0, 0, 3], "rotation": [0, 0, 0], "scale": [1, 1, 1]},
-            {"id": "camera_component", "target": "player", "up": [0, 1, 0], "fov": 45, "aspect_ratio": 1.777, "near_plane": 0.1, "far_plane": 100, "is_orthographic": false}
-        ]
+    "config": {
+        "physics": {
+            "gravity": [0, -9.81, 0],
+            "timestep": 0.016,
+            "max_velocity": 50.0
         },
-        {"id": "player",
-        "components": [{"id": "transform_component", "position": [-0.5, 0, 0], "rotation": [0, 0, 0], "scale": [0.5, 0.5, 0.5]}]
+        "spatial": {
+            "cell_size": 5.0,
+            "grid_width": 20,
+            "grid_height": 10,
+            "grid_depth": 20,
+            "grid_cell_capacity": 8
+        }
+    },
+    "gameObjects": [
+        {
+            "id": "camera",
+            "components": [
+                {"id": "transform_component", "position": [0, 0, 3], "rotation": [0, 0, 0], "scale": [1, 1, 1]},
+                {"id": "camera_component", "target": "player", "up": [0, 1, 0], "fov": 45, "aspect_ratio": 1.777, "near_plane": 0.1, "far_plane": 100, "is_orthographic": false}
+            ]
+        },
+        {
+            "id": "player",
+            "components": [
+                {"id": "transform_component", "position": [-0.5, 0, 0], "rotation": [0, 0, 0], "scale": [0.5, 0.5, 0.5]},
+                {"id": "rigid_body_component", "mass": 1.0, "velocity": [0, 0, 0], "use_gravity": true}
+            ]
         }
     ]
 }

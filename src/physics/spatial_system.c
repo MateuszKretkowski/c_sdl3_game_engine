@@ -1,3 +1,4 @@
+// spatial_system.c
 #include "spatial_system.h"
 
 spatial_system_config spc;
@@ -6,34 +7,60 @@ int spacial_length;
 
 void spatial_system_realloc_objects(GameObject *objects);
 
-void spatial_system_init(GameObject *objects, int gameObject_length, cJSON *json) {
-    cJSON *cell_size = cJSON_GetObjectItemCaseSensitive(json, "cell_size");
+void spatial_system_init(GameObject *objects, int gameObject_length) {
+    cJSON *json = scene_get_scene_config();
+    if (!json) {
+        printf("spatial_system_init(): ERROR: COULD NOT GET SCENE_CONFIG.");
+        return;
+    }
+    cJSON *spatial_config = cJSON_GetObjectItemCaseSensitive(json, "spatial");
+    if (!spatial_config) {
+        printf("spatial_system_init(): ERROR: SPATIAL CONFIG NOT FOUND.\n");
+        return;
+    }
+    
+    cJSON *cell_size = cJSON_GetObjectItemCaseSensitive(spatial_config, "cell_size");
     if (!cell_size || !cell_size->valuedouble) {
-        printf("spatial_system_init(): cell_size not defined.");
+        printf("spatial_system_init(): ERROR: CELL_SIZE NOT DEFINED.\n");
         return;
     }
     spc.cell_size = cell_size->valuedouble;
-    cJSON *grid_width = cJSON_GetObjectItemCaseSensitive(json, "grid_width");
+    
+    cJSON *grid_width = cJSON_GetObjectItemCaseSensitive(spatial_config, "grid_width");
     if (!grid_width || !grid_width->valueint) {
-        printf("spatial_system_init(): grid_width not defined.");
+        printf("spatial_system_init(): ERROR: GRID_WIDTH NOT DEFINED.\n");
         return;
     }
     spc.grid_width = grid_width->valueint;
-    cJSON *grid_height = cJSON_GetObjectItemCaseSensitive(json, "grid_height");
+    
+    cJSON *grid_height = cJSON_GetObjectItemCaseSensitive(spatial_config, "grid_height");
     if (!grid_height || !grid_height->valueint) {
-        printf("spatial_system_init(): grid_height not defined.");
+        printf("spatial_system_init(): ERROR: GRID_WIDTH NOT DEFINED.\n");
         return;
     }
     spc.grid_height = grid_height->valueint;
+    
+    cJSON *grid_depth = cJSON_GetObjectItemCaseSensitive(spatial_config, "grid_depth");
+    if (!grid_depth || !grid_depth->valueint) {
+        printf("spatial_system_init(): ERROR: GRID_DEPTH NOT DEFINED.\n");
+        return;
+    }
+    spc.grid_depth = grid_depth->valueint;
+    
+    cJSON *grid_cell_capacity = cJSON_GetObjectItemCaseSensitive(spatial_config, "grid_cell_capacity");
+    if (!grid_cell_capacity || !grid_cell_capacity->valueint) {
+        printf("spatial_system_init(): grid_cell_capacity not defined.\n");
+        grid_cell_capacity = 1024;
+    }
+    spc.grid_cell_capacity = grid_cell_capacity->valueint;
 
+    spacial_length = gameObject_length;
     spatial = malloc(spc.grid_width*spc.grid_height*spc.grid_depth*sizeof(grid_cell));
     spatial_system_realloc_objects(objects);
 }
 
 void spatial_system_realloc_objects(GameObject *objects) {
     for (int i = 0; i < spc.grid_width * spc.grid_height * spc.grid_depth; i++) {
-        // someday: calculating which go's didn't move in the frame, and not calculating them.
-        // for now:
         spatial[i].count = 0;
     }
     for (int i=0; i<spacial_length; i++) {

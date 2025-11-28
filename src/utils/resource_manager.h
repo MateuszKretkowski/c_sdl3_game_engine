@@ -27,6 +27,7 @@ Mesh *resource_get_mesh(char *mesh_id);
 GameObject *resource_get_prefab(char *prefab_id);
 cJSON *open_json(const char *path);
 char *get_path_from_id(const char *id, const char *bookmark);
+cJSON *resource_get_scene_config(char *id);
 Scene *resource_get_scene(char *id);
 
 #endif // RESOURCE_MANAGER_H
