@@ -1,4 +1,3 @@
-// spatial_system.c
 #include "spatial_system.h"
 
 spatial_system_config spc;
