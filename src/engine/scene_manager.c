@@ -10,6 +10,22 @@ void scene_manager_init() {
     active_camera = NULL;
 }
 
+cJSON *scene_get_scene_config() {
+    if (!current_scene->scene_config) {
+        printf("scene_get_scene_config(): Could not get scene_config.\n");
+        return NULL;
+    }
+    return current_scene->scene_config;
+}
+
+Scene *scene_get_scene() {
+    if (!current_scene) {
+        printf("scene_get_current_scene(): Could not get scene.\n");
+        return NULL;
+    }
+    return current_scene;
+}
+
 camera_component *render_get_active_camera() {
     for (int i=0; i<current_scene->gameObjects_length; i++) {
         if (current_scene->gameObjects[i].id && current_scene->gameObjects[i].id && strcmp(current_scene->gameObjects[i].id, "camera") == 0) {
@@ -47,6 +63,11 @@ void load_scene(char *id) {
         }
     }
     current_scene = scene;
+    cJSON *sc = resource_get_scene_config(id);
+    if (!sc) {
+        printf("load_scene(): Could not get scene config.\n");
+    }
+    scene->scene_config = sc;
 
     // Resolve camera target references before awake/start
     fprintf(stderr, "load_scene: Resolving camera target references\n");

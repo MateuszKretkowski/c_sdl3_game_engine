@@ -10,7 +10,11 @@ typedef struct Scene {
     char *id;
     GameObject *gameObjects;
     int gameObjects_length;
+    cJSON *scene_config;
 } Scene;
+
+cJSON *scene_get_scene_config();
+Scene *scene_get_scene();
 
 void load_scene(char *id);
 camera_component *render_get_active_camera();
