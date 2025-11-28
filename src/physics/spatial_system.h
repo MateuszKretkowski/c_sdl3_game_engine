@@ -6,12 +6,14 @@
 #include "core/gameObject.h"
 #include "components.h"
 #include "json_utils.h"
+#include "math.h"
 
 typedef struct {
     float cell_size;
     int grid_width;
     int grid_height;
     int grid_depth;
+    int grid_cell_capacity;
 } spatial_system_config;
 
 typedef struct {
