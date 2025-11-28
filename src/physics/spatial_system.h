@@ -4,6 +4,7 @@
 #include "utils/utils.h"
 #include "utils/collision_utils.h"
 #include "core/gameObject.h"
+#include "scene_manager.h"
 #include "components.h"
 #include "json_utils.h"
 #include "math.h"
