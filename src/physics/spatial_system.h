@@ -22,4 +22,7 @@ typedef struct {
     int capacity;
 } grid_cell;
 
+void spatial_system_init(GameObject *objects, int gameObject_length, cJSON *json);
+void spatial_system_update(GameObject *gameObjects);
+
 #endif

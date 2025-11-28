@@ -32,9 +32,9 @@ void spatial_system_init(GameObject *objects, int gameObject_length, cJSON *json
 
 void spatial_system_realloc_objects(GameObject *objects) {
     for (int i = 0; i < spc.grid_width * spc.grid_height * spc.grid_depth; i++) {
+        // someday: calculating which go's didn't move in the frame, and not calculating them.
         // for now:
         spatial[i].count = 0;
-        // someday: calculating which go's didn't move in the frame, and not calculating them.
     }
     for (int i=0; i<spacial_length; i++) {
         transform_component *transform = get_component(&objects[i], transform_component, "transform_component");
