@@ -5,7 +5,7 @@
 #include "utils/collision_utils.h"
 #include "core/gameObject.h"
 #include "scene_manager.h"
-#include "components.h"
+#include "components/components.h"
 #include "json_utils.h"
 #include "math.h"
 
@@ -23,7 +23,7 @@ typedef struct {
     int capacity;
 } grid_cell;
 
-void spatial_system_init(GameObject *objects, int gameObject_length, cJSON *json);
+void spatial_system_init(GameObject *objects, int gameObject_length);
 void spatial_system_update(GameObject *gameObjects);
 
 #endif

@@ -49,7 +49,7 @@ void spatial_system_init(GameObject *objects, int gameObject_length) {
     cJSON *grid_cell_capacity = cJSON_GetObjectItemCaseSensitive(spatial_config, "grid_cell_capacity");
     if (!grid_cell_capacity || !grid_cell_capacity->valueint) {
         printf("spatial_system_init(): grid_cell_capacity not defined.\n");
-        grid_cell_capacity = 1024;
+        spc.grid_cell_capacity = 1024;
     }
     spc.grid_cell_capacity = grid_cell_capacity->valueint;
 
