@@ -35,7 +35,7 @@ void physics_manager_add(GameObject *gameObject) {
     }
     if (physics_m.gameObjects_length == physics_m.gameObjects_capacity) {
         physics_m.gameObjects_capacity *= 2;
-        realloc(physics_m.gameObjects, sizeof(GameObject*)*physics_m.gameObjects_capacity);
+        physics_m.gameObjects = realloc(physics_m.gameObjects, sizeof(GameObject*)*physics_m.gameObjects_capacity);
     }
     physics_m.gameObjects[physics_m.gameObjects_length] = *gameObject;
     physics_m.gameObjects_length++;

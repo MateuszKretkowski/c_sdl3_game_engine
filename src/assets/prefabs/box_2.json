@@ -1,10 +1,10 @@
 {
-    "id": "player",
-    "name": "Player",
+    "id": "box_2",
+    "name": "box_2",
     "components": [
         {
             "id": "transform_component",
-            "position": [1, 0, 0],
+            "position": [0, 0, 0],
             "rotation": [0, 0, 0],
             "scale": [0.5, 0.5, 0.5]
         },
@@ -14,6 +14,8 @@
         },
         {
             "id": "sample_component"
-        }
+        },
+        {"id": "rigid_body_component", "mass": 1.0, "velocity": [0, 0, 0], "use_gravity": true},
+        {"id": "box_collider_component", "position": [0, 0, 0], "scale": [1, 1, 1]}
     ]
 }
