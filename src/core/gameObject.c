@@ -70,6 +70,50 @@ void add_component(GameObject *gameObject, Component *component) {
     gameObject->components_length++;
 }
 
+void remove_component_by_id(GameObject *gameObject, const char *id) {
+    if (!gameObject || !id) {
+        const char *safe_id = id ? id : "NULL_ID"; 
+        fprintf(stderr, "remove_component_by_id: Invalid parameters. GameObject: %p, ID: %s\n", (void*)gameObject, safe_id);
+        return;
+    }
+    if (strlen(id) == 0) {
+        fprintf(stderr, "remove_component_by_id: Component ID cannot be an empty string.\n");
+        return;
+    }
+    if (gameObject->components == NULL) {
+        fprintf(stderr, "remove_component_by_id: Component list is NULL on GameObject '%s'. ID: %s\n", gameObject->name, id);
+        return;
+    }
+    if (gameObject->components_length <= 0) {
+        fprintf(stderr, "remove_component_by_id: Component list is empty on GameObject '%s'. ID: %s\n", gameObject->name, id);
+        return;
+    }
+    for (int i = 0; i < gameObject->components_length; i++) {
+        
+        if (gameObject->components[i] == NULL) {
+            fprintf(stderr, "remove_component_by_id: Component at index %d is NULL. Skipping.\n", i);
+            continue;
+        }
+        if (gameObject->components[i]->name == NULL) {
+             fprintf(stderr, "remove_component_by_id: Component at index %d has NULL name. Skipping.\n", i);
+             continue; 
+        }
+        if (strcmp(gameObject->components[i]->name, id) == 0) {
+            printf("\nRemoving component: %s from GameObject: %s\n", gameObject->components[i]->name, gameObject->name);
+            local_destroy_component(gameObject->components[i]);
+            if (i == gameObject->components_length - 1) {
+                gameObject->components[i] = NULL;
+            } else {
+                gameObject->components[i] = gameObject->components[gameObject->components_length - 1];
+            }
+            
+            gameObject->components_length--;
+            return;
+        }
+    }
+    fprintf(stderr, "remove_component_by_id: Could not find component with ID/Name '%s' on GameObject '%s'.\n", id, gameObject->name);
+}
+
 void remove_component(GameObject *gameObject, Component *component) {
     if (!gameObject || !component || gameObject->components == NULL || !component || strcmp(component->id, "transform_component") == 0) {
         fprintf(stderr, "remove_component: invalid parameters - gameObject: %p, component: %p\n", (void*)gameObject, (void*)component);
