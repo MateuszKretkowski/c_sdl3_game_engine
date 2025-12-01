@@ -296,7 +296,8 @@ Scene *resource_get_scene(char *id) {
                     fprintf(stderr, "No component when trying to component_registry_create() in resource_get_scene()");
                     break;
                 }
-                    add_component(&scene->gameObjects[i], component);
+                remove_component_by_id(&scene->gameObjects[i], component_id->valuestring);
+                add_component(&scene->gameObjects[i], component);
             }
         }
 
@@ -469,6 +470,7 @@ void resource_load_prefab(char *prefab_id)
             Component *component = component_registry_create(component_id->valuestring, component_json);
             if (component)
             {
+                printf("Created Component for: %s, Component: %s\n", prefab_id, component_id->valuestring);
                 add_component(prefab, component);
             }
             else
