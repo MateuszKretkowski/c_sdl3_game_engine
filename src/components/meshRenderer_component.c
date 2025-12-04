@@ -35,6 +35,7 @@ mesh_renderer_component *create_mesh_renderer_component(Mesh *mesh) {
     t->base.id = strdup("mesh_renderer_component");
     t->base.name = strdup("MeshRenderer");
     t->base.isActive = true;
+    t->base.size = sizeof(mesh_renderer_component);
     t->base.gameObject = NULL;
     t->base.standard_voids = malloc(sizeof(component_standard_voids));
     if (!t->base.standard_voids) {
