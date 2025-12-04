@@ -34,7 +34,7 @@ void spatial_system_init(GameObject *objects, int gameObject_length) {
     
     cJSON *grid_height = cJSON_GetObjectItemCaseSensitive(spatial_config, "grid_height");
     if (!grid_height || !grid_height->valueint) {
-        printf("spatial_system_init(): ERROR: GRID_WIDTH NOT DEFINED.\n");
+        printf("spatial_system_init(): ERROR: GRID_HEIGHT NOT DEFINED.\n");
         return;
     }
     spc.grid_height = grid_height->valueint;
@@ -50,8 +50,9 @@ void spatial_system_init(GameObject *objects, int gameObject_length) {
     if (!grid_cell_capacity || !grid_cell_capacity->valueint) {
         printf("spatial_system_init(): grid_cell_capacity not defined.\n");
         spc.grid_cell_capacity = 1024;
+    } else {
+        spc.grid_cell_capacity = grid_cell_capacity->valueint;
     }
-    spc.grid_cell_capacity = grid_cell_capacity->valueint;
 
     spacial_length = gameObject_length;
     spatial = malloc(spc.grid_width*spc.grid_height*spc.grid_depth*sizeof(grid_cell));
@@ -64,6 +65,7 @@ void spatial_system_realloc_objects(GameObject *objects) {
     }
     for (int i=0; i<spacial_length; i++) {
         transform_component *transform = get_component(&objects[i], transform_component, "transform_component");
+        if (!transform) continue;
         int x = (int)round(transform->position.x / spc.cell_size);
         int y = (int)round(transform->position.y / spc.cell_size);
         int z = (int)round(transform->position.z / spc.cell_size);
@@ -82,8 +84,50 @@ void spatial_system_realloc_objects(GameObject *objects) {
             gc->capacity *= 2;
             gc->objects = realloc(gc->objects, sizeof(GameObject*)*gc->capacity);
         }
-        gc->objects[gc->count] = objects[i];
+        gc->objects[gc->count] = &objects[i];
         gc->count++;
+    }
+}
+
+void spatial_system_check_collisions(grid_cell *gc) {
+    if (!gc || !gc->objects) {
+        return;
+    }
+    if (gc->count <= 1) {
+        return;
+    }
+    for (int i=0; i<gc->count; i++) {
+        GameObject *curr = gc->objects[i];
+
+        sphere_collider_component *curr_sphere = get_component(curr, sphere_collider_component, "sphere_collider_component");
+        box_collider_component *curr_box = get_component(curr, box_collider_component, "box_collider_component");
+
+        for (int j=i+1; j<gc->count; j++) {
+            GameObject *col_curr = gc->objects[j];
+
+            sphere_collider_component *collision_sphere = get_component(col_curr, sphere_collider_component, "sphere_collider_component");
+            box_collider_component *collision_box = get_component(col_curr, box_collider_component, "box_collider_component");
+            if (curr_sphere && collision_sphere) {
+                if (intersect_sphere_sphere(curr_sphere, collision_sphere)) {
+                    // physics_manager_handle_collision();
+                }
+            }
+            else if (curr_sphere && collision_box) {
+                if (intersect_AABB_sphere(collision_box, curr_sphere)) {
+
+                }
+            }
+            else if (curr_box && collision_sphere) {
+                if (intersect_AABB_sphere(curr_box, collision_sphere)) {
+
+                }
+            }
+            else if (curr_box && collision_box) {
+                if (intersect_AABB_AABB(curr_box, collision_box)) {
+
+                }
+            }
+        }
     }
 }
 
