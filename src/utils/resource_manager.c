@@ -274,21 +274,35 @@ Scene *resource_get_scene(char *id) {
     cJSON_ArrayForEach(gameObject_json, gameObjects_json) {
         cJSON *id_json = cJSON_GetObjectItemCaseSensitive(gameObject_json, "id");
         const char *id_const = (id_json && cJSON_IsString(id_json)) ? id_json->valuestring : "GameObject";
-        char *id = strdup(id_const);
-        GameObject *gameObject = resource_get_prefab(id);
-        if (!gameObject) {
-            fprintf(stderr, "resource_get_scene: failed to instantiate gameObject with id: %s\n", id);
-            free(id);
+        char *go_id = strdup(id_const);
+        
+        GameObject *prefab = resource_get_prefab(go_id);
+        if (!prefab) {
+            fprintf(stderr, "resource_get_scene: failed to get prefab with id: %s\n", go_id);
+            free(go_id);
             continue;
         }
+        
+        GameObject *gameObject = instantiate_prefab(prefab);
+        if (!gameObject) {
+            fprintf(stderr, "resource_get_scene: failed to instantiate gameObject from prefab: %s\n", go_id);
+            free(go_id);
+            continue;
+        }
+
         scene->gameObjects[i] = *gameObject;
+        for (int j = 0; j < scene->gameObjects[i].components_length; j++) {
+            scene->gameObjects[i].components[j]->gameObject = &scene->gameObjects[i];
+        }
+
+        free(gameObject);
 
         if (cJSON_IsArray(cJSON_GetObjectItemCaseSensitive(gameObject_json, "components"))) {
             cJSON *component_json = NULL;
             cJSON_ArrayForEach(component_json, cJSON_GetObjectItemCaseSensitive(gameObject_json, "components")) {
                 cJSON *component_id = cJSON_GetObjectItemCaseSensitive(component_json, "id");
                 if (!component_id || !component_id->valuestring) {
-                    fprintf(stderr, "No component_id in %s scene json.\n", id);
+                    fprintf(stderr, "No component_id in %s scene json.\n", go_id);
                     break;
                 }
                 Component *component = component_registry_create(component_id->valuestring, component_json);
@@ -296,12 +310,13 @@ Scene *resource_get_scene(char *id) {
                     fprintf(stderr, "No component when trying to component_registry_create() in resource_get_scene()");
                     break;
                 }
+
                 remove_component_by_id(&scene->gameObjects[i], component_id->valuestring);
                 add_component(&scene->gameObjects[i], component);
             }
         }
 
-        free(id);
+        free(go_id);
         i++;
     }
     scene->gameObjects_length = i;
@@ -310,7 +325,7 @@ Scene *resource_get_scene(char *id) {
         scene->gameObjects = temp;
     }
     else {
-        fprintf(stderr, "Failded to realloc memory after getting gameObject components when loading scene: scene: %s", scene->id);
+        fprintf(stderr, "Failed to realloc memory after getting gameObject components when loading scene: scene: %s", scene->id);
     }
 
     cJSON_Delete(scene_json);
@@ -470,7 +485,6 @@ void resource_load_prefab(char *prefab_id)
             Component *component = component_registry_create(component_id->valuestring, component_json);
             if (component)
             {
-                printf("Created Component for: %s, Component: %s\n", prefab_id, component_id->valuestring);
                 add_component(prefab, component);
             }
             else
