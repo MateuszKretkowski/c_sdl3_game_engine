@@ -122,7 +122,6 @@ Vector3 parse_vector3_array(cJSON *json) {
             v.z = (float)item2->valuedouble;
         }
     }
-
     return v;
 }
 
