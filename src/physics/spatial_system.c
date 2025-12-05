@@ -2,7 +2,7 @@
 
 spatial_system_config spc;
 grid_cell *spatial;
-int spacial_length;
+int spatial_length;
 
 void spatial_system_realloc_objects(GameObject *objects);
 
@@ -54,7 +54,7 @@ void spatial_system_init(GameObject *objects, int gameObject_length) {
         spc.grid_cell_capacity = grid_cell_capacity->valueint;
     }
 
-    spacial_length = gameObject_length;
+    spatial_length = gameObject_length;
     spatial = malloc(spc.grid_width*spc.grid_height*spc.grid_depth*sizeof(grid_cell));
     spatial_system_realloc_objects(objects);
 }
@@ -63,7 +63,7 @@ void spatial_system_realloc_objects(GameObject *objects) {
     for (int i = 0; i < spc.grid_width * spc.grid_height * spc.grid_depth; i++) {
         spatial[i].count = 0;
     }
-    for (int i=0; i<spacial_length; i++) {
+    for (int i=0; i<spatial_length; i++) {
         transform_component *transform = get_component(&objects[i], transform_component, "transform_component");
         if (!transform) continue;
         int x = (int)round(transform->position.x / spc.cell_size);
@@ -77,14 +77,14 @@ void spatial_system_realloc_objects(GameObject *objects) {
         grid_cell *gc = &spatial[index];
         if (!gc->objects) {
             gc->capacity = spc.grid_cell_capacity;
-            gc->objects = malloc(sizeof(GameObject*)*gc->capacity);
+            gc->objects = malloc(sizeof(GameObject)*gc->capacity);
             gc->count = 0;
         }
         else if (gc->count >= gc->capacity) {
             gc->capacity *= 2;
-            gc->objects = realloc(gc->objects, sizeof(GameObject*)*gc->capacity);
+            gc->objects = realloc(gc->objects, sizeof(GameObject)*gc->capacity);
         }
-        gc->objects[gc->count] = &objects[i];
+        gc->objects[gc->count] = objects[i];
         gc->count++;
     }
 }
@@ -97,13 +97,13 @@ void spatial_system_check_collisions(grid_cell *gc) {
         return;
     }
     for (int i=0; i<gc->count; i++) {
-        GameObject *curr = gc->objects[i];
+        GameObject *curr = &gc->objects[i];
 
         sphere_collider_component *curr_sphere = get_component(curr, sphere_collider_component, "sphere_collider_component");
         box_collider_component *curr_box = get_component(curr, box_collider_component, "box_collider_component");
 
         for (int j=i+1; j<gc->count; j++) {
-            GameObject *col_curr = gc->objects[j];
+            GameObject *col_curr = &gc->objects[j];
 
             sphere_collider_component *collision_sphere = get_component(col_curr, sphere_collider_component, "sphere_collider_component");
             box_collider_component *collision_box = get_component(col_curr, box_collider_component, "box_collider_component");
