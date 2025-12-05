@@ -7,6 +7,7 @@
 #include "scene_manager.h"
 #include "components/components.h"
 #include "json_utils.h"
+#include "physics_manager.h"
 #include "math.h"
 
 typedef struct {
