@@ -82,4 +82,23 @@ typedef struct {
 
 char *read_file(const char* filename);
 
+// Vector2 functions
+Vector2 vector2_add(Vector2 a, Vector2 b);
+Vector2 vector2_subtract(Vector2 a, Vector2 b);
+Vector2 vector2_multiply(Vector2 v, float scalar);
+Vector2 vector2_divide(Vector2 v, float scalar);
+float vector2_dot(Vector2 a, Vector2 b);
+float vector2_length(Vector2 v);
+Vector2 vector2_normalize(Vector2 v);
+
+// Vector3 functions
+Vector3 vector3_add(Vector3 a, Vector3 b);
+Vector3 vector3_subtract(Vector3 a, Vector3 b);
+Vector3 vector3_multiply(Vector3 v, float scalar);
+Vector3 vector3_divide(Vector3 v, float scalar);
+float vector3_dot(Vector3 a, Vector3 b);
+Vector3 vector3_cross(Vector3 a, Vector3 b);
+float vector3_length(Vector3 v);
+Vector3 vector3_normalize(Vector3 v);
+
 #endif // UTILS_H

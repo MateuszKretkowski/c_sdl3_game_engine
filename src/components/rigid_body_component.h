@@ -8,9 +8,8 @@ typedef struct {
     Component base;
 
     float mass;
-    float friction;
-    bool use_gravity;
-    Vector3 resultant_force;
+    Vector3 velocity;
+    Vector3 acceleration;
 } rigid_body_component;
 
 rigid_body_component *create_rigid_body_component();
