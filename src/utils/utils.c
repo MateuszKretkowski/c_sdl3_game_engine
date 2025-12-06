@@ -24,6 +24,10 @@ char* read_file(const char* filename) {
 }
 
 // Vector2 functions
+Vector2 vector2_zero() {
+    return (Vector2){0, 0};
+}
+
 Vector2 vector2_add(Vector2 a, Vector2 b) {
     return (Vector2){a.x + b.x, a.y + b.y};
 }
@@ -57,6 +61,11 @@ Vector2 vector2_normalize(Vector2 v) {
 }
 
 // Vector3 functions
+
+Vector3 vector3_zero() {
+    return (Vector3){0, 0, 0};
+}
+
 Vector3 vector3_add(Vector3 a, Vector3 b) {
     return (Vector3){a.x + b.x, a.y + b.y, a.z + b.z};
 }

@@ -13,7 +13,7 @@ typedef struct {
     int gameObjects_length;
     int gameObjects_capacity;
 
-    Vector3 gravity;
+    Vector3 gravity_force;
     float timestep;
     float max_velocity;
 } physics_manager;
