@@ -11,7 +11,7 @@ void physics_manager_init(cJSON *json) {
     
     cJSON *gravity = cJSON_GetObjectItemCaseSensitive(physics_config, "gravity");
     if (gravity && cJSON_IsArray(gravity)) {
-        physics_m.gravity = parse_vector3_array(gravity);
+        physics_m.gravity_force = parse_vector3_array(gravity);
     }
     
     cJSON *timestep = cJSON_GetObjectItemCaseSensitive(physics_config, "timestep");
@@ -59,8 +59,33 @@ void physics_manager_remove(GameObject *gameObject) {
 void physics_manager_handle_collision(GameObject *objA, GameObject *objB) {
     rigid_body_component *rb_a = get_component(objA, rigid_body_component, "rigid_body_component");
     rigid_body_component *rb_b = get_component(objB, rigid_body_component, "rigid_body_component");
+
+
+}
+
+void calculate_inelastic_collision(float mass_a, float speed_a, float mass_b, float speed_b) {
+    float momentum = (mass_a*speed_a)-(mass_b*speed_b);
+
+}
+
+void physics_manager_calculate_objects() {
+    for (int i=0; i<physics_m.gameObjects_length; i++) {
+        GameObject *curr = &physics_m.gameObjects[i];
+        rigid_body_component *rb =  get_component(curr, rigid_body_component, "rigid_body_component");
+        transform_component *transform = get_component(curr, transform_component, "transform_component");
+        rb->acceleration = vector3_add(rb->acceleration, physics_m.gravity_force);
+        Vector3 currVelocity = vector3_add(rb->velocity, vector3_multiply(rb->acceleration, physics_m.timestep));
+        if (vector3_length(currVelocity) > physics_m.max_velocity) {
+            currVelocity = vector3_multiply(vector3_normalize(currVelocity), physics_m.max_velocity);
+        }
+        rb->velocity = currVelocity;
+        Vector3 currPos = vector3_add(transform->position, vector3_multiply(currVelocity, physics_m.timestep));
+        transform->position = currPos;
+        rb->acceleration = vector3_zero();
+    }
 }
 
 void physics_manager_update() {
+    physics_manager_calculate_objects();
     spatial_system_update(physics_m.gameObjects);
 }
