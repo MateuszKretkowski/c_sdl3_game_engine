@@ -56,6 +56,11 @@ void physics_manager_remove(GameObject *gameObject) {
     }
 }
 
+void physics_manager_handle_collision(GameObject *objA, GameObject *objB) {
+    rigid_body_component *rb_a = get_component(objA, rigid_body_component, "rigid_body_component");
+    rigid_body_component *rb_b = get_component(objB, rigid_body_component, "rigid_body_component");
+}
+
 void physics_manager_update() {
     spatial_system_update(physics_m.gameObjects);
 }
