@@ -3,12 +3,13 @@
 		"material_bricks":	"src/assets/materials/material_bricks.json"
 	},
 	"meshes":	{
-		"primitive_rectangle":	"src/assets/meshes/rectangle2D.json"
+		"primitive_rectangle":	"src/assets/meshes/rectangle2D.json",
+		"sphere":	"src/assets/meshes/sphere.json"
 	},
 	"prefabs":	{
-		"box_1":	"src/assets/prefabs/box_1.json",
-		"box_2":	"src/assets/prefabs/box_2.json",
-		"camera":	"src/assets/prefabs/camera.json"
+		"camera":	"src/assets/prefabs/camera.json",
+		"sphere_1":	"src/assets/prefabs/sphere_1.json",
+		"sphere_2":	"src/assets/prefabs/sphere_2.json"
 	},
 	"shaders":	{
 		"standard_lit":	"src/assets/shaders/standard_shader.json"
