@@ -1,0 +1,18 @@
+{
+    "id": "sphere_1",
+    "name": "sphere_1",
+    "components": [
+        {
+            "id": "transform_component",
+            "position": [1, 0, 0],
+            "rotation": [0, 0, 0],
+            "scale": [1, 1, 1]
+        },
+        {
+            "id": "mesh_renderer_component",
+            "mesh": "sphere"
+        },
+        {"id": "rigid_body_component", "mass": 1, "velocity": [0, 0, 0], "use_gravity": true},
+        {"id": "sphere_collider_component", "position": [0, 0, 0], "radius": 1}
+    ]
+}
