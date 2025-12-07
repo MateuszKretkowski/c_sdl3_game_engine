@@ -81,6 +81,14 @@ typedef struct {
     int indexCount;
 } Mesh;
 
+typedef struct {
+    char *id;
+    char *name;
+    float friction;
+    float restitution;
+    float density;
+} physics_material_component;
+
 char *read_file(const char* filename);
 
 // Vector2 functions

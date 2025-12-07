@@ -12,6 +12,7 @@ Shader resource_get_shader(const char *shader_id);
 HashMap *material_cache = NULL;
 HashMap *shader_cache = NULL;
 HashMap *prefab_cache = NULL;
+HashMap *physics_material_cache = NULL;
 
 const char *asset_index_path = "src/assets/asset_index.json";
 cJSON *asset_index_json = NULL;
@@ -21,6 +22,7 @@ void initialize_resource_manager()
     material_cache = hashmap_create(hash_string, compare_string);
     shader_cache = hashmap_create(hash_string, compare_string);
     prefab_cache = hashmap_create(hash_string, compare_string);
+    physics_material_cache = hashmap_create(hash_string, compare_string);
 }
 
 Material *resource_get_material(const char *material_id)
@@ -141,6 +143,73 @@ Material *resource_get_material(const char *material_id)
     hashmap_insert(material_cache, strdup(material_id), mat);
 
     return mat;
+}
+
+physics_material_component *resource_get_physics_material(const char *physics_material_id)
+{
+    if (!asset_index_json)
+    {
+        asset_index_json = open_json(asset_index_path);
+        if (!asset_index_json)
+        {
+            fprintf(stderr, "resource_get_physics_material: could not parse asset_index.json at path: %s\n", asset_index_path);
+            return NULL;
+        }
+    }
+    if (!physics_material_cache)
+    {
+        initialize_resource_manager();
+    }
+    else if (hashmap_contains(physics_material_cache, (void *)physics_material_id))
+    {
+        return (physics_material_component *)hashmap_get(physics_material_cache, (void *)physics_material_id);
+    }
+
+    char *path = get_path_from_id(physics_material_id, "physics_materials");
+    cJSON *physics_material_json = open_json(path);
+    if (!physics_material_json)
+    {
+        fprintf(stderr, "resource_get_physics_material: could not parse physics_material JSON at path: %s\n", path);
+        return NULL;
+    }
+
+    physics_material_component *pm = malloc(sizeof(physics_material_component));
+    if (!pm) {
+        fprintf(stderr, "resource_get_physics_material: failed to allocate memory for physics_material\n");
+        cJSON_Delete(physics_material_json);
+        return NULL;
+    }
+
+    cJSON *name = cJSON_GetObjectItemCaseSensitive(physics_material_json, "name");
+    if (cJSON_IsString(name) && (name->valuestring != NULL))
+    {
+        pm->name = strdup(name->valuestring);
+    }
+    else
+    {
+        fprintf(stderr, "resource_get_physics_material: physics_material missing name field\n");
+        pm->name = strdup("Unnamed Physics Material");
+    }
+
+    pm->id = strdup(physics_material_id);
+
+    cJSON *friction = cJSON_GetObjectItemCaseSensitive(physics_material_json, "friction");
+    pm->friction = (cJSON_IsNumber(friction)) ? friction->valuedouble : 0.5f;
+
+    cJSON *restitution = cJSON_GetObjectItemCaseSensitive(physics_material_json, "restitution");
+    pm->restitution = (cJSON_IsNumber(restitution)) ? restitution->valuedouble : 0.5f;
+
+    cJSON *density = cJSON_GetObjectItemCaseSensitive(physics_material_json, "density");
+    pm->density = (cJSON_IsNumber(density)) ? density->valuedouble : 1.0f;
+
+    fprintf(stderr, "Physics Material loaded: %s (friction: %.2f, restitution: %.2f, density: %.2f)\n",
+            pm->name, pm->friction, pm->restitution, pm->density);
+
+    cJSON_Delete(physics_material_json);
+
+    hashmap_insert(physics_material_cache, strdup(physics_material_id), pm);
+
+    return pm;
 }
 
 Shader resource_get_shader(const char *shader_id)
