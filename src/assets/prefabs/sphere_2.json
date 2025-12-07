@@ -12,7 +12,7 @@
             "id": "mesh_renderer_component",
             "mesh": "sphere"
         },
-        {"id": "rigid_body_component", "mass": 0.5, "velocity": [0, 0, 0], "use_gravity": true},
+        {"id": "rigid_body_component", "physics_material": "physics_material_plastic", "mass": 0.5, "velocity": [0, 0, 0], "use_gravity": true},
         {"id": "sphere_collider_component", "position": [0, 0, 0], "radius": 0.5}
     ]
 }

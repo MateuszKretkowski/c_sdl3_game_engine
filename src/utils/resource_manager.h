@@ -22,6 +22,7 @@ typedef struct Scene Scene;
 
 void initialize_resource_manager();
 Material *resource_get_material(const char* material_id);
+physics_material_component *resource_get_physics_material(const char *physics_material_id);
 Shader resource_get_shader(const char *shader_id);
 Mesh *resource_get_mesh(char *mesh_id);
 GameObject *resource_get_prefab(char *prefab_id);

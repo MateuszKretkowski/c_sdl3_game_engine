@@ -16,5 +16,8 @@
 	},
 	"scenes":	{
 		"sample_scene":	"src/assets/scenes/sample_scene.json"
+	},
+	"physics_materials":	{
+		"physics_material_plastic":	"src/assets/physics_materials/physics_material_plastic.json"
 	}
 }
