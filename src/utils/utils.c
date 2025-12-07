@@ -106,3 +106,14 @@ Vector3 vector3_normalize(Vector3 v) {
     return v;
 }
 
+bool vector3_compare(Vector3 a, Vector3 b) {
+    return (a.x == b.x && a.y == b.y && a.z == b.z);
+}
+
+Vector3 vector2_to_vector3(Vector2 v, float z) {
+    return (Vector3){v.x, v.y, z};
+}
+
+Vector2 vector3_to_vector2(Vector3 v) {
+    return (Vector2){v.x, v.y};
+}
