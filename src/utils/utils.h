@@ -2,6 +2,7 @@
 #define UTILS_H
 
 #include <glad/glad.h>
+#include "stdbool.h"
 
 typedef struct {
     GLuint id;
@@ -102,5 +103,11 @@ float vector3_dot(Vector3 a, Vector3 b);
 Vector3 vector3_cross(Vector3 a, Vector3 b);
 float vector3_length(Vector3 v);
 Vector3 vector3_normalize(Vector3 v);
+
+bool vector3_compare(Vector3 a, Vector3 b);
+
+// Conversion functions
+Vector3 vector2_to_vector3(Vector2 v, float z);
+Vector2 vector3_to_vector2(Vector3 v);
 
 #endif // UTILS_H
