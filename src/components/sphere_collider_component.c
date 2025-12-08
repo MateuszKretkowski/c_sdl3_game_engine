@@ -78,5 +78,5 @@ Component* sphere_collider_from_json(cJSON *json) {
 
 __attribute__((constructor))
 static void register_sphere_collider_component() {
-    component_registry_register("sphere_collider", sphere_collider_from_json);
+    component_registry_register("sphere_collider_component", sphere_collider_from_json);
 }
