@@ -27,7 +27,7 @@ void rigid_body_destroy(Component* self) {
     rigid_body_component *comp = (rigid_body_component*)self;
 }
 
-rigid_body_component *create_rigid_body_component(physics_material_component *pmc) {
+rigid_body_component *create_rigid_body_component(physics_material *pmc) {
     rigid_body_component* comp = malloc(sizeof(rigid_body_component));
     comp->base.id = strdup("rigid_body_component");
     comp->base.name = strdup("RigidBody");
@@ -40,7 +40,7 @@ rigid_body_component *create_rigid_body_component(physics_material_component *pm
     comp->base.standard_voids->update = rigid_body_update;
     comp->base.standard_voids->destroy = rigid_body_destroy;
 
-    comp->physics_material_component = pmc;
+    comp->physics_material = pmc;
 
     return comp;
 }
@@ -57,7 +57,7 @@ Component* rigid_body_from_json(cJSON *json) {
         return NULL;
     }
 
-    physics_material_component *pmc = resource_get_physics_material(pmc_id->valuestring);
+    physics_material *pmc = resource_get_physics_material(pmc_id->valuestring);
     if (!pmc) {
         printf("ERROR: rigid_body_from_json failed to load physics_material: %s\n", pmc_id->valuestring);
         return NULL;

@@ -87,7 +87,7 @@ typedef struct {
     float friction;
     float restitution;
     float density;
-} physics_material_component;
+} physics_material;
 
 char *read_file(const char* filename);
 
