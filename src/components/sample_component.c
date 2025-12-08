@@ -26,15 +26,10 @@ void sample_update(Component* self) {
         return;
     }
 
-    Vector3 current_rotation = transform_get_rotation(t);
-    current_rotation.z += 1.0f;
-    current_rotation.x += 1.0f;
-    // Vector3 scale = {0.5f, 0.5f, 0.5f};
-    // Vector3 pos = transform_get_position(t);
-    // pos.x = 1;
-    // transform_set_position(t, pos);
-    // transform_set_scale(t, scale);
-    transform_set_rotation(t, current_rotation);
+    Vector3 direction = {1, 0, 0};
+    float force = 1;
+    add_force(get_component(self->gameObject, rigid_body_component, "rigid_body_component"), direction, force);
+
 }
 
 void sample_destroy(Component* self) {
