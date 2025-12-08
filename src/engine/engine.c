@@ -5,7 +5,7 @@
 #include "resources.h"
 #include "render.h"
 #include "init.h"
-
+#include "physics/physics_manager.h"
 #include <glad/glad.h>
 
 #include <SDL3/SDL.h>
@@ -55,6 +55,7 @@ void engine_run(void) {
 
         game_update();
         render_frame();
+        physics_manager_update();
         window_swap();
     }
     fprintf(stderr, "engine_run: Main loop ended\n");
