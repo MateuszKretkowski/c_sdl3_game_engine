@@ -145,7 +145,7 @@ Material *resource_get_material(const char *material_id)
     return mat;
 }
 
-physics_material_component *resource_get_physics_material(const char *physics_material_id)
+physics_material *resource_get_physics_material(const char *physics_material_id)
 {
     if (!asset_index_json)
     {
@@ -162,7 +162,7 @@ physics_material_component *resource_get_physics_material(const char *physics_ma
     }
     else if (hashmap_contains(physics_material_cache, (void *)physics_material_id))
     {
-        return (physics_material_component *)hashmap_get(physics_material_cache, (void *)physics_material_id);
+        return (physics_material *)hashmap_get(physics_material_cache, (void *)physics_material_id);
     }
 
     char *path = get_path_from_id(physics_material_id, "physics_materials");
@@ -173,7 +173,7 @@ physics_material_component *resource_get_physics_material(const char *physics_ma
         return NULL;
     }
 
-    physics_material_component *pm = malloc(sizeof(physics_material_component));
+    physics_material *pm = malloc(sizeof(physics_material));
     if (!pm) {
         fprintf(stderr, "resource_get_physics_material: failed to allocate memory for physics_material\n");
         cJSON_Delete(physics_material_json);
