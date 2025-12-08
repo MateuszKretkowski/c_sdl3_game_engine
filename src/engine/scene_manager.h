@@ -5,6 +5,7 @@
 #include "graphics/render.h"
 #include "core/gameObject.h"
 #include "components/components.h"
+#include "physics/physics_manager.h"
 
 typedef struct Scene {
     char *id;

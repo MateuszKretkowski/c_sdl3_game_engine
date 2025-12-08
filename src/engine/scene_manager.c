@@ -93,7 +93,7 @@ void load_scene(char *id) {
             }
         }
     }
-
+    
     for (int i=0; i<scene->gameObjects_length; i++) {
         for (int j=0; j<scene->gameObjects[i].components_length; j++) {
             Component *comp = scene->gameObjects[i].components[j];
@@ -102,7 +102,7 @@ void load_scene(char *id) {
             }
         }
     }
-
+    
     for (int i=0; i<scene->gameObjects_length; i++) {
         for (int j=0; j<scene->gameObjects[i].components_length; j++) {
             Component *comp = scene->gameObjects[i].components[j];
@@ -111,12 +111,20 @@ void load_scene(char *id) {
             }
         }
     }
-    
+
+    // physics_manager initialization
+    physics_manager_init(scene->scene_config);
+
     for (int i=0; i<current_scene->gameObjects_length; i++) {
         render_object *ro = malloc(sizeof(render_object));
         ro->gameObject = &current_scene->gameObjects[i];
         ro->mesh_renderer_component = get_component(&current_scene->gameObjects[i], mesh_renderer_component, "mesh_renderer_component");
         ro->transform_component = get_component(&current_scene->gameObjects[i], transform_component, "transform_component");
         render_add_object(ro);
+
+        physics_manager_add(&current_scene->gameObjects[i]);
     }
+    
+
+    
 }     
