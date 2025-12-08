@@ -27,9 +27,9 @@ bool intersect_AABB_sphere(box_collider_component *compA, sphere_collider_compon
         compA->scale.z * 0.5f,
     };
     
-    float x = glm_max(compA->pos.x - halfA.x, glm_min(compB->pos.x, compA->pos.x + halfA.x));
-    float y = glm_max(compA->pos.y - halfA.y, glm_min(compB->pos.y, compA->pos.y + halfA.y));
-    float z = glm_max(compA->pos.z - halfA.z, glm_min(compB->pos.z, compA->pos.z + halfA.x));
+    float x = max(compA->pos.x - halfA.x, min(compB->pos.x, compA->pos.x + halfA.x));
+    float y = max(compA->pos.y - halfA.y, min(compB->pos.y, compA->pos.y + halfA.y));
+    float z = max(compA->pos.z - halfA.z, min(compB->pos.z, compA->pos.z + halfA.x));
     
     float distance = 
         (x - compB->pos.x)*(x - compB->pos.x)+
