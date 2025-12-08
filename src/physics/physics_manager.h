@@ -23,4 +23,6 @@ void physics_manager_add(GameObject *gameObject);
 void physics_manager_remove(GameObject *gameObject);
 void physics_manager_update();
 
+void physics_manager_handle_collision(GameObject *objA, GameObject *objB);
+
 #endif

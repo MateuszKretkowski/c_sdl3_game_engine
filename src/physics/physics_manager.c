@@ -59,13 +59,57 @@ void physics_manager_remove(GameObject *gameObject) {
 void physics_manager_handle_collision(GameObject *objA, GameObject *objB) {
     rigid_body_component *rb_a = get_component(objA, rigid_body_component, "rigid_body_component");
     rigid_body_component *rb_b = get_component(objB, rigid_body_component, "rigid_body_component");
+    transform_component *transform_a = get_component(objA, transform_component, "transform_component");
+    transform_component *transform_b = get_component(objB, transform_component, "transform_component");
 
+    physics_material *pm_a = rb_a->physics_material;
+    physics_material *pm_b = rb_b->physics_material;
 
-}
+    Vector3 Ua = rb_a->velocity;
+    Vector3 Ub = rb_b->velocity;
+    float ma = rb_a->mass;
+    float mb = rb_b->mass;
 
-void calculate_inelastic_collision(float mass_a, float speed_a, float mass_b, float speed_b) {
-    float momentum = (mass_a*speed_a)-(mass_b*speed_b);
+    // SPHERE_A
+    // velocity before collision is length, times the orthogonal unit (1) vector. + length times the parallel unit vector
 
+    // Uao = (Pb - Pa)/length(Pb - Pa)
+    // calculating Uao:
+    Vector3 Uao = (vector3_divide(vector3_subtract(Ub, Ua), vector3_length(vector3_subtract(Ub, Ua))));
+    // calculating Uap:
+    Vector3 Uap = vector3_zero();
+    if (!vector3_compare(vector3_cross(Ua, Uao), vector3_zero())) {
+        Vector3 Uap = vector3_divide(vector3_cross(vector3_cross(Ua, Uao), Uao), vector3_length((vector3_cross(vector3_cross(Ua, Uao), Uao))));
+    }
+
+    // Lao = dot(Uao, Ua)
+    float Lao = vector3_dot(Uao, Ua);
+    float Lap = vector3_dot(Uap, Ua);
+
+    // SPHERE_B
+    // same here, but instead of Ubo we take Uao, because if we took Ubo, then the vector would had opposite direction.
+    
+    // so we don't calculkate Ubo, we take Uao.
+
+    Vector3 Ubp = vector3_zero();
+    if (!vector3_compare(vector3_cross(Ub, Uao), vector3_zero())) {
+        Vector3 Ubp = vector3_divide(vector3_cross(vector3_cross(Ub, Uao), Uao), vector3_length((vector3_cross(vector3_cross(Ub, Uao), Uao))));
+    }
+    
+    float Lbo = vector3_dot(Uao, Ub);
+    float Lbp = vector3_dot(Ubp, Ub);
+
+    // now we have defined every variable that we need to calculate new velocities:
+
+    // na jutro: dokojnczyc Va Vb:
+
+    float avg_restitution = (pm_a->restitution + pm_b->restitution)/2;
+
+    Vector3 Va = vector3_add(vector3_multiply(Uao, ((Lao * ma + Lbo * mb + (Lbo - Lao) * mb * avg_restitution) / (ma + mb))), vector3_multiply(Uap, Lap));
+    Vector3 Vb = vector3_add(vector3_multiply(Uao, ((Lao * ma + Lbo * mb + (Lao - Lbo) * ma * avg_restitution) / (ma + mb))), vector3_multiply(Ubp, Lbp));
+
+    rb_a->velocity = Va;
+    rb_b->velocity = Vb;
 }
 
 void physics_manager_calculate_objects() {

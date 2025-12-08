@@ -109,22 +109,22 @@ void spatial_system_check_collisions(grid_cell *gc) {
             box_collider_component *collision_box = get_component(col_curr, box_collider_component, "box_collider_component");
             if (curr_sphere && collision_sphere) {
                 if (intersect_sphere_sphere(curr_sphere, collision_sphere)) {
-                    // physics_manager_handle_collision();
+                    physics_manager_handle_collision(curr, col_curr);
                 }
             }
             else if (curr_sphere && collision_box) {
                 if (intersect_AABB_sphere(collision_box, curr_sphere)) {
-
+                    physics_manager_handle_collision(curr, col_curr);
                 }
             }
             else if (curr_box && collision_sphere) {
                 if (intersect_AABB_sphere(curr_box, collision_sphere)) {
-
+                    physics_manager_handle_collision(curr, col_curr);
                 }
             }
             else if (curr_box && collision_box) {
                 if (intersect_AABB_AABB(curr_box, collision_box)) {
-
+                    physics_manager_handle_collision(curr, col_curr);
                 }
             }
         }
