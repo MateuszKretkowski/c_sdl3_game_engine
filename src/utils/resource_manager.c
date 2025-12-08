@@ -288,7 +288,12 @@ cJSON *resource_get_scene_config(char *id) {
         fprintf(stderr, "resource_get_scene: cannot read scene_json for scene_id: %s\n", id);
         return NULL;
     }
-    return scene_json;
+    cJSON *scene_config_json = cJSON_GetObjectItemCaseSensitive(scene_json, "config");
+    if (!scene_config_json) {
+        fprintf(stderr, "resource_get_scene: cannot read scene_config_json");
+        return NULL;
+    }
+    return scene_config_json;
 }
 
 Scene *resource_get_scene(char *id) {
