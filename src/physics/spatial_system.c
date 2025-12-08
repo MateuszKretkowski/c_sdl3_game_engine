@@ -1,7 +1,7 @@
 #include "spatial_system.h"
 
 spatial_system_config spc;
-grid_cell *spatial;
+grid_cell *spatial = NULL;
 int spatial_length;
 
 void spatial_system_realloc_objects(GameObject *objects);
@@ -60,6 +60,7 @@ void spatial_system_init(GameObject *objects, int gameObject_length) {
 }
 
 void spatial_system_realloc_objects(GameObject *objects) {
+    printf("spatial_system_realloc_objects.count: %d\n", sizeof(objects)/sizeof(GameObject*));
     for (int i = 0; i < spc.grid_width * spc.grid_height * spc.grid_depth; i++) {
         spatial[i].count = 0;
     }
@@ -98,32 +99,38 @@ void spatial_system_check_collisions(grid_cell *gc) {
     }
     for (int i=0; i<gc->count; i++) {
         GameObject *curr = &gc->objects[i];
+        printf("curr: %s\n", curr->id);
 
         sphere_collider_component *curr_sphere = get_component(curr, sphere_collider_component, "sphere_collider_component");
         box_collider_component *curr_box = get_component(curr, box_collider_component, "box_collider_component");
 
         for (int j=i+1; j<gc->count; j++) {
             GameObject *col_curr = &gc->objects[j];
-
+            printf("col_curr: %s\n", col_curr->id);
+            
             sphere_collider_component *collision_sphere = get_component(col_curr, sphere_collider_component, "sphere_collider_component");
             box_collider_component *collision_box = get_component(col_curr, box_collider_component, "box_collider_component");
             if (curr_sphere && collision_sphere) {
                 if (intersect_sphere_sphere(curr_sphere, collision_sphere)) {
+                    printf("COLLISION!\n");
                     physics_manager_handle_collision(curr, col_curr);
                 }
             }
             else if (curr_sphere && collision_box) {
                 if (intersect_AABB_sphere(collision_box, curr_sphere)) {
+                    printf("COLLISION!\n");
                     physics_manager_handle_collision(curr, col_curr);
                 }
             }
             else if (curr_box && collision_sphere) {
                 if (intersect_AABB_sphere(curr_box, collision_sphere)) {
+                    printf("COLLISION!\n");
                     physics_manager_handle_collision(curr, col_curr);
                 }
             }
             else if (curr_box && collision_box) {
                 if (intersect_AABB_AABB(curr_box, collision_box)) {
+                    printf("COLLISION!\n");
                     physics_manager_handle_collision(curr, col_curr);
                 }
             }
@@ -140,4 +147,7 @@ void spatial_system_free() {
 
 void spatial_system_update(GameObject *gameObjects) {
     spatial_system_realloc_objects(gameObjects);
+    for (int i=0; i<sizeof(spatial)/sizeof(grid_cell); i++) {
+        spatial_system_check_collisions(&spatial[i]);
+    }
 }
