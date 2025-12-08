@@ -18,6 +18,8 @@ typedef struct {
     float max_velocity;
 } physics_manager;
 
+extern physics_manager *physics_m;
+
 void physics_manager_init(cJSON *json);
 void physics_manager_add(GameObject *gameObject);
 void physics_manager_remove(GameObject *gameObject);
