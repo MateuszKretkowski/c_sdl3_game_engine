@@ -117,3 +117,11 @@ Vector3 vector2_to_vector3(Vector2 v, float z) {
 Vector2 vector3_to_vector2(Vector3 v) {
     return (Vector2){v.x, v.y};
 }
+
+float max(float a, float b) {
+    return a > b ? a : b;
+}
+
+float min(float a, float b) {
+    return a < b ? a : b;
+}
