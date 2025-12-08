@@ -27,7 +27,7 @@ void rigid_body_destroy(Component* self) {
     rigid_body_component *comp = (rigid_body_component*)self;
 }
 
-rigid_body_component *create_rigid_body_component(physics_material *pmc) {
+rigid_body_component *create_rigid_body_component(physics_material *pmc, bool use_gravity) {
     rigid_body_component* comp = malloc(sizeof(rigid_body_component));
     comp->base.id = strdup("rigid_body_component");
     comp->base.name = strdup("RigidBody");
@@ -41,6 +41,7 @@ rigid_body_component *create_rigid_body_component(physics_material *pmc) {
     comp->base.standard_voids->destroy = rigid_body_destroy;
 
     comp->physics_material = pmc;
+    comp->use_gravity = use_gravity;
 
     return comp;
 }
@@ -63,7 +64,16 @@ Component* rigid_body_from_json(cJSON *json) {
         return NULL;
     }
 
-    return (Component*)create_rigid_body_component(pmc);
+    cJSON *use_gravity_json = cJSON_GetObjectItemCaseSensitive(json, "use_gravity");
+    if (!use_gravity_json) {
+        printf("ERROR: rigid_body_from_json failed to load use_gravity.\n");
+        return NULL;
+    }
+
+    printf("\n\n\nUSE_GRAVITY_VALUEINT: %d\n\n\n", use_gravity_json->valueint);
+    bool use_gravity = cJSON_IsTrue(use_gravity_json);
+
+    return (Component*)create_rigid_body_component(pmc, use_gravity);
 }
 
 __attribute__((constructor))
