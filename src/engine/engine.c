@@ -27,6 +27,8 @@ bool engine_init(const char *title, int width, int height) {
     }
     fprintf(stderr, "engine_init: resources_load succeeded, calling render_init\n");
     render_init();
+    fprintf(stderr, "engine_init: calling input_init\n");
+    input_init();
     if (!game_init()) {
         fprintf(stderr, "engine_init: game_init failed\n");
         return false;
@@ -53,6 +55,7 @@ void engine_run(void) {
             }
         }
 
+        input_update_state();
         game_update();
         render_frame();
         physics_manager_update();

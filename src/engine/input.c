@@ -2,7 +2,8 @@
 #include <SDL3/SDL.h>
 #include <string.h>
 #include <stdlib.h>
-#include <math.h> // DODANO: Naprawia błąd 'fabsf'
+#include <math.h>
+#include <stdio.h>
 
 static SDL_Gamepad *gamepad = NULL;
 
@@ -23,6 +24,10 @@ void input_init(void) {
 
     if (count > 0) {
         gamepad = SDL_OpenGamepad(pads[0]);
+        if (gamepad) {
+            const char* name = SDL_GetGamepadName(gamepad);
+            printf("Gamepad initialized: %s\n", name ? name : "Unknown");
+        }
     }
 
     SDL_free(pads);
@@ -42,6 +47,8 @@ void input_process_event(SDL_Event *event) {
         case SDL_EVENT_GAMEPAD_ADDED:
             if (!gamepad) {
                 gamepad = SDL_OpenGamepad(event->gdevice.which);
+                const char* name = SDL_GetGamepadName(gamepad);
+                printf("Gamepad connected: %s\n\n\n", name ? name : "Unknown");
             }
             break;
 
@@ -80,23 +87,23 @@ void input_update_state(void) {
 // ------------------------------------------------------------
 // API dla przycisków
 // ------------------------------------------------------------
-bool gamepad_is_button_down(SDL_GamepadButton button) {
+bool input_gamepad_is_button_down(SDL_GamepadButton button) {
     return currentButtons[button];
 }
 
-bool gamepad_was_button_pressed(SDL_GamepadButton button) {
+bool input_gamepad_was_button_pressed(SDL_GamepadButton button) {
     return currentButtons[button] && !previousButtons[button];
 }
 
 // ------------------------------------------------------------
 // API dla osi
 // ------------------------------------------------------------
-float gamepad_get_axis(SDL_GamepadAxis axis) {
+float input_gamepad_get_axis(SDL_GamepadAxis axis) {
     return currentAxis[axis];
 }
 
-float gamepad_get_axis_deadzone(SDL_GamepadAxis axis, float deadzone) {
+float input_gamepad_get_axis_deadzone(SDL_GamepadAxis axis, float deadzone) {
     float v = currentAxis[axis];
-    if (fabsf(v) < deadzone) return 0.0f; 
+    if (fabsf(v) < deadzone) return 0.0f;
     return v;
 }
