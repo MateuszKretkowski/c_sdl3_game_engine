@@ -35,11 +35,19 @@ void debug_draw_sphere(Vector3 pos, float radius, Vector4 color, float time) {
     scale.x = 1 * radius;
     scale.y = 1 * radius;
     scale.z = 1 * radius;
-    ro->gameObject = NULL;
-    ro->transform_component = create_transform_component(pos, vector3_zero(), scale);
-    printf("\n\n\n\nBEFORE CREATING MESH_RENDERER\n\n\n\n");
-    ro->mesh_renderer_component = create_mesh_renderer_component(resource_get_mesh("sphere"));
-    printf("AFTER CREATING MESH_RENDERER\n");
+    GameObject *prefab = resource_get_prefab("sphere_debug_prefab");
+    ro->gameObject = instantiate_prefab(prefab);
+    ro->transform_component = get_component(ro->gameObject, transform_component, "transform_component");
+    ro->mesh_renderer_component = get_component(ro->gameObject, mesh_renderer_component, "mesh_renderer_component");
+
+    ro->transform_component->position = pos;
+    ro->transform_component->scale = scale;
+
+    if (ro->transform_component->base.standard_voids &&
+        ro->transform_component->base.standard_voids->update) {
+        ro->transform_component->base.standard_voids->update((Component*)ro->transform_component);
+    }
+
     debug_object *debug_obj = malloc(sizeof(debug_object));
     debug_obj->ro = ro;
     debug_obj->time_left = time;
