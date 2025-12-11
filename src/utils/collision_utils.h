@@ -6,6 +6,8 @@
 #include <stdbool.h>
 #include "utils.h"
 
+#include "../components/components.h"
+
 #include "../components/sphere_collider_component.h"
 #include "../components/box_collider_component.h"
 
