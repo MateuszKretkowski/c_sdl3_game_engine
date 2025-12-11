@@ -365,11 +365,19 @@ Scene *resource_get_scene(char *id) {
         }
 
         scene->gameObjects[i] = *gameObject;
+
+        // CRITICAL FIX: Deep copy the components array!
+        Component **original_components = scene->gameObjects[i].components;
+        scene->gameObjects[i].components = malloc(sizeof(Component*) * scene->gameObjects[i].components_capacity);
+        memcpy(scene->gameObjects[i].components, original_components, sizeof(Component*) * scene->gameObjects[i].components_length);
+
         for (int j = 0; j < scene->gameObjects[i].components_length; j++) {
             scene->gameObjects[i].components[j]->gameObject = &scene->gameObjects[i];
         }
 
         free(gameObject);
+
+        fprintf(stderr, "DEBUG: GameObject '%s' has %d components after prefab instantiation\n", go_id, scene->gameObjects[i].components_length);
 
         if (cJSON_IsArray(cJSON_GetObjectItemCaseSensitive(gameObject_json, "components"))) {
             cJSON *component_json = NULL;
@@ -379,6 +387,9 @@ Scene *resource_get_scene(char *id) {
                     fprintf(stderr, "No component_id in %s scene json.\n", go_id);
                     break;
                 }
+                fprintf(stderr, "DEBUG: Processing component '%s' for GameObject '%s'\n", component_id->valuestring, go_id);
+                fprintf(stderr, "DEBUG: GameObject '%s' has %d components BEFORE remove_component_by_id\n", go_id, scene->gameObjects[i].components_length);
+
                 Component *component = component_registry_create(component_id->valuestring, component_json);
                 if (!component) {
                     fprintf(stderr, "No component when trying to component_registry_create() in resource_get_scene()");
@@ -386,9 +397,13 @@ Scene *resource_get_scene(char *id) {
                 }
 
                 remove_component_by_id(&scene->gameObjects[i], component_id->valuestring);
+                fprintf(stderr, "DEBUG: GameObject '%s' has %d components AFTER remove_component_by_id\n", go_id, scene->gameObjects[i].components_length);
                 add_component(&scene->gameObjects[i], component);
+                fprintf(stderr, "DEBUG: GameObject '%s' has %d components AFTER add_component\n", go_id, scene->gameObjects[i].components_length);
             }
         }
+
+        fprintf(stderr, "DEBUG: GameObject '%s' FINAL component count: %d\n", go_id, scene->gameObjects[i].components_length);
 
         free(go_id);
         i++;
@@ -397,6 +412,13 @@ Scene *resource_get_scene(char *id) {
     GameObject *temp = realloc(scene->gameObjects, sizeof(GameObject)*scene->gameObjects_length);
     if (temp) {
         scene->gameObjects = temp;
+
+        // CRITICAL FIX: Update all component->gameObject pointers after realloc!
+        for (int j = 0; j < scene->gameObjects_length; j++) {
+            for (int k = 0; k < scene->gameObjects[j].components_length; k++) {
+                scene->gameObjects[j].components[k]->gameObject = &scene->gameObjects[j];
+            }
+        }
     }
     else {
         fprintf(stderr, "Failed to realloc memory after getting gameObject components when loading scene: scene: %s", scene->id);

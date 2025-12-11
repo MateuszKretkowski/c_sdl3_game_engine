@@ -1,0 +1,18 @@
+{
+    "id": "floor",
+    "name": "Floor",
+    "components": [
+        {
+            "id": "transform_component",
+            "position": [0, -1, 0],
+            "rotation": [0, 0, 0],
+            "scale": [1, 1, 1]
+        },
+        {
+            "id": "mesh_renderer_component",
+            "mesh": "primitive_rectangle"
+        },
+        {"id": "rigid_body_component", "physics_material": "physics_material_plastic", "mass": 1000, "velocity": [0, 0, 0], "use_gravity": false},
+        {"id": "box_collider_component", "position": [0, 0, 0], "scale": [1, 1, 1]}
+    ]
+}
