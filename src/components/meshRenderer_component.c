@@ -27,6 +27,7 @@ void meshRenderer_destroy(Component* self) {
 }
 
 mesh_renderer_component *create_mesh_renderer_component(Mesh *mesh) {
+    printf("did create_mesh_renderer_component();\n");
     mesh_renderer_component* t = malloc(sizeof(mesh_renderer_component));
     if (!t) {
         fprintf(stderr, "create_mesh_renderer_component: failed to allocate memory for component\n");

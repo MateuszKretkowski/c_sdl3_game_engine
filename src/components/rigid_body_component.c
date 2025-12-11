@@ -27,7 +27,7 @@ void rigid_body_destroy(Component* self) {
     rigid_body_component *comp = (rigid_body_component*)self;
 }
 
-rigid_body_component *create_rigid_body_component(physics_material *pmc, bool use_gravity) {
+rigid_body_component *create_rigid_body_component(physics_material *pmc, bool use_gravity, float mass, Vector3 velocity) {
     rigid_body_component* comp = malloc(sizeof(rigid_body_component));
     comp->base.id = strdup("rigid_body_component");
     comp->base.name = strdup("RigidBody");
@@ -42,6 +42,9 @@ rigid_body_component *create_rigid_body_component(physics_material *pmc, bool us
 
     comp->physics_material = pmc;
     comp->use_gravity = use_gravity;
+    comp->mass = mass;
+    comp->velocity = velocity;
+    comp->acceleration = vector3_zero();
 
     return comp;
 }
@@ -70,10 +73,27 @@ Component* rigid_body_from_json(cJSON *json) {
         return NULL;
     }
 
-    printf("\n\n\nUSE_GRAVITY_VALUEINT: %d\n\n\n", use_gravity_json->valueint);
     bool use_gravity = cJSON_IsTrue(use_gravity_json);
 
-    return (Component*)create_rigid_body_component(pmc, use_gravity);
+    // Parse mass
+    cJSON *mass_json = cJSON_GetObjectItemCaseSensitive(json, "mass");
+    float mass = 1.0f; // Default mass
+    if (mass_json && cJSON_IsNumber(mass_json)) {
+        mass = (float)mass_json->valuedouble;
+    }
+
+    // Parse velocity
+    cJSON *velocity_json = cJSON_GetObjectItemCaseSensitive(json, "velocity");
+    Vector3 velocity = vector3_zero();
+    if (velocity_json && cJSON_IsArray(velocity_json)) {
+        if (cJSON_GetArraySize(velocity_json) >= 3) {
+            velocity.x = (float)cJSON_GetArrayItem(velocity_json, 0)->valuedouble;
+            velocity.y = (float)cJSON_GetArrayItem(velocity_json, 1)->valuedouble;
+            velocity.z = (float)cJSON_GetArrayItem(velocity_json, 2)->valuedouble;
+        }
+    }
+
+    return (Component*)create_rigid_body_component(pmc, use_gravity, mass, velocity);
 }
 
 __attribute__((constructor))

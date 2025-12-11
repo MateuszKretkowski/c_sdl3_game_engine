@@ -16,6 +16,17 @@ void sample_awake(Component* self) {
 
 void sample_start(Component* self) {
     sample_component *comp = (sample_component*)self;
+    
+    if (strcmp(self->gameObject->id, "sphere_1") == 0) {
+        Vector3 direction = {1, 0, 0};
+        float force = 75;
+        add_force(get_component(self->gameObject, rigid_body_component, "rigid_body_component"), direction, force);
+    }
+    if (strcmp(self->gameObject->id, "sphere_2") == 0) {
+        Vector3 direction = {-1, 0, 0};
+        float force = 75;
+        add_force(get_component(self->gameObject, rigid_body_component, "rigid_body_component"), direction, force);
+    }
 }
 
 void sample_update(Component* self) {
@@ -25,11 +36,6 @@ void sample_update(Component* self) {
         fprintf(stderr, "no transform_component on %s gameObject\n", self->gameObject->name);
         return;
     }
-
-    Vector3 direction = {1, 0, 0};
-    float force = 1;
-    add_force(get_component(self->gameObject, rigid_body_component, "rigid_body_component"), direction, force);
-
 }
 
 void sample_destroy(Component* self) {

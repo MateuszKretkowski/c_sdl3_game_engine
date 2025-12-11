@@ -16,6 +16,6 @@ typedef struct {
     bool use_gravity;
 } rigid_body_component;
 
-rigid_body_component *create_rigid_body_component(physics_material *pmc, bool use_gravity);
+rigid_body_component *create_rigid_body_component(physics_material *pmc, bool use_gravity, float mass, Vector3 velocity);
 
 #endif
