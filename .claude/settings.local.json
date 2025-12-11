@@ -12,7 +12,8 @@
       "Bash(for i in 1 2 3 4 5)",
       "Bash(do echo \"=== Run $i ===\")",
       "Bash(for i in 1 2 3)",
-      "Bash(tree:*)"
+      "Bash(tree:*)",
+      "Bash(git checkout:*)"
     ],
     "deny": [],
     "ask": []

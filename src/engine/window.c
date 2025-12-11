@@ -8,7 +8,7 @@ static SDL_GLContext gl_context = NULL;
 bool window_init(const char *title, int width, int height) {
     fprintf(stderr, "=== Window Initialization ===\n");
 
-    if (SDL_Init(SDL_INIT_VIDEO) != 1) {
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMEPAD) != 1) {
         fprintf(stderr, "SDL_Init failed: %s\n", SDL_GetError());
         return false;
     }

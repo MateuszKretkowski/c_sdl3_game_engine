@@ -1,12 +1,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
+#include <SDL3/SDL.h>
 #include "camera_component.h"
 #include "component_registry.h"
 #include "components.h"
 #include "core/gameObject.h"
 #include "json_utils.h"
 #include "transform_component.h"
+#include "input.h"
+#include "utils/utils.h"
+#include "physics/physics_manager.h"
 
 #include <cglm/cglm.h>
 
@@ -27,6 +32,14 @@ void camera_update(Component* self) {
         return;
     }
 
+    float radius = 3.0f;
+    float speed = 5;
+    float horizontal_input = input_gamepad_get_axis_deadzone(SDL_GAMEPAD_AXIS_RIGHTX, 0.15f);
+    float vertical_input = input_gamepad_get_axis_deadzone(SDL_GAMEPAD_AXIS_RIGHTY, 0.15f);
+
+    transform->position.x += horizontal_input * speed * physics_m->timestep;
+    transform->position.y += vertical_input * speed * physics_m->timestep;
+
     if (!cam->target) {
         // Only log once per frame to avoid spam
         static bool logged = false;
@@ -36,9 +49,7 @@ void camera_update(Component* self) {
         }
         // Use default forward-looking camera if no target
         vec3 position = {transform->position.x, transform->position.y, transform->position.z};
-        vec3 forward = {0.0f, 0.0f, -1.0f};
-        vec3 target_pos;
-        glm_vec3_add(position, forward, target_pos);
+        vec3 target_pos = {0.0f, 0.0f, 0.0f};
         vec3 up = {cam->up.x, cam->up.y, cam->up.z};
         glm_lookat(position, target_pos, up, cam->view);
     } else {
@@ -47,6 +58,7 @@ void camera_update(Component* self) {
         vec3 up = {cam->up.x, cam->up.y, cam->up.z};
         glm_lookat(position, target_pos, up, cam->view);
     }
+
 
     if (cam->is_orthographic) {
         float half_width = 10.0f;
