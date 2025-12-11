@@ -10,13 +10,15 @@ bool intersect_sphere_point(sphere_collider_component *comp, Vector3 point) {
 }
 
 bool intersect_sphere_sphere(sphere_collider_component *compA, sphere_collider_component *compB) {
+    transform_component *transform_a = get_component(compA->base.gameObject, transform_component, "transform_component");
+    transform_component *transform_b = get_component(compB->base.gameObject, transform_component, "transform_component");
     float distance = 
-        (compA->pos.x - compB->pos.x)*(compA->pos.x - compB->pos.x)+
-        (compA->pos.y - compB->pos.y)*(compA->pos.y - compB->pos.y)+
-        (compA->pos.z - compB->pos.z)*(compA->pos.z - compB->pos.z);
+        (transform_a->position.x - transform_b->position.x)*(transform_a->position.x - transform_b->position.x)+
+        (transform_a->position.y - transform_b->position.y)*(transform_a->position.y - transform_b->position.y)+
+        (transform_a->position.z - transform_b->position.z)*(transform_a->position.z - transform_b->position.z);
     
     float radiusSum = compA->radius + compB->radius;
-    
+    printf("\n\n\n DISTANCE: %f, RADIUS_SUM: %f\n\n\n", distance, radiusSum*radiusSum);
     return distance <= radiusSum * radiusSum;
 }
 
