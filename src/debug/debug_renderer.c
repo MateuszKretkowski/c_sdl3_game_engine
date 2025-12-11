@@ -35,7 +35,7 @@ void debug_draw_sphere(Vector3 pos, float radius, Vector4 color, float time) {
     scale.x = 1 * radius;
     scale.y = 1 * radius;
     scale.z = 1 * radius;
-    GameObject *prefab = resource_get_prefab("sphere_debug_prefab");
+    GameObject *prefab = resource_get_prefab("sphere_1");
     ro->gameObject = instantiate_prefab(prefab);
     ro->transform_component = get_component(ro->gameObject, transform_component, "transform_component");
     ro->mesh_renderer_component = get_component(ro->gameObject, mesh_renderer_component, "mesh_renderer_component");
