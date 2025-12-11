@@ -46,7 +46,7 @@ void render_remove_object(render_object *render_object) {
             render_stack_count--;
             break;
         }
-    }
+        }
 }
 
 void render_init(void) {
@@ -66,6 +66,8 @@ void render_clear_stack(void) {
     render_stack_count = 0;
 }
 
+void render_render_object(render_object *ro);
+
 void render_frame(void) {
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -73,56 +75,25 @@ void render_frame(void) {
     if (render_stack_count < 1) {
         return;
     }
-    
+
     for (int i=0; i<render_stack_count; i++) {
-        mesh_renderer_component *mesh_renderer = render_stack[i]->mesh_renderer_component;
-        if (!mesh_renderer) {
-            continue;
-        }
-        if (!mesh_renderer->mesh) {
-            fprintf(stderr, "render_frame: GameObject '%s' has mesh_renderer but mesh is NULL\n", render_stack[i]->gameObject->name);
-            continue;
-        }
-        if (!mesh_renderer->mesh->materials) {
-            fprintf(stderr, "render_frame: GameObject '%s' mesh has no materials array\n", render_stack[i]->gameObject->name);
-            continue;
-        }
-        if (mesh_renderer->mesh->materials[0] == NULL) {
-            fprintf(stderr, "render_frame: GameObject '%s' mesh materials[0] is NULL\n", render_stack[i]->gameObject->name);
-            continue;
-        }
-        transform_component *transform = render_stack[i]->transform_component;
-        if (!transform) {
-            fprintf(stderr, "render_frame: GameObject '%s' has no transform_component\n", render_stack[i]->gameObject->name);
-            continue;
-        }
-        shader_use(&mesh_renderer->mesh->materials[0]->shader);
-
-        camera_component *active_camera = render_get_active_camera();
-        if (!active_camera) {
-            fprintf(stderr, "render_frame: No active camera found, skipping rendering for '%s'\n", render_stack[i]->gameObject->name);
-            continue;
-        }
-
-        GLuint transformLoc = glGetUniformLocation(mesh_renderer->mesh->materials[0]->shader.id, "transform");
-        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, (float*)transform->model);
-
-        GLuint viewLoc = glGetUniformLocation(mesh_renderer->mesh->materials[0]->shader.id, "view");
-        glUniformMatrix4fv(viewLoc, 1, GL_FALSE, (float*)active_camera->view);
-
-        GLuint projectionLoc = glGetUniformLocation(mesh_renderer->mesh->materials[0]->shader.id, "projection");
-        glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, (float*)active_camera->projection);
-
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, mesh_renderer->mesh->materials[0]->diffuse_map.id);
-
-        glBindVertexArray(mesh_renderer->mesh->vao);
-        glDrawElements(GL_TRIANGLES, mesh_renderer->mesh->indexCount, GL_UNSIGNED_INT, 0);
-        glBindVertexArray(0);
+        render_render_object(render_stack[i]);
     }
+    
+    // debug rendering:
+    int debug_count = debug_get_count();
+    render_object *debug_objects = debug_get_objects();
+    for (int i=0; i<debug_count; i++) {
+        render_render_object(&debug_objects[i]);
+        printf("Just rendered debug_object;\n");
+    }
+    free(debug_objects);
 
     for (int i=0; i<render_stack_count; i++) {
         GameObject *gameObject = render_stack[i]->gameObject;
+        if (!gameObject) {
+            continue;
+        }
         for (int j=0; j<gameObject->components_length; j++) {
             Component *comp = gameObject->components[j];
             if (comp && comp->standard_voids && comp->standard_voids->update) {
@@ -132,6 +103,53 @@ void render_frame(void) {
     }
 }
 
+void render_render_object(render_object *ro) {
+    mesh_renderer_component *mesh_renderer = ro->mesh_renderer_component;
+    if (!mesh_renderer) {
+        return;
+    }
+    if (!mesh_renderer->mesh) {
+        fprintf(stderr, "render_frame: GameObject '%s' has mesh_renderer but mesh is NULL\n", ro->gameObject->name);
+        return;
+    }
+    if (!mesh_renderer->mesh->materials) {
+        fprintf(stderr, "render_frame: GameObject '%s' mesh has no materials array\n", ro->gameObject->name);
+        return;
+    }
+    if (mesh_renderer->mesh->materials[0] == NULL) {
+        fprintf(stderr, "render_frame: GameObject '%s' mesh materials[0] is NULL\n", ro->gameObject->name);
+        return;
+    }
+    transform_component *transform = ro->transform_component;
+    if (!transform) {
+        fprintf(stderr, "render_frame: GameObject '%s' has no transform_component\n", ro->gameObject->name);
+            return;
+    }
+    shader_use(&mesh_renderer->mesh->materials[0]->shader);
+
+    camera_component *active_camera = render_get_active_camera();
+    if (!active_camera) {
+        fprintf(stderr, "render_frame: No active camera found, skipping rendering for '%s'\n", ro->gameObject->name);
+        return;
+    }
+
+    GLuint transformLoc = glGetUniformLocation(mesh_renderer->mesh->materials[0]->shader.id, "transform");
+    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, (float*)transform->model);
+
+    GLuint viewLoc = glGetUniformLocation(mesh_renderer->mesh->materials[0]->shader.id, "view");
+    glUniformMatrix4fv(viewLoc, 1, GL_FALSE, (float*)active_camera->view);
+
+    GLuint projectionLoc = glGetUniformLocation(mesh_renderer->mesh->materials[0]->shader.id, "projection");
+    glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, (float*)active_camera->projection);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, mesh_renderer->mesh->materials[0]->diffuse_map.id);
+
+    glBindVertexArray(mesh_renderer->mesh->vao);
+    glDrawElements(GL_TRIANGLES, mesh_renderer->mesh->indexCount, GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
+}
+ 
 void render_shutdown(void) {
     for (int i=0; i<render_stack_count; i++) {
         GameObject *gameObject = render_stack[i]->gameObject;

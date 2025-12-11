@@ -4,12 +4,13 @@
 #include "core/gameObject.h"
 #include "components/components.h"
 #include "scene_manager.h"
+#include "debug/debug_renderer.h"
 
 #define MAX_OBJECTS 2048
 
 typedef struct Scene Scene;
 
-typedef struct {
+typedef struct render_object {
     GameObject *gameObject;
     mesh_renderer_component *mesh_renderer_component;
     transform_component *transform_component;
