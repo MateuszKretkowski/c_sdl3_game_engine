@@ -9,7 +9,7 @@
 #include "spatial_system.h"
 
 typedef struct {
-    GameObject *gameObjects;
+    GameObject **gameObjects;
     int gameObjects_length;
     int gameObjects_capacity;
 

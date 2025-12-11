@@ -41,7 +41,7 @@ void physics_manager_add(GameObject *gameObject) {
         physics_m->gameObjects_capacity *= 2;
         physics_m->gameObjects = realloc(physics_m->gameObjects, sizeof(GameObject*)*physics_m->gameObjects_capacity);
     }
-    physics_m->gameObjects[physics_m->gameObjects_length] = *gameObject;
+    physics_m->gameObjects[physics_m->gameObjects_length] = gameObject;
     physics_m->gameObjects_length++;
 }
 
@@ -53,9 +53,10 @@ void physics_manager_remove(GameObject *gameObject) {
         return;
     }
     for (int i=0; i<physics_m->gameObjects_length; i++) {
-        if (&physics_m->gameObjects[i] == gameObject) {
-            physics_m->gameObjects[i] = physics_m->gameObjects[physics_m->gameObjects_length];
+        if (physics_m->gameObjects[i] == gameObject) {
+            physics_m->gameObjects[i] = physics_m->gameObjects[physics_m->gameObjects_length - 1];
             physics_m->gameObjects_length--;
+            break;
         }
     }
 }
@@ -74,17 +75,33 @@ void physics_manager_handle_collision(GameObject *objA, GameObject *objB) {
     float ma = rb_a->mass;
     float mb = rb_b->mass;
 
+    Vector4 color;
+    color.x = 1;
+    color.y = 1;
+    color.z = 1;
+    color.w = 1;
+    // vector3_divide(vector3_add(transform_a->position, transform_b->position), 2)
+    
     // SPHERE_A
     // velocity before collision is length, times the orthogonal unit (1) vector. + length times the parallel unit vector
-
+    
     // Uao = (Pb - Pa)/length(Pb - Pa)
     // calculating Uao:
-    Vector3 Uao = (vector3_divide(vector3_subtract(Ub, Ua), vector3_length(vector3_subtract(Ub, Ua))));
+    Vector3 Uao = vector3_zero();
+    Vector3 pos_diff = vector3_subtract(transform_b->position, transform_a->position);
+    if (vector3_length(pos_diff) > 0.0001f) {
+        Uao = vector3_normalize(pos_diff);
+    }
     // calculating Uap:
     Vector3 Uap = vector3_zero();
-    if (!vector3_compare(vector3_cross(Ua, Uao), vector3_zero())) {
-        Vector3 Uap = vector3_divide(vector3_cross(vector3_cross(Ua, Uao), Uao), vector3_length((vector3_cross(vector3_cross(Ua, Uao), Uao))));
+    Vector3 cross_ua_uao = vector3_cross(Ua, Uao);
+    if (vector3_length(cross_ua_uao) > 0.0001f) {
+        Vector3 cross_result = vector3_cross(cross_ua_uao, Uao);
+        if (vector3_length(cross_result) > 0.0001f) {
+            Uap = vector3_normalize(cross_result);
+        }
     }
+    // debug_draw_sphere(Uao, 0.2, color, 0.01);
 
     // Lao = dot(Uao, Ua)
     float Lao = vector3_dot(Uao, Ua);
@@ -96,8 +113,12 @@ void physics_manager_handle_collision(GameObject *objA, GameObject *objB) {
     // so we don't calculkate Ubo, we take Uao.
 
     Vector3 Ubp = vector3_zero();
-    if (!vector3_compare(vector3_cross(Ub, Uao), vector3_zero())) {
-        Vector3 Ubp = vector3_divide(vector3_cross(vector3_cross(Ub, Uao), Uao), vector3_length((vector3_cross(vector3_cross(Ub, Uao), Uao))));
+    Vector3 cross_ub_uao = vector3_cross(Ub, Uao);
+    if (vector3_length(cross_ub_uao) > 0.0001f) {
+        Vector3 cross_result_b = vector3_cross(cross_ub_uao, Uao);
+        if (vector3_length(cross_result_b) > 0.0001f) {
+            Ubp = vector3_normalize(cross_result_b);
+        }
     }
     
     float Lbo = vector3_dot(Uao, Ub);
@@ -118,7 +139,7 @@ void physics_manager_handle_collision(GameObject *objA, GameObject *objB) {
 
 void physics_manager_calculate_objects() {
     for (int i=0; i<physics_m->gameObjects_length; i++) {
-        GameObject *curr = &physics_m->gameObjects[i];
+        GameObject *curr = physics_m->gameObjects[i];
         rigid_body_component *rb =  get_component(curr, rigid_body_component, "rigid_body_component");
         transform_component *transform = get_component(curr, transform_component, "transform_component");
         if (rb->use_gravity == true) {
@@ -137,5 +158,5 @@ void physics_manager_calculate_objects() {
 
 void physics_manager_update() {
     physics_manager_calculate_objects();
-    spatial_system_update(physics_m->gameObjects);
+    spatial_system_update(physics_m->gameObjects, physics_m->gameObjects_length);
 }

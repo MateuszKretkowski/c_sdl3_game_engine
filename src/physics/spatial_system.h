@@ -19,12 +19,12 @@ typedef struct {
 } spatial_system_config;
 
 typedef struct {
-    GameObject *objects;
+    GameObject **objects;
     int count;
     int capacity;
 } grid_cell;
 
-void spatial_system_init(GameObject *objects, int gameObject_length);
-void spatial_system_update(GameObject *gameObjects);
+void spatial_system_init(GameObject **objects, int objects_length);
+void spatial_system_update(GameObject **gameObjects, int objects_length);
 
 #endif
