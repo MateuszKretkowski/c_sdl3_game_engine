@@ -1,15 +1,18 @@
 {
 	"materials":	{
-		"material_bricks":	"src/assets/materials/material_bricks.json"
+		"material_bricks":	"src/assets/materials/material_bricks.json",
+		"material_white":	"src/assets/materials/white.json"
 	},
 	"meshes":	{
 		"primitive_rectangle":	"src/assets/meshes/rectangle2D.json",
-		"sphere":	"src/assets/meshes/sphere.json"
+		"sphere":	"src/assets/meshes/sphere.json",
+		"sphere_debug":	"src/assets/meshes/sphere_debug.json"
 	},
 	"prefabs":	{
 		"camera":	"src/assets/prefabs/camera.json",
 		"sphere_1":	"src/assets/prefabs/sphere_1.json",
-		"sphere_2":	"src/assets/prefabs/sphere_2.json"
+		"sphere_2":	"src/assets/prefabs/sphere_2.json",
+		"sphere_debug_prefab":	"src/assets/prefabs/sphere_debug.json"
 	},
 	"shaders":	{
 		"standard_lit":	"src/assets/shaders/standard_shader.json"
