@@ -10,6 +10,7 @@
 	},
 	"prefabs":	{
 		"camera":	"src/assets/prefabs/camera.json",
+		"floor":	"src/assets/prefabs/floor.json",
 		"sphere_1":	"src/assets/prefabs/sphere_1.json",
 		"sphere_2":	"src/assets/prefabs/sphere_2.json",
 		"sphere_debug_prefab":	"src/assets/prefabs/sphere_debug.json"

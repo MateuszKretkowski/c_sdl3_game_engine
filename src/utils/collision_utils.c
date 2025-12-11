@@ -22,22 +22,24 @@ bool intersect_sphere_sphere(sphere_collider_component *compA, sphere_collider_c
 }
 
 bool intersect_AABB_sphere(box_collider_component *compA, sphere_collider_component *compB) {
+    transform_component *transform_a = get_component(compA->base.gameObject, transform_component, "transform_component");
+    transform_component *transform_b = get_component(compB->base.gameObject, transform_component, "transform_component");
     Vector3 halfA = {
-        compA->scale.x * 0.5f,
-        compA->scale.y * 0.5f,
-        compA->scale.z * 0.5f,
+        transform_a->scale.x * 0.5f,
+        transform_a->scale.y * 0.5f,
+        transform_a->scale.z * 0.5f,
     };
-    
-    float x = max(compA->pos.x - halfA.x, min(compB->pos.x, compA->pos.x + halfA.x));
-    float y = max(compA->pos.y - halfA.y, min(compB->pos.y, compA->pos.y + halfA.y));
-    float z = max(compA->pos.z - halfA.z, min(compB->pos.z, compA->pos.z + halfA.x));
-    
-    float distance = 
-        (x - compB->pos.x)*(x - compB->pos.x)+
-        (y - compB->pos.y)*(y - compB->pos.y)+
-        (z - compB->pos.z)*(z - compB->pos.z);
 
-    return distance < compB->radius * compB->radius;
+    float x = max(transform_a->position.x - halfA.x, min(transform_b->position.x, transform_a->position.x + halfA.x));
+    float y = max(transform_a->position.y - halfA.y, min(transform_b->position.y, transform_a->position.y + halfA.y));
+    float z = max(transform_a->position.z - halfA.z, min(transform_b->position.z, transform_a->position.z + halfA.z));
+
+    float distance =
+        (x - transform_b->position.x)*(x - transform_b->position.x)+
+        (y - transform_b->position.y)*(y - transform_b->position.y)+
+        (z - transform_b->position.z)*(z - transform_b->position.z);
+
+    return distance <= compB->radius * compB->radius;
 }
 
 bool intersect_AABB_point(box_collider_component *comp, Vector3 pos) {

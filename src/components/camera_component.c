@@ -33,7 +33,7 @@ void camera_update(Component* self) {
     }
 
     float radius = 3.0f;
-    float speed = 5;
+    float speed = 8;
     float horizontal_input = input_gamepad_get_axis_deadzone(SDL_GAMEPAD_AXIS_RIGHTX, 0.15f);
     float vertical_input = input_gamepad_get_axis_deadzone(SDL_GAMEPAD_AXIS_RIGHTY, 0.15f);
 
