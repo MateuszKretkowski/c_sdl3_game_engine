@@ -18,7 +18,6 @@ bool intersect_sphere_sphere(sphere_collider_component *compA, sphere_collider_c
         (transform_a->position.z - transform_b->position.z)*(transform_a->position.z - transform_b->position.z);
     
     float radiusSum = compA->radius + compB->radius;
-    printf("\n\n\n DISTANCE: %f, RADIUS_SUM: %f\n\n\n", distance, radiusSum*radiusSum);
     return distance <= radiusSum * radiusSum;
 }
 
