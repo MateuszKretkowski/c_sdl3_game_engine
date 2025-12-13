@@ -61,7 +61,7 @@ void physics_manager_remove(GameObject *gameObject) {
     }
 }
 
-void physics_manager_handle_collision(GameObject *objA, GameObject *objB) {
+void physics_manager_handle_collision(GameObject *objA, GameObject *objB, Vector3 normal) {
     rigid_body_component *rb_a = get_component(objA, rigid_body_component, "rigid_body_component");
     rigid_body_component *rb_b = get_component(objB, rigid_body_component, "rigid_body_component");
     transform_component *transform_a = get_component(objA, transform_component, "transform_component");
@@ -87,11 +87,9 @@ void physics_manager_handle_collision(GameObject *objA, GameObject *objB) {
     
     // Uao = (Pb - Pa)/length(Pb - Pa)
     // calculating Uao:
-    Vector3 Uao = vector3_zero();
-    Vector3 pos_diff = vector3_subtract(transform_b->position, transform_a->position);
-    if (vector3_length(pos_diff) > 0.0001f) {
-        Uao = vector3_normalize(pos_diff);
-    }
+
+    Vector3 Uao = normal;
+
     // calculating Uap:
     Vector3 Uap = vector3_zero();
     Vector3 cross_ua_uao = vector3_cross(Ua, Uao);
