@@ -118,6 +118,15 @@ bool vector3_compare(Vector3 a, Vector3 b);
 Vector3 vector2_to_vector3(Vector2 v, float z);
 Vector2 vector3_to_vector2(Vector3 v);
 
+void vector3_printf(Vector3 v);
+
+Vector3 vector3_left();
+Vector3 vector3_right();
+Vector3 vector3_down();
+Vector3 vector3_up();
+Vector3 vector3_back();
+Vector3 vector3_forward();
+
 float max(float a, float b);
 float min(float a, float b);
 

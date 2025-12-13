@@ -9,7 +9,7 @@ bool intersect_sphere_point(sphere_collider_component *comp, Vector3 point) {
     return distance < comp->radius * comp->radius;
 }
 
-bool intersect_sphere_sphere(sphere_collider_component *compA, sphere_collider_component *compB) {
+Vector3 intersect_sphere_sphere(sphere_collider_component *compA, sphere_collider_component *compB) {
     transform_component *transform_a = get_component(compA->base.gameObject, transform_component, "transform_component");
     transform_component *transform_b = get_component(compB->base.gameObject, transform_component, "transform_component");
     float distance = 
@@ -18,10 +18,15 @@ bool intersect_sphere_sphere(sphere_collider_component *compA, sphere_collider_c
         (transform_a->position.z - transform_b->position.z)*(transform_a->position.z - transform_b->position.z);
     
     float radiusSum = compA->radius + compB->radius;
-    return distance <= radiusSum * radiusSum;
+    if (distance <= radiusSum * radiusSum) {
+        return vector3_divide(vector3_subtract(transform_a->position, transform_b->position), vector3_length(vector3_subtract(transform_a->position, transform_b->position))); 
+    }
+    else {
+        return vector3_zero();
+    }
 }
 
-bool intersect_AABB_sphere(box_collider_component *compA, sphere_collider_component *compB) {
+Vector3 intersect_AABB_sphere(box_collider_component *compA, sphere_collider_component *compB) {
     transform_component *transform_a = get_component(compA->base.gameObject, transform_component, "transform_component");
     transform_component *transform_b = get_component(compB->base.gameObject, transform_component, "transform_component");
     Vector3 halfA = {
@@ -30,16 +35,60 @@ bool intersect_AABB_sphere(box_collider_component *compA, sphere_collider_compon
         transform_a->scale.z * 0.5f,
     };
 
-    float x = max(transform_a->position.x - halfA.x, min(transform_b->position.x, transform_a->position.x + halfA.x));
-    float y = max(transform_a->position.y - halfA.y, min(transform_b->position.y, transform_a->position.y + halfA.y));
-    float z = max(transform_a->position.z - halfA.z, min(transform_b->position.z, transform_a->position.z + halfA.z));
+    Vector3 a_min = vector3_zero();
+    a_min.x = transform_a->position.x - halfA.x;
+    a_min.y = transform_a->position.y - halfA.y;
+    a_min.z = transform_a->position.z - halfA.z;
+    
+    Vector3 a_max = vector3_zero();
+    a_max.x = transform_a->position.x + halfA.x;
+    a_max.y = transform_a->position.y + halfA.y;
+    a_max.z = transform_a->position.z + halfA.z;
+    
+    Vector3 p_avg = vector3_zero();
+    p_avg.x = glm_clamp(transform_b->position.x, a_min.x, a_max.x);
+    p_avg.y = glm_clamp(transform_b->position.y, a_min.y, a_max.y);
+    p_avg.z = glm_clamp(transform_b->position.z, a_min.z, a_max.z);
 
     float distance =
-        (x - transform_b->position.x)*(x - transform_b->position.x)+
-        (y - transform_b->position.y)*(y - transform_b->position.y)+
-        (z - transform_b->position.z)*(z - transform_b->position.z);
+        (p_avg.x - transform_b->position.x)*(p_avg.x - transform_b->position.x)+
+        (p_avg.y - transform_b->position.y)*(p_avg.y - transform_b->position.y)+
+        (p_avg.z - transform_b->position.z)*(p_avg.z - transform_b->position.z);
 
-    return distance <= compB->radius * compB->radius;
+    if (distance > compB->radius * compB->radius) {
+        return vector3_zero();
+    }
+    else if (distance == compB->radius * compB->radius) {
+        return vector3_divide(vector3_subtract(transform_b->position, p_avg), vector3_length(vector3_subtract(transform_b->position, p_avg)));
+    }
+    else {
+        float closest;
+        float left = transform_b->position.x - a_min.x;
+        float right = a_max.x - transform_b->position.x;
+        float down = transform_b->position.y - a_min.y;
+        float up = a_max.y - transform_b->position.y;
+        float back = transform_b->position.z - a_min.z;
+        float front = a_max.z - transform_b->position.z;
+        float distances[6];
+        distances[0] = left;
+        distances[1] = right;
+        distances[2] = up;
+        distances[3] = down;
+        distances[4] = front;
+        distances[5] = back;
+        closest = distances[0];
+        for (int i=0; i<6; i++) {
+            if (distances[i] < closest) {
+                closest = distances[i];
+            }
+        }
+        if (closest == left) return vector3_left();
+        else if (closest == right) return vector3_right();
+        else if (closest == down) return vector3_down();
+        else if (closest == up) return vector3_up();
+        else if (closest == back) return vector3_back();
+        else return vector3_forward();
+    }
 }
 
 bool intersect_AABB_point(box_collider_component *comp, Vector3 pos) {
@@ -59,20 +108,42 @@ bool intersect_AABB_point(box_collider_component *comp, Vector3 pos) {
     );
 }
 
-bool intersect_AABB_AABB(box_collider_component *compA, box_collider_component *compB) {
+Vector3 intersect_AABB_AABB(box_collider_component *compA, box_collider_component *compB) {
+    transform_component *transform_a = get_component(compA->base.gameObject, transform_component, "transform_component");
+    transform_component *transform_b = get_component(compB->base.gameObject, transform_component, "transform_component");
+    
     Vector3 halfA = {
-        compA->scale.x * 0.5f,
-        compA->scale.y * 0.5f,
-        compA->scale.z * 0.5f
+        transform_a->scale.x * 0.5f,
+        transform_a->scale.y * 0.5f,
+        transform_a->scale.z * 0.5f
     };
     Vector3 halfB = {
-        compB->scale.x * 0.5f,
-        compB->scale.y * 0.5f,
-        compB->scale.z * 0.5f
+        transform_b->scale.x * 0.5f,
+        transform_b->scale.y * 0.5f,
+        transform_b->scale.z * 0.5f
     };
-    return (
-        (compA->pos.x - halfA.x <= compB->pos.x + halfB.x && compA->pos.x + halfA.x >= compB->pos.x - halfB.x) &&
-        (compA->pos.y - halfA.y <= compB->pos.y + halfB.y && compA->pos.y + halfA.y >= compB->pos.y - halfB.y) &&
-        (compA->pos.z - halfA.z <= compB->pos.z + halfB.z && compA->pos.z + halfA.z >= compB->pos.z - halfB.z)    
-    );
+
+    float overlap_x = (halfA.x + halfB.x) - fabsf(transform_a->position.x - transform_b->position.x);
+    float overlap_y = (halfA.y + halfB.y) - fabsf(transform_a->position.y - transform_b->position.y);
+    float overlap_z = (halfA.z + halfB.z) - fabsf(transform_a->position.z - transform_b->position.z);
+
+    float min_overlap = overlap_x;
+    int axis = 0;
+
+    if (overlap_y < min_overlap) {
+        min_overlap = overlap_y;
+        axis = 1;
+    }
+    if (overlap_z < min_overlap) {
+        min_overlap = overlap_z;
+        axis = 2;
+    }
+
+    if (axis == 0) {
+        return (transform_a->position.x < transform_b->position.x) ? vector3_left() : vector3_right();
+    } else if (axis == 1) {
+        return (transform_a->position.y < transform_b->position.y) ? vector3_down() : vector3_up();
+    } else {
+        return (transform_a->position.z < transform_b->position.z) ? vector3_back() : vector3_forward();
+    }
 }
