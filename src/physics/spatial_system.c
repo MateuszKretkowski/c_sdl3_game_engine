@@ -131,7 +131,7 @@ void spatial_system_check_collisions(grid_cell *gc) {
                 }
             }
             else if (curr_box && collision_box) {
-                Vector3 normal = intersect_sphere_sphere(curr_sphere, collision_sphere);
+                Vector3 normal = intersect_AABB_AABB(curr_box, collision_box);
                 if (!vector3_compare(normal, vector3_zero())) {
                     printf("COLLISION! BOX BOX\n");
                     physics_manager_handle_collision(curr, col_curr, normal);
