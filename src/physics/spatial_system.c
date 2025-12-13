@@ -110,27 +110,31 @@ void spatial_system_check_collisions(grid_cell *gc) {
             sphere_collider_component *collision_sphere = get_component(col_curr, sphere_collider_component, "sphere_collider_component");
             box_collider_component *collision_box = get_component(col_curr, box_collider_component, "box_collider_component");
             if (curr_sphere && collision_sphere) {
-                if (intersect_sphere_sphere(curr_sphere, collision_sphere)) {
+                Vector3 normal = intersect_sphere_sphere(curr_sphere, collision_sphere);
+                if (!vector3_compare(normal, vector3_zero())) {
                     printf("COLLISION! SPHERE_SPHERE: %s, %s\n", curr->id, col_curr->id);
-                    physics_manager_handle_collision(curr, col_curr);
+                    physics_manager_handle_collision(curr, col_curr, normal);
                 }
             }
             else if (curr_sphere && collision_box) {
-                if (intersect_AABB_sphere(collision_box, curr_sphere)) {
+                Vector3 normal = intersect_AABB_sphere(collision_box, curr_sphere);
+                if (!vector3_compare(normal, vector3_zero())) {
                     printf("COLLISION! SPHERE BOX\n");
-                    physics_manager_handle_collision(curr, col_curr);
+                    physics_manager_handle_collision(curr, col_curr, normal);
                 }
             }
             else if (curr_box && collision_sphere) {
-                if (intersect_AABB_sphere(curr_box, collision_sphere)) {
+                Vector3 normal = intersect_AABB_sphere(curr_box, collision_sphere);
+                if (!vector3_compare(normal, vector3_zero())) {
                     printf("COLLISION! BOX SPHERE\n");
-                    physics_manager_handle_collision(curr, col_curr);
+                    physics_manager_handle_collision(curr, col_curr, normal);
                 }
             }
             else if (curr_box && collision_box) {
-                if (intersect_AABB_AABB(curr_box, collision_box)) {
+                Vector3 normal = intersect_sphere_sphere(curr_sphere, collision_sphere);
+                if (!vector3_compare(normal, vector3_zero())) {
                     printf("COLLISION! BOX BOX\n");
-                    physics_manager_handle_collision(curr, col_curr);
+                    physics_manager_handle_collision(curr, col_curr, normal);
                 }
             }
         }
