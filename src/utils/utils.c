@@ -125,3 +125,14 @@ float max(float a, float b) {
 float min(float a, float b) {
     return a < b ? a : b;
 }
+
+void vector3_printf(Vector3 v) {
+    printf("Vector3(%f, %f, %f)\n", v.x, v.y, v.z);
+}
+
+Vector3 vector3_left() { return (Vector3){-1, 0, 0}; }
+Vector3 vector3_right() { return (Vector3){1, 0, 0}; }
+Vector3 vector3_down() { return (Vector3){0, -1, 0}; }
+Vector3 vector3_up() { return (Vector3){0, 1, 0}; }
+Vector3 vector3_back() { return (Vector3){0, 0, -1}; }
+Vector3 vector3_forward() { return (Vector3){0, 0, 1}; }
