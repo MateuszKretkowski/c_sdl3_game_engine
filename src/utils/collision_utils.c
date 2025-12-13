@@ -18,7 +18,7 @@ Vector3 intersect_sphere_sphere(sphere_collider_component *compA, sphere_collide
         (transform_a->position.z - transform_b->position.z)*(transform_a->position.z - transform_b->position.z);
     
     float radiusSum = compA->radius + compB->radius;
-    if (distance <= radiusSum * radiusSum) {
+    if (distance < radiusSum * radiusSum) {
         return vector3_divide(vector3_subtract(transform_a->position, transform_b->position), vector3_length(vector3_subtract(transform_a->position, transform_b->position))); 
     }
     else {
@@ -30,9 +30,9 @@ Vector3 intersect_AABB_sphere(box_collider_component *compA, sphere_collider_com
     transform_component *transform_a = get_component(compA->base.gameObject, transform_component, "transform_component");
     transform_component *transform_b = get_component(compB->base.gameObject, transform_component, "transform_component");
     Vector3 halfA = {
-        transform_a->scale.x * 0.5f,
-        transform_a->scale.y * 0.5f,
-        transform_a->scale.z * 0.5f,
+        compA->scale.x * 0.5f,
+        compA->scale.y * 0.5f,
+        compA->scale.z * 0.5f,
     };
 
     Vector3 a_min = vector3_zero();
@@ -111,21 +111,25 @@ bool intersect_AABB_point(box_collider_component *comp, Vector3 pos) {
 Vector3 intersect_AABB_AABB(box_collider_component *compA, box_collider_component *compB) {
     transform_component *transform_a = get_component(compA->base.gameObject, transform_component, "transform_component");
     transform_component *transform_b = get_component(compB->base.gameObject, transform_component, "transform_component");
-    
+
     Vector3 halfA = {
-        transform_a->scale.x * 0.5f,
-        transform_a->scale.y * 0.5f,
-        transform_a->scale.z * 0.5f
+        compA->scale.x * 0.5f,
+        compA->scale.y * 0.5f,
+        compA->scale.z * 0.5f
     };
     Vector3 halfB = {
-        transform_b->scale.x * 0.5f,
-        transform_b->scale.y * 0.5f,
-        transform_b->scale.z * 0.5f
+        compB->scale.x * 0.5f,
+        compB->scale.y * 0.5f,
+        compB->scale.z * 0.5f
     };
 
     float overlap_x = (halfA.x + halfB.x) - fabsf(transform_a->position.x - transform_b->position.x);
     float overlap_y = (halfA.y + halfB.y) - fabsf(transform_a->position.y - transform_b->position.y);
     float overlap_z = (halfA.z + halfB.z) - fabsf(transform_a->position.z - transform_b->position.z);
+
+    if (overlap_x <= 0 || overlap_y <= 0 || overlap_z <= 0) {
+        return vector3_zero();
+    }
 
     float min_overlap = overlap_x;
     int axis = 0;

@@ -377,6 +377,15 @@ Scene *resource_get_scene(char *id) {
 
         free(gameObject);
 
+        // Override name from scene JSON if provided
+        cJSON *name_json = cJSON_GetObjectItemCaseSensitive(gameObject_json, "name");
+        if (name_json && cJSON_IsString(name_json) && name_json->valuestring) {
+            if (scene->gameObjects[i].name) {
+                free(scene->gameObjects[i].name);
+            }
+            scene->gameObjects[i].name = strdup(name_json->valuestring);
+        }
+
         fprintf(stderr, "DEBUG: GameObject '%s' has %d components after prefab instantiation\n", go_id, scene->gameObjects[i].components_length);
 
         if (cJSON_IsArray(cJSON_GetObjectItemCaseSensitive(gameObject_json, "components"))) {
