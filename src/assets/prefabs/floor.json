@@ -10,9 +10,9 @@
         },
         {
             "id": "mesh_renderer_component",
-            "mesh": "primitive_rectangle"
+            "mesh": "rectangle_3d"
         },
-        {"id": "rigid_body_component", "physics_material": "physics_material_plastic", "mass": 1000, "velocity": [0, 0, 0], "use_gravity": false},
+        {"id": "rigid_body_component", "physics_material": "physics_material_plastic", "mass": 10000000, "velocity": [0, 0, 0], "use_gravity": false, "is_kinematic": true},
         {"id": "box_collider_component", "position": [0, 0, 0], "scale": [1, 1, 1]}
     ]
 }

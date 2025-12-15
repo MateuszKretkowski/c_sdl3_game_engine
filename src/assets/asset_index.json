@@ -1,10 +1,12 @@
 {
 	"materials":	{
 		"material_bricks":	"src/assets/materials/material_bricks.json",
+		"prototype_dark_material":	"src/assets/materials/prototype_dark_material.json",
+		"prototype_white_material":	"src/assets/materials/prototype_white_material.json",
 		"material_white":	"src/assets/materials/white.json"
 	},
 	"meshes":	{
-		"primitive_rectangle":	"src/assets/meshes/rectangle2D.json",
+		"rectangle_3d":	"src/assets/meshes/rectangle2D.json",
 		"sphere":	"src/assets/meshes/sphere.json",
 		"sphere_debug":	"src/assets/meshes/sphere_debug.json"
 	},

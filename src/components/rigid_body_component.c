@@ -27,7 +27,7 @@ void rigid_body_destroy(Component* self) {
     rigid_body_component *comp = (rigid_body_component*)self;
 }
 
-rigid_body_component *create_rigid_body_component(physics_material *pmc, bool use_gravity, float mass, Vector3 velocity) {
+rigid_body_component *create_rigid_body_component(physics_material *pmc, bool use_gravity, float mass, Vector3 velocity, bool is_kinematic) {
     rigid_body_component* comp = malloc(sizeof(rigid_body_component));
     comp->base.id = strdup("rigid_body_component");
     comp->base.name = strdup("RigidBody");
@@ -44,6 +44,7 @@ rigid_body_component *create_rigid_body_component(physics_material *pmc, bool us
     comp->use_gravity = use_gravity;
     comp->mass = mass;
     comp->velocity = velocity;
+    comp->is_kinematic = is_kinematic;
     comp->acceleration = vector3_zero();
 
     return comp;
@@ -75,6 +76,14 @@ Component* rigid_body_from_json(cJSON *json) {
 
     bool use_gravity = cJSON_IsTrue(use_gravity_json);
 
+    cJSON *is_kinematic_json = cJSON_GetObjectItemCaseSensitive(json, "is_kinematic");
+    if (!use_gravity_json) {
+        printf("ERROR: rigid_body_from_json failed to load is_kinematic.\n");
+        return NULL;
+    }
+
+    bool is_kinematic = cJSON_IsTrue(is_kinematic_json);
+
     // Parse mass
     cJSON *mass_json = cJSON_GetObjectItemCaseSensitive(json, "mass");
     float mass = 1.0f; // Default mass
@@ -93,7 +102,7 @@ Component* rigid_body_from_json(cJSON *json) {
         }
     }
 
-    return (Component*)create_rigid_body_component(pmc, use_gravity, mass, velocity);
+    return (Component*)create_rigid_body_component(pmc, use_gravity, mass, velocity, is_kinematic);
 }
 
 __attribute__((constructor))

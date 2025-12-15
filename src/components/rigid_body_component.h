@@ -14,8 +14,9 @@ typedef struct {
     Vector3 acceleration;
 
     bool use_gravity;
+    bool is_kinematic;
 } rigid_body_component;
 
-rigid_body_component *create_rigid_body_component(physics_material *pmc, bool use_gravity, float mass, Vector3 velocity);
+rigid_body_component *create_rigid_body_component(physics_material *pmc, bool use_gravity, float mass, Vector3 velocity, bool is_kinematic);
 
 #endif
