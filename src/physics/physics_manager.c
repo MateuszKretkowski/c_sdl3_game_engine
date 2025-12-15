@@ -90,13 +90,15 @@ void physics_manager_handle_collision(GameObject *objA, GameObject *objB, Vector
 
     Vector3 Uao = normal;
 
+    printf("GameObject: %s, Uao.y: %f\n", rb_a->base.gameObject->id, Uao.y);
+
     // calculating Uap:
     Vector3 Uap = vector3_zero();
     Vector3 cross_ua_uao = vector3_cross(Ua, Uao);
     if (vector3_length(cross_ua_uao) > 0.0001f) {
         Vector3 cross_result = vector3_cross(cross_ua_uao, Uao);
         if (vector3_length(cross_result) > 0.0001f) {
-            Uap = vector3_normalize(cross_result);
+            Uap = vector3_divide(cross_result, vector3_length(cross_result));
         }
     }
     // debug_draw_sphere(Uao, 0.2, color, 0.01);
@@ -104,6 +106,8 @@ void physics_manager_handle_collision(GameObject *objA, GameObject *objB, Vector
     // Lao = dot(Uao, Ua)
     float Lao = vector3_dot(Uao, Ua);
     float Lap = vector3_dot(Uap, Ua);
+
+    printf("GameObject: %s, Lao: %f\n", rb_a->base.gameObject->id, Lao);
 
     // SPHERE_B
     // same here, but instead of Ubo we take Uao, because if we took Ubo, then the vector would had opposite direction.
@@ -115,7 +119,7 @@ void physics_manager_handle_collision(GameObject *objA, GameObject *objB, Vector
     if (vector3_length(cross_ub_uao) > 0.0001f) {
         Vector3 cross_result_b = vector3_cross(cross_ub_uao, Uao);
         if (vector3_length(cross_result_b) > 0.0001f) {
-            Ubp = vector3_normalize(cross_result_b);
+            Ubp = vector3_divide(cross_result_b, vector3_length(cross_result_b));
         }
     }
     
