@@ -18,7 +18,7 @@ Vector3 intersect_sphere_sphere(sphere_collider_component *compA, sphere_collide
         (transform_a->position.z - transform_b->position.z)*(transform_a->position.z - transform_b->position.z);
     
     float radiusSum = compA->radius + compB->radius;
-    if (distance < radiusSum * radiusSum) {
+    if (distance <= radiusSum * radiusSum) {
         return vector3_divide(vector3_subtract(transform_a->position, transform_b->position), vector3_length(vector3_subtract(transform_a->position, transform_b->position))); 
     }
     else {
@@ -82,12 +82,12 @@ Vector3 intersect_AABB_sphere(box_collider_component *compA, sphere_collider_com
                 closest = distances[i];
             }
         }
-        if (closest == left) return vector3_left();
-        else if (closest == right) return vector3_right();
-        else if (closest == down) return vector3_down();
-        else if (closest == up) return vector3_up();
-        else if (closest == back) return vector3_back();
-        else return vector3_forward();
+        if (closest == left) return vector3_right();
+        else if (closest == right) return vector3_left();
+        else if (closest == down) return vector3_up();
+        else if (closest == up) return vector3_down();
+        else if (closest == back) return vector3_forward();
+        else return vector3_back();
     }
 }
 
@@ -144,10 +144,10 @@ Vector3 intersect_AABB_AABB(box_collider_component *compA, box_collider_componen
     }
 
     if (axis == 0) {
-        return (transform_a->position.x < transform_b->position.x) ? vector3_left() : vector3_right();
+        return (transform_a->position.x < transform_b->position.x) ? vector3_right() : vector3_left();
     } else if (axis == 1) {
-        return (transform_a->position.y < transform_b->position.y) ? vector3_down() : vector3_up();
+        return (transform_a->position.y < transform_b->position.y) ? vector3_up() : vector3_down();
     } else {
-        return (transform_a->position.z < transform_b->position.z) ? vector3_back() : vector3_forward();
+        return (transform_a->position.z < transform_b->position.z) ? vector3_forward() : vector3_back();
     }
 }
