@@ -1,0 +1,14 @@
+{
+  "id": "prototype_white_material",
+  "name": "Prototype Dark Material",
+  
+  "shader": "standard_lit",
+
+  "maps": {
+    "diffuse": "prototype_textures/prototype_white_diffuse.png"
+  },
+
+  "properties": {
+    "shininess": 32.0
+  }
+}

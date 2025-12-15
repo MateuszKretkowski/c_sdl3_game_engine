@@ -18,13 +18,13 @@ void sample_start(Component* self) {
     sample_component *comp = (sample_component*)self;
     
     if (strcmp(self->gameObject->id, "sphere_1") == 0) {
-        float force = 75;
+        float force = 150;
         add_force(get_component(self->gameObject, rigid_body_component, "rigid_body_component"), vector3_right(), force*4);
         add_force(get_component(self->gameObject, rigid_body_component, "rigid_body_component"), vector3_up(), force);
     }
     if (strcmp(self->gameObject->id, "sphere_2") == 0) {
         Vector3 direction = {-1, 0, 0};
-        float force = 75;
+        float force = 150;
         add_force(get_component(self->gameObject, rigid_body_component, "rigid_body_component"), direction, force);
     }
 }

@@ -64,6 +64,11 @@ void physics_manager_remove(GameObject *gameObject) {
 void physics_manager_handle_collision(GameObject *objA, GameObject *objB, Vector3 normal) {
     rigid_body_component *rb_a = get_component(objA, rigid_body_component, "rigid_body_component");
     rigid_body_component *rb_b = get_component(objB, rigid_body_component, "rigid_body_component");
+
+    if (rb_a->is_kinematic && rb_b->is_kinematic) {
+        return;
+    }
+
     transform_component *transform_a = get_component(objA, transform_component, "transform_component");
     transform_component *transform_b = get_component(objB, transform_component, "transform_component");
 
@@ -132,11 +137,14 @@ void physics_manager_handle_collision(GameObject *objA, GameObject *objB, Vector
 
     float avg_restitution = (pm_a->restitution + pm_b->restitution)/2;
 
-    Vector3 Va = vector3_add(vector3_multiply(Uao, ((Lao * ma + Lbo * mb + (Lbo - Lao) * mb * avg_restitution) / (ma + mb))), vector3_multiply(Uap, Lap));
-    Vector3 Vb = vector3_add(vector3_multiply(Uao, ((Lao * ma + Lbo * mb + (Lao - Lbo) * ma * avg_restitution) / (ma + mb))), vector3_multiply(Ubp, Lbp));
-
-    rb_a->velocity = Va;
-    rb_b->velocity = Vb;
+    if (!rb_a->is_kinematic) {
+        Vector3 Va = vector3_add(vector3_multiply(Uao, ((Lao * ma + Lbo * mb + (Lbo - Lao) * mb * avg_restitution) / (ma + mb))), vector3_multiply(Uap, Lap));
+        rb_a->velocity = Va;
+    } 
+    if (!rb_b->is_kinematic) {
+        Vector3 Vb = vector3_add(vector3_multiply(Uao, ((Lao * ma + Lbo * mb + (Lao - Lbo) * ma * avg_restitution) / (ma + mb))), vector3_multiply(Ubp, Lbp));
+        rb_b->velocity = Vb;
+    }
 }
 
 void physics_manager_calculate_objects() {
