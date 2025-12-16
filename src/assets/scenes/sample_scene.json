@@ -4,7 +4,7 @@
         "physics": {
             "gravity": [0, -9.81, 0],
             "timestep": 0.0032,
-            "air_resistance": 0.98,
+            "air_resistance": 1,
             "max_velocity": 50.0
         },
         "spatial": {

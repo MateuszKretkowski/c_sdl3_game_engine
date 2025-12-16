@@ -9,7 +9,7 @@ bool intersect_sphere_point(sphere_collider_component *comp, Vector3 point) {
     return distance < comp->radius * comp->radius;
 }
 
-Vector3 intersect_sphere_sphere(sphere_collider_component *compA, sphere_collider_component *compB) {
+Vector3 intersect_sphere_sphere(sphere_collider_component *compA, sphere_collider_component *compB, float *depth) {
     transform_component *transform_a = get_component(compA->base.gameObject, transform_component, "transform_component");
     transform_component *transform_b = get_component(compB->base.gameObject, transform_component, "transform_component");
     float distance = 
@@ -19,6 +19,7 @@ Vector3 intersect_sphere_sphere(sphere_collider_component *compA, sphere_collide
     
     float radiusSum = compA->radius + compB->radius;
     if (distance <= radiusSum * radiusSum) {
+        *depth = radiusSum - sqrt(distance);
         return vector3_divide(vector3_subtract(transform_a->position, transform_b->position), vector3_length(vector3_subtract(transform_a->position, transform_b->position))); 
     }
     else {
@@ -26,7 +27,7 @@ Vector3 intersect_sphere_sphere(sphere_collider_component *compA, sphere_collide
     }
 }
 
-Vector3 intersect_AABB_sphere(box_collider_component *compA, sphere_collider_component *compB) {
+Vector3 intersect_AABB_sphere(box_collider_component *compA, sphere_collider_component *compB, float *depth) {
     transform_component *transform_a = get_component(compA->base.gameObject, transform_component, "transform_component");
     transform_component *transform_b = get_component(compB->base.gameObject, transform_component, "transform_component");
     Vector3 halfA = {
@@ -59,16 +60,18 @@ Vector3 intersect_AABB_sphere(box_collider_component *compA, sphere_collider_com
         return vector3_zero();
     }
     else if (distance == compB->radius * compB->radius) {
+        *depth = compB->radius - sqrt(distance);
+        printf("distance == radius^2\n");
         return vector3_divide(vector3_subtract(transform_b->position, p_avg), vector3_length(vector3_subtract(transform_b->position, p_avg)));
     }
     else {
         float closest;
-        float left = transform_b->position.x - a_min.x;
-        float right = a_max.x - transform_b->position.x;
-        float down = transform_b->position.y - a_min.y;
-        float up = a_max.y - transform_b->position.y;
-        float back = transform_b->position.z - a_min.z;
-        float front = a_max.z - transform_b->position.z;
+        float left = transform_b->position.x - a_min.x + compB->radius;
+        float right = a_max.x - transform_b->position.x + compB->radius;
+        float down = transform_b->position.y - a_min.y + compB->radius;
+        float up = a_max.y - transform_b->position.y + compB->radius;
+        float back = transform_b->position.z - a_min.z + compB->radius;
+        float front = a_max.z - transform_b->position.z + compB->radius;
         float distances[6];
         distances[0] = left;
         distances[1] = right;
@@ -82,12 +85,31 @@ Vector3 intersect_AABB_sphere(box_collider_component *compA, sphere_collider_com
                 closest = distances[i];
             }
         }
-        if (closest == left) return vector3_right();
-        else if (closest == right) return vector3_left();
-        else if (closest == down) return vector3_up();
-        else if (closest == up) return vector3_down();
-        else if (closest == back) return vector3_forward();
-        else return vector3_back();
+        *depth = closest;
+        if (closest == left) {
+            printf("Collision direction: LEFT\n");
+            return vector3_right();
+        }
+        else if (closest == right) {
+            printf("Collision direction: RIGHT\n");
+            return vector3_left();
+        }
+        else if (closest == down) {
+            printf("Collision direction: DOWN\n");
+            return vector3_up();
+        }
+        else if (closest == up) {
+            printf("Collision direction: UP\n");
+            return vector3_down();
+        }
+        else if (closest == back) {
+            printf("Collision direction: BACK\n");
+            return vector3_forward();
+        }
+        else {
+            printf("Collision direction: FRONT\n");
+            return vector3_back();
+        }
     }
 }
 
@@ -108,7 +130,7 @@ bool intersect_AABB_point(box_collider_component *comp, Vector3 pos) {
     );
 }
 
-Vector3 intersect_AABB_AABB(box_collider_component *compA, box_collider_component *compB) {
+Vector3 intersect_AABB_AABB(box_collider_component *compA, box_collider_component *compB, float *depth) {
     transform_component *transform_a = get_component(compA->base.gameObject, transform_component, "transform_component");
     transform_component *transform_b = get_component(compB->base.gameObject, transform_component, "transform_component");
 
@@ -142,6 +164,8 @@ Vector3 intersect_AABB_AABB(box_collider_component *compA, box_collider_componen
         min_overlap = overlap_z;
         axis = 2;
     }
+
+    *depth = min_overlap;
 
     if (axis == 0) {
         return (transform_a->position.x < transform_b->position.x) ? vector3_right() : vector3_left();

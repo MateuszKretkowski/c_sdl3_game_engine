@@ -110,28 +110,36 @@ void spatial_system_check_collisions(grid_cell *gc) {
             sphere_collider_component *collision_sphere = get_component(col_curr, sphere_collider_component, "sphere_collider_component");
             box_collider_component *collision_box = get_component(col_curr, box_collider_component, "box_collider_component");
             if (curr_sphere && collision_sphere) {
-                Vector3 normal = intersect_sphere_sphere(curr_sphere, collision_sphere);
+                float *depth = malloc(sizeof(float));
+                Vector3 normal = intersect_sphere_sphere(curr_sphere, collision_sphere, depth);
                 if (!vector3_compare(normal, vector3_zero())) {
-                    physics_manager_handle_collision(curr, col_curr, normal);
+                    physics_manager_handle_collision(curr, col_curr, normal, *depth);
                 }
+                free(depth);
             }
             else if (curr_sphere && collision_box) {
-                Vector3 normal = intersect_AABB_sphere(collision_box, curr_sphere);
+                float *depth = malloc(sizeof(float));
+                Vector3 normal = intersect_AABB_sphere(collision_box, curr_sphere, depth);
                 if (!vector3_compare(normal, vector3_zero())) {
-                    physics_manager_handle_collision(col_curr, curr, normal);
+                    physics_manager_handle_collision(col_curr, curr, normal, *depth);
                 }
+                free(depth);
             }
             else if (curr_box && collision_sphere) {
-                Vector3 normal = intersect_AABB_sphere(curr_box, collision_sphere);
+                float *depth = malloc(sizeof(float));
+                Vector3 normal = intersect_AABB_sphere(curr_box, collision_sphere, depth);
                 if (!vector3_compare(normal, vector3_zero())) {
-                    physics_manager_handle_collision(curr, col_curr, normal);
+                    physics_manager_handle_collision(curr, col_curr, normal, *depth);
                 }
+                free(depth);
             }
             else if (curr_box && collision_box) {
-                Vector3 normal = intersect_AABB_AABB(curr_box, collision_box);
+                float *depth = malloc(sizeof(float));
+                Vector3 normal = intersect_AABB_AABB(curr_box, collision_box, depth);
                 if (!vector3_compare(normal, vector3_zero())) {
-                    physics_manager_handle_collision(curr, col_curr, normal);
+                    physics_manager_handle_collision(curr, col_curr, normal, *depth);
                 }
+                free(depth);
             }
         }
     }

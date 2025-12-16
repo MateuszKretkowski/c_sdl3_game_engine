@@ -66,7 +66,7 @@ void physics_manager_remove(GameObject *gameObject) {
     }
 }
 
-void physics_manager_handle_collision(GameObject *objA, GameObject *objB, Vector3 normal) {
+void physics_manager_handle_collision(GameObject *objA, GameObject *objB, Vector3 normal, float depth) {
     rigid_body_component *rb_a = get_component(objA, rigid_body_component, "rigid_body_component");
     rigid_body_component *rb_b = get_component(objB, rigid_body_component, "rigid_body_component");
 
@@ -77,6 +77,15 @@ void physics_manager_handle_collision(GameObject *objA, GameObject *objB, Vector
     transform_component *transform_a = get_component(objA, transform_component, "transform_component");
     transform_component *transform_b = get_component(objB, transform_component, "transform_component");
 
+    // calculate depth
+    printf("depth: %f\n", depth);
+    if (!rb_a->is_kinematic && depth != 0) {
+        transform_a->position = vector3_subtract(transform_a->position, vector3_multiply(normal, -depth/2));
+    }
+    if (!rb_b->is_kinematic && depth != 0) {
+        transform_b->position = vector3_subtract(transform_b->position, vector3_multiply(normal, depth/2));
+    }
+    
     physics_material *pm_a = rb_a->physics_material;
     physics_material *pm_b = rb_b->physics_material;
 
@@ -157,8 +166,6 @@ void physics_manager_handle_collision(GameObject *objA, GameObject *objB, Vector
     
     // now we have defined every variable that we need to calculate new velocities:
 
-    // na jutro: dokojnczyc Va Vb:
-
     float avg_restitution = (pm_a->restitution + pm_b->restitution)/2;
 
     if (!rb_a->is_kinematic) {
@@ -183,7 +190,7 @@ void physics_manager_calculate_objects() {
         if (vector3_length(currVelocity) > physics_m->max_velocity) {
             currVelocity = vector3_multiply(vector3_normalize(currVelocity), physics_m->max_velocity);
         }
-        vector3_multiply(currVelocity, physics_m->air_resistance);
+        currVelocity = vector3_multiply(currVelocity, physics_m->air_resistance);
         rb->velocity = currVelocity;
         Vector3 currPos = vector3_add(transform->position, vector3_multiply(currVelocity, physics_m->timestep));
         transform->position = currPos;
