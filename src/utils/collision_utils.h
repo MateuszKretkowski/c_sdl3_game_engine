@@ -12,10 +12,10 @@
 #include "../components/box_collider_component.h"
 
 bool intersect_point_AABB(box_collider_component *comp, Vector3 pos);
-Vector3 intersect_AABB_AABB(box_collider_component *compA, box_collider_component *compB);
+Vector3 intersect_AABB_AABB(box_collider_component *compA, box_collider_component *compB, float *depth);
 
 bool intersect_point_sphere(sphere_collider_component *comp, Vector3 point);
-Vector3 intersect_sphere_sphere(sphere_collider_component *compA, sphere_collider_component *compB);
-Vector3 intersect_AABB_sphere(box_collider_component *compA, sphere_collider_component *compB);
+Vector3 intersect_sphere_sphere(sphere_collider_component *compA, sphere_collider_component *compB, float *depth);
+Vector3 intersect_AABB_sphere(box_collider_component *compA, sphere_collider_component *compB, float *depth);
 
 #endif
