@@ -18,7 +18,7 @@ void sample_start(Component* self) {
     sample_component *comp = (sample_component*)self;
     
     if (strcmp(self->gameObject->id, "sphere_1") == 0) {
-        float force = 150;
+        float force = 800;
         add_force(get_component(self->gameObject, rigid_body_component, "rigid_body_component"), vector3_right(), force*4);
         add_force(get_component(self->gameObject, rigid_body_component, "rigid_body_component"), vector3_up(), force);
     }

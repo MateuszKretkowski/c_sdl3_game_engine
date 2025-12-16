@@ -15,6 +15,7 @@ typedef struct {
 
     Vector3 gravity_force;
     float timestep;
+    float air_resistance;
     float max_velocity;
 } physics_manager;
 
