@@ -20,7 +20,12 @@ void physics_manager_init(cJSON *json) {
     if (timestep && timestep->valuedouble) {
         physics_m->timestep = timestep->valuedouble;
     }
-    
+        
+    cJSON *air_resistance = cJSON_GetObjectItemCaseSensitive(physics_config, "air_resistance");
+    if (air_resistance && air_resistance->valuedouble) {
+        physics_m->air_resistance = air_resistance->valuedouble;
+    }
+
     cJSON *max_velocity = cJSON_GetObjectItemCaseSensitive(physics_config, "max_velocity");
     if (max_velocity && max_velocity->valuedouble) {
         physics_m->max_velocity = max_velocity->valuedouble;
@@ -95,8 +100,7 @@ void physics_manager_handle_collision(GameObject *objA, GameObject *objB, Vector
 
     Vector3 Uao = normal;
 
-    printf("GameObject: %s, Uao.y: %f\n", rb_a->base.gameObject->id, Uao.y);
-
+    
     // calculating Uap:
     Vector3 Uap = vector3_zero();
     Vector3 cross_ua_uao = vector3_cross(Ua, Uao);
@@ -107,18 +111,25 @@ void physics_manager_handle_collision(GameObject *objA, GameObject *objB, Vector
         }
     }
     // debug_draw_sphere(Uao, 0.2, color, 0.01);
-
+    
     // Lao = dot(Uao, Ua)
     float Lao = vector3_dot(Uao, Ua);
     float Lap = vector3_dot(Uap, Ua);
 
-    printf("GameObject: %s, Lao: %f\n", rb_a->base.gameObject->id, Lao);
-
+    float Lap_friction_force = rb_a->physics_material->friction * Lap;
+    
+    if (fabs(Lap_friction_force) >= fabs(Lap)) {
+        Lap = 0;
+    }
+    else {
+        Lap -= Lap_friction_force;
+    }
+    
     // SPHERE_B
     // same here, but instead of Ubo we take Uao, because if we took Ubo, then the vector would had opposite direction.
     
     // so we don't calculkate Ubo, we take Uao.
-
+    
     Vector3 Ubp = vector3_zero();
     Vector3 cross_ub_uao = vector3_cross(Ub, Uao);
     if (vector3_length(cross_ub_uao) > 0.0001f) {
@@ -131,6 +142,19 @@ void physics_manager_handle_collision(GameObject *objA, GameObject *objB, Vector
     float Lbo = vector3_dot(Uao, Ub);
     float Lbp = vector3_dot(Ubp, Ub);
 
+    float Lbp_friction_force = rb_b->physics_material->friction * Lbp;
+
+    if (fabs(Lbp_friction_force) >= fabs(Lbp)) {
+        Lbp = 0;
+    }
+    else {
+        Lbp -= Lbp_friction_force;
+    }
+
+    
+    printf("GameObject: %s, Uao.y: %f\n", rb_b->base.gameObject->id, Uao.y);
+    printf("GameObject: %s, Lao: %f\n", rb_b->base.gameObject->id, Lbo);
+    
     // now we have defined every variable that we need to calculate new velocities:
 
     // na jutro: dokojnczyc Va Vb:
@@ -159,6 +183,7 @@ void physics_manager_calculate_objects() {
         if (vector3_length(currVelocity) > physics_m->max_velocity) {
             currVelocity = vector3_multiply(vector3_normalize(currVelocity), physics_m->max_velocity);
         }
+        vector3_multiply(currVelocity, physics_m->air_resistance);
         rb->velocity = currVelocity;
         Vector3 currPos = vector3_add(transform->position, vector3_multiply(currVelocity, physics_m->timestep));
         transform->position = currPos;
