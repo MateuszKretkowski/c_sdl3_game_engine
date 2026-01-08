@@ -8,6 +8,7 @@
 #include "rigid_body_component.h"
 #include "sample_component.h"
 #include "sphere_collider_component.h"
+#include "spring_component.h"
 #include "transform_component.h"
 
 #endif
