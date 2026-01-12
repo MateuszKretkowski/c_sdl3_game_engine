@@ -20,13 +20,17 @@ void spring_start(Component* self) {
 
 void spring_update(Component* self) {
     spring_component *comp = (spring_component*)self;
+    Vector3 middle_u = vector3_divide(vector3_subtract(comp->tc_1->posiiton, comp->tc_2->position), vector3_length(vector3_subtract(comp->tc_1->posiiton, comp->tc_2->position)));
+    float force = -(comp->stiffness * comp->length);
+    add_force(comp->obj_1, middle_u, force);
+    add_force(comp->obj_2, middle_u, force);
 }
 
 void spring_destroy(Component* self) {
     spring_component *comp = (spring_component*)self;
 }
 
-spring_component *create_spring_component(float stiffness, GameObject *obj_1, GameObject *obj_2) {
+spring_component *create_spring_component(float stiffness, rigid_body_component *obj_1, transform_component *tc_1,  rigid_body_component *obj_2, transform_component *tc_2) {
     spring_component* comp = malloc(sizeof(spring_component));
     comp->base.id = strdup("spring_component");
     comp->base.name = strdup("spring");
@@ -42,7 +46,9 @@ spring_component *create_spring_component(float stiffness, GameObject *obj_1, Ga
     comp->stiffness = stiffness;
 
     comp->obj_1 = obj_1;
+    comp->tc_1 = tc_1;
     comp->obj_2 = obj_2;
+    comp->tc_2 = tc_2;
 
     return comp;
 }

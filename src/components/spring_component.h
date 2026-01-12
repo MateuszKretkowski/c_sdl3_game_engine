@@ -8,11 +8,14 @@ typedef struct {
     Component base;
 
     float stiffness;
+    float length;
 
-    GameObject *obj_1;
-    GameObject *obj_2;
+    rigid_body_component *obj_1;
+    transform_component *tc_1;
+    rigid_body_component *obj_2;
+    transform_component *tc_2;
 } spring_component;
 
-spring_component *create_spring_component(float stiffness, GameObject *obj_1, GameObject *obj_2);
+spring_component *create_spring_component(float stiffness, rigid_body_component *obj_1, transform_component *tc_1, rigid_body_component *obj_2, transform_component *tc_2);
 
 #endif
