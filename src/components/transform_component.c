@@ -9,6 +9,9 @@
 
 #include <cglm/cglm.h>
 
+void transform_translate(transform_component *t, Vector3 pos);
+void transform_rotate(transform_component *t, Vector3 rot);
+
 void transform_awake(Component* self) {
     transform_component *t = (transform_component*)self;
 
@@ -37,6 +40,7 @@ void transform_update(Component* self) {
     
     vec3 pos = {t->position.x, t->position.y, t->position.z};
     glm_translate(t->model, pos);
+
     
     vec3 x_axis = {1.0f, 0.0f, 0.0f};
     vec3 y_axis = {0.0f, 1.0f, 0.0f};
@@ -47,11 +51,29 @@ void transform_update(Component* self) {
     
     vec3 scale = {t->scale.x, t->scale.y, t->scale.z};
     glm_scale(t->model, scale);
+    
+    GameObject **children = get_children(t->base.gameObject);
+    for (int i=0; i<t->base.gameObject->gameObjects_length; i++) {
+        transform_component *child_tc = get_component(children[i], transform_component, "transform_component");
+        
+        transform_translate(child_tc, t->position);
+        transform_rotate(child_tc, t->rotation);
+    }
 }
 
 void transform_destroy(Component* self) {
     transform_component *t = (transform_component*)self;
 
+}
+
+void transform_translate(transform_component *t, Vector3 pos) {
+    if (!t || vector3_compare(pos, vector3_zero())) return;
+    t->position = vector3_add(t->position, pos);
+}
+
+void transform_rotate(transform_component *t, Vector3 rot) {
+    if (!t || vector3_compare(rot, vector3_zero())) return;
+    t->position = vector3_add(t->position, rot);
 }
 
 void transform_set_position(transform_component *t, Vector3 pos) {
