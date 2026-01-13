@@ -208,6 +208,20 @@ Component *get_component_base(GameObject *gameObject, const char *id) {
     return NULL;
 }
 
+// Child Actions:
+void add_child(GameObject *parent, GameObject *child) {
+    if (!parent || !child) {
+        printf("add_child(): invalid parameters\n");
+        return;
+    }
+    if (parent->gameObjects_length == parent->gameObjects_capacity) {
+        parent->gameObjects_capacity *= 2;
+        parent->gameObjects = realloc(parent->gameObjects, sizeof(GameObject*)*parent->gameObjects_capacity);
+    }
+    parent->gameObjects[parent->gameObjects_length] = child;
+    parent->gameObjects_length++;
+}
+
 GameObject *instantiate_prefab(GameObject *prefab) {
     if (!prefab) {
         fprintf(stderr, "instantiate_prefab: ERROR - prefab is NULL\n");
