@@ -17,6 +17,9 @@ typedef struct {
 
 transform_component *create_transform_component(Vector3 pos, Vector3 rot, Vector3 scale);
 
+void transform_translate(transform_component *t, Vector3 pos);
+void transform_rotate(transform_component *t, Vector3 rot);
+
 // Setters
 void transform_set_position(transform_component *t, Vector3 pos);
 void transform_set_rotation(transform_component *t, Vector3 rot);
