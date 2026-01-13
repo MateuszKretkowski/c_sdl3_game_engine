@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "resource_manager.h"
+#include "core/gameObject.h"
 #include "engine/scene_manager.h"
 #include "components/components.h"
 #include "components/transform_component.h"
@@ -597,6 +598,24 @@ void resource_load_prefab(char *prefab_id)
                 fprintf(stderr, "ERROR: Failed to create component '%s' for prefab '%s'\n",
                         component_id->valuestring, prefab_id);
             }
+        }
+    }
+
+    cJSON *gameObjects_json = cJSON_GetObjectItemCaseSensitive(prefab_json, "gameObjects");
+    if (cJSON_IsArray(gameObjects_json))
+    {
+        cJSON *gameObject_json = NULL;
+        cJSON_ArrayForEach(gameObject_json, gameObjects_json)
+        {
+            cJSON *gameObject_id = cJSON_GetObjectItemCaseSensitive(gameObject_json, "id");
+
+            if (!cJSON_IsString(gameObject_id) || !gameObject_id->valuestring)
+            {
+                fprintf(stderr, "ERROR: Component missing 'id' field in prefab '%s'\n", prefab_id);
+                continue;
+            }
+
+            add_child(prefab, resource_get_prefab(gameObject_id->valuestring));
         }
     }
 
