@@ -3,6 +3,7 @@
 
 #include "utils.h"
 #include "core/component.h"
+#include "components/components.h"
 
 typedef struct {
     Component base;

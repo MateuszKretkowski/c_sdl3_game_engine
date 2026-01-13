@@ -20,7 +20,7 @@ void spring_start(Component* self) {
 
 void spring_update(Component* self) {
     spring_component *comp = (spring_component*)self;
-    Vector3 middle_u = vector3_divide(vector3_subtract(comp->tc_1->posiiton, comp->tc_2->position), vector3_length(vector3_subtract(comp->tc_1->posiiton, comp->tc_2->position)));
+    Vector3 middle_u = vector3_divide(vector3_subtract(comp->tc_1->position, comp->tc_2->position), vector3_length(vector3_subtract(comp->tc_1->position, comp->tc_2->position)));
     float force = -(comp->stiffness * comp->length);
     add_force(comp->obj_1, middle_u, force);
     add_force(comp->obj_2, middle_u, force);
@@ -51,24 +51,4 @@ spring_component *create_spring_component(float stiffness, rigid_body_component 
     comp->tc_2 = tc_2;
 
     return comp;
-}
-
-Component* spring_from_json(cJSON *json) {
-    if (!json) {
-        fprintf(stderr, "ERROR: spring_from_json received NULL json\n");
-        return NULL;
-    }
-    float stiffness = 10.0f;
-    cJSON *stiffness_json = cJSON_GetObjectItemCaseSensitive(json, "stiffness");
-    if (stiffness_json && cJSON_IsNumber(stiffness_json)) {
-        stiffness = (float)stiffness_json->valuedouble;
-    }
-    spring_component *comp = create_spring_component(stiffness, NULL, NULL);
-
-    return (Component*)comp;
-}
-
-__attribute__((constructor))
-static void register_spring_component() {
-    component_registry_register("spring_component", spring_from_json);
 }
