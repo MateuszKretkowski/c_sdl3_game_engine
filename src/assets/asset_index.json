@@ -15,7 +15,8 @@
 		"floor":	"src/assets/prefabs/floor.json",
 		"sphere_1":	"src/assets/prefabs/sphere_1.json",
 		"sphere_2":	"src/assets/prefabs/sphere_2.json",
-		"sphere_debug_prefab":	"src/assets/prefabs/sphere_debug.json"
+		"sphere_debug_prefab":	"src/assets/prefabs/sphere_debug.json",
+		"squishy_ball":	"src/assets/prefabs/squishy_ball.json"
 	},
 	"shaders":	{
 		"standard_lit":	"src/assets/shaders/standard_shader.json"
