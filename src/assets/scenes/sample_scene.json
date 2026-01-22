@@ -19,64 +19,70 @@
         {
             "id": "camera",
             "components": [
-                {"id": "transform_component", "position": [0, 0, 4], "rotation": [0, 0, 0], "scale": [1, 1, 1]},
-                {"id": "camera_component", "target": "squishy_ball", "up": [0, 1, 0], "fov": 45, "aspect_ratio": 1.777, "near_plane": 0.1, "far_plane": 100, "is_orthographic": false}
+                {"id": "transform_component", "position": [0, 0, 2], "rotation": [0, 0, 0], "scale": [1, 1, 1]},
+                {"id": "camera_component", "target": "sphere_1", "up": [0, 1, 0], "fov": 45, "aspect_ratio": 1.777, "near_plane": 0.1, "far_plane": 100, "is_orthographic": false}
             ]
         },
         {
-            "id": "squishy_ball",
-            "name": "squishy_ball",
+            "id": "sphere_1",
+            "name": "sphere_1",
             "components": [
-                {"id": "transform_component", "position": [0, 0, 0], "rotation": [0, 0, 0], "scale": [1, 1, 1]},
-                {"id": "soft_body_component", "physics_material": "physics_material_plastic", "mass": 1, "use_gravity": true, "is_kinematic": false, "child_count": 0}
+                {"id": "transform_component", "position": [-0.4, -0.2, 0.2], "rotation": [0, 0, 0], "scale": [0.5, 0.5, 0.5]}
+            ]
+        },
+        {
+            "id": "sphere_2",
+            "name": "sphere_2",
+            "components": [
+                {"id": "transform_component", "position": [1, -0.2, -0.2], "rotation": [0, 0, 0], "scale": [0.5, 0.5, 0.5]}
             ]
         },
         {
             "id": "floor",
             "name": "floor bottom",
             "components": [
-                {"id": "transform_component", "position": [0, -5.1, 0], "rotation": [0, 0, 0], "scale": [10, 0.2, 10]},
-                {"id": "box_collider_component", "position": [0, 0, 0], "scale": [9.8, 0.2, 9.8]}
+                {"id": "transform_component", "position": [0, -2.55, 0], "rotation": [0, 0, 0], "scale": [5, 0.1, 5]},
+                {"id": "box_collider_component", "position": [0, 0, 0], "scale": [4.9, 0.1, 4.9]}
             ]
         },
         {
             "id": "floor",
             "name": "floor up",
             "components": [
-                {"id": "transform_component", "position": [0, 5.1, 0], "rotation": [0, 0, 0], "scale": [10, 0.2, 10]},
-                {"id": "box_collider_component", "position": [0, 0, 0], "scale": [9.8, 0.2, 9.8]}
+                {"id": "transform_component", "position": [0, 2.55, 0], "rotation": [0, 0, 0], "scale": [5, 0.1, 5]},
+                {"id": "box_collider_component", "position": [0, 0, 0], "scale": [4.9, 0.1, 4.9]}
             ]
         },
         {
             "id": "floor",
             "name": "floor left",
             "components": [
-                {"id": "transform_component", "position": [-5.1, 0, 0], "rotation": [0, 0, 90], "scale": [10, 0.2, 10]},
-                {"id": "box_collider_component", "position": [0, 0, 0], "scale": [0.2, 9.8, 9.8]}
+                {"id": "transform_component", "position": [-2.55, 0, 0], "rotation": [0, 0, 90], "scale": [5, 0.1, 5]},
+                {"id": "box_collider_component", "position": [0, 0, 0], "scale": [0.1, 4.9, 4.9]}
             ]
         },
         {
             "id": "floor",
             "name": "floor right",
             "components": [
-                {"id": "transform_component", "position": [5.1, 0, 0], "rotation": [0, 0, 90], "scale": [10, 0.2, 10]},
-                {"id": "box_collider_component", "position": [0, 0, 0], "scale": [0.2, 9.8, 9.8]}
+                {"id": "transform_component", "position": [2.55, 0, 0], "rotation": [0, 0, 90], "scale": [5, 0.1, 5]},
+                {"id": "box_collider_component", "position": [0, 0, 0], "scale": [0.1, 4.9, 4.9]}
             ]
         },
         {
             "id": "floor",
             "name": "floor back",
             "components": [
-                {"id": "transform_component", "position": [0, 0, -5.1], "rotation": [90, 0, 0], "scale": [10, 0.2, 10]},
-                {"id": "box_collider_component", "position": [0, 0, 0], "scale": [9.8, 9.8, 0.2]}
+                {"id": "transform_component", "position": [0, 0, -2.55], "rotation": [90, 0, 0], "scale": [5, 0.1, 5]},
+                {"id": "box_collider_component", "position": [0, 0, 0], "scale": [4.9, 4.9, 0.1]}
             ]
         },
         {
             "id": "floor",
             "name": "floor front",
             "components": [
-                {"id": "transform_component", "position": [0, 0, 5.1], "rotation": [90, 0, 0], "scale": [10, 0.2, 10]},
-                {"id": "box_collider_component", "position": [0, 0, 0], "scale": [9.8, 9.8, 0.2]}
+                {"id": "transform_component", "position": [0, 0, 2.55], "rotation": [90, 0, 0], "scale": [5, 0.1, 5]},
+                {"id": "box_collider_component", "position": [0, 0, 0], "scale": [4.9, 4.9, 0.1]}
             ]
         }
     ]
