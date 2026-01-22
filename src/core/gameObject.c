@@ -32,6 +32,16 @@ GameObject *instantiate_gameObject(char* id) {
     gameObject->components_capacity = 8;
     gameObject->components_length = 0;
 
+    gameObject->gameObjects = malloc(sizeof(GameObject*) * 8);
+    if (!gameObject->components) {
+        fprintf(stderr, "instantiate_gameObject: failed to allocate memory for gameObjects array\n");
+        free(gameObject->id);
+        free(gameObject);
+        return NULL;
+    }
+    gameObject->gameObjects_capacity = 8;
+    gameObject->gameObjects_length = 0;
+
     return gameObject;
 }
 
@@ -209,6 +219,27 @@ Component *get_component_base(GameObject *gameObject, const char *id) {
 }
 
 // Child Actions:
+GameObject *get_child(GameObject *parent, int index) {
+    if (!parent || index < 0) {
+        printf("get_child(): invalid parameters;\n");
+    }
+    if (parent->gameObjects_length < index) {
+        printf("get_child(): index too large;\n");
+    }
+    return parent->gameObjects[index];
+}
+
+GameObject **get_children(GameObject *gameObject) {
+    if (!gameObject) {
+        printf("get_children(): invalid parameter;\n");
+        return NULL;
+    }
+    if (gameObject->gameObjects_length <= 0) {
+        return NULL;
+    }
+    return gameObject->gameObjects;
+}
+
 void add_child(GameObject *parent, GameObject *child) {
     if (!parent || !child) {
         printf("add_child(): invalid parameters\n");
@@ -220,6 +251,34 @@ void add_child(GameObject *parent, GameObject *child) {
     }
     parent->gameObjects[parent->gameObjects_length] = child;
     parent->gameObjects_length++;
+}
+
+void remove_child_by_gameObject(GameObject *parent, GameObject *child) {
+    if (!parent || !child) {
+        printf("remove_child(): invalid parameters\n");
+        return;
+    }
+    for (int i=0; i<parent->gameObjects_length; i++) {
+        if (strcmp(parent->gameObjects[i]->id, child->id) == 0) {
+            parent->gameObjects[i] = parent->gameObjects[parent->gameObjects_length];
+            parent->gameObjects_length--;
+            return;
+        }
+    }
+    printf("remove_child(): child not found;\n");
+}
+
+void remove_child(GameObject *parent, int index) {
+    if (!parent || index < 0) {
+        printf("remove_child_by_id(): invalid parameters\n");
+        return;
+    }
+    if (index > parent->gameObjects_length) {
+        printf("remove_child_by_id(): index too large;\n");
+        return;
+    }
+    parent->gameObjects[index] = parent->gameObjects[parent->gameObjects_length];
+    parent->gameObjects_length--;
 }
 
 GameObject *instantiate_prefab(GameObject *prefab) {
