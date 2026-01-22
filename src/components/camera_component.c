@@ -32,7 +32,6 @@ void camera_update(Component* self) {
         return;
     }
 
-    float radius = 3.0f;
     float speed = 8;
     float horizontal_input = input_gamepad_get_axis_deadzone(SDL_GAMEPAD_AXIS_RIGHTX, 0.15f);
     float vertical_input = input_gamepad_get_axis_deadzone(SDL_GAMEPAD_AXIS_RIGHTY, 0.15f);
@@ -135,8 +134,7 @@ Component* camera_from_json(cJSON *json) {
     }
     else {
       Vector3 origin = {0, 0, 0};
-      Vector3 rot = {0, 0, 0};            // Store the target ID string to resolve later
-
+      Vector3 rot = {0, 0, 0};
       Vector3 scale = {1, 1, 1};
       target = create_transform_component(origin, rot, scale);
     }
