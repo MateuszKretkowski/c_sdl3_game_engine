@@ -20,21 +20,15 @@
             "id": "camera",
             "components": [
                 {"id": "transform_component", "position": [0, 0, 4], "rotation": [0, 0, 0], "scale": [1, 1, 1]},
-                {"id": "camera_component", "target": "sphere_2", "up": [0, 1, 0], "fov": 45, "aspect_ratio": 1.777, "near_plane": 0.1, "far_plane": 100, "is_orthographic": false}
+                {"id": "camera_component", "target": "squishy_ball", "up": [0, 1, 0], "fov": 45, "aspect_ratio": 1.777, "near_plane": 0.1, "far_plane": 100, "is_orthographic": false}
             ]
         },
         {
-            "id": "sphere_1",
-            "name": "sphere_1",
+            "id": "squishy_ball",
+            "name": "squishy_ball",
             "components": [
-                {"id": "transform_component", "position": [-0.4, -0.2, 0], "rotation": [0, 0, 0], "scale": [0.5, 0.5, 0.5]}
-            ]
-        },
-        {
-            "id": "sphere_2",
-            "name": "sphere_2",
-            "components": [
-                {"id": "transform_component", "position": [1, -0.2, 0], "rotation": [0, 0, 0], "scale": [0.5, 0.5, 0.5]}
+                {"id": "transform_component", "position": [0, 0, 0], "rotation": [0, 0, 0], "scale": [1, 1, 1]},
+                {"id": "soft_body_component", "physics_material": "physics_material_plastic", "mass": 1, "use_gravity": true, "is_kinematic": false, "child_count": 0}
             ]
         },
         {
