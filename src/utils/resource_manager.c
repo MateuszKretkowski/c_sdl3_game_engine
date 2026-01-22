@@ -387,7 +387,6 @@ Scene *resource_get_scene(char *id) {
             scene->gameObjects[i].name = strdup(name_json->valuestring);
         }
 
-        fprintf(stderr, "DEBUG: GameObject '%s' has %d components after prefab instantiation\n", go_id, scene->gameObjects[i].components_length);
 
         if (cJSON_IsArray(cJSON_GetObjectItemCaseSensitive(gameObject_json, "components"))) {
             cJSON *component_json = NULL;
@@ -397,8 +396,6 @@ Scene *resource_get_scene(char *id) {
                     fprintf(stderr, "No component_id in %s scene json.\n", go_id);
                     break;
                 }
-                fprintf(stderr, "DEBUG: Processing component '%s' for GameObject '%s'\n", component_id->valuestring, go_id);
-                fprintf(stderr, "DEBUG: GameObject '%s' has %d components BEFORE remove_component_by_id\n", go_id, scene->gameObjects[i].components_length);
 
                 Component *component = component_registry_create(component_id->valuestring, component_json);
                 if (!component) {
@@ -407,15 +404,11 @@ Scene *resource_get_scene(char *id) {
                 }
 
                 remove_component_by_id(&scene->gameObjects[i], component_id->valuestring);
-                fprintf(stderr, "DEBUG: GameObject '%s' has %d components AFTER remove_component_by_id\n", go_id, scene->gameObjects[i].components_length);
                 add_component(&scene->gameObjects[i], component);
-                fprintf(stderr, "DEBUG: GameObject '%s' has %d components AFTER add_component\n", go_id, scene->gameObjects[i].components_length);
             }
         }
 
-        fprintf(stderr, "DEBUG: GameObject '%s' FINAL component count: %d\n", go_id, scene->gameObjects[i].components_length);
-
-        free(go_id);
+       free(go_id);
         i++;
     }
     scene->gameObjects_length = i;
