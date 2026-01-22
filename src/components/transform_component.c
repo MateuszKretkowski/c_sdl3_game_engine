@@ -51,13 +51,14 @@ void transform_update(Component* self) {
     
     vec3 scale = {t->scale.x, t->scale.y, t->scale.z};
     glm_scale(t->model, scale);
-    
     GameObject **children = get_children(t->base.gameObject);
-    for (int i=0; i<t->base.gameObject->gameObjects_length; i++) {
-        transform_component *child_tc = get_component(children[i], transform_component, "transform_component");
-        
-        transform_translate(child_tc, t->position);
-        transform_rotate(child_tc, t->rotation);
+    if (children) {
+        for (int i=0; i<t->base.gameObject->gameObjects_length; i++) {
+            transform_component *child_tc = get_component(children[i], transform_component, "transform_component");
+            
+            transform_translate(child_tc, t->position);
+            transform_rotate(child_tc, t->rotation);
+        }
     }
 }
 
