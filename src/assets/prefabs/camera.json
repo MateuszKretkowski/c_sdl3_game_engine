@@ -18,5 +18,8 @@
             "far_plane": 100,
             "is_orthographic": false
         }
+    ],
+    "gameObjects": [
+        
     ]
 }

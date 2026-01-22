@@ -14,5 +14,8 @@
         },
         {"id": "rigid_body_component", "physics_material": "physics_material_plastic", "mass": 10000000, "velocity": [0, 0, 0], "use_gravity": false, "is_kinematic": true},
         {"id": "box_collider_component", "position": [0, 0, 0], "scale": [1, 1, 1]}
+    ],
+    "gameObjects": [
+        
     ]
 }
