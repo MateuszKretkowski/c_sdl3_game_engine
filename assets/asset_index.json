@@ -1,0 +1,30 @@
+{
+	"materials":	{
+		"material_bricks":	"assets/materials/material_bricks.json",
+		"prototype_dark_material":	"assets/materials/prototype_dark_material.json",
+		"prototype_white_material":	"assets/materials/prototype_white_material.json",
+		"material_white":	"assets/materials/white.json"
+	},
+	"meshes":	{
+		"rectangle_3d":	"assets/meshes/rectangle2D.json",
+		"sphere":	"assets/meshes/sphere.json",
+		"sphere_debug":	"assets/meshes/sphere_debug.json"
+	},
+	"prefabs":	{
+		"camera":	"assets/prefabs/camera.json",
+		"floor":	"assets/prefabs/floor.json",
+		"sphere_1":	"assets/prefabs/sphere_1.json",
+		"sphere_2":	"assets/prefabs/sphere_2.json",
+		"sphere_debug_prefab":	"assets/prefabs/sphere_debug.json",
+		"squishy_ball":	"assets/prefabs/squishy_ball.json"
+	},
+	"shaders_id":	{
+		"standard_lit":	"assets/shaders_id/standard_shader.json"
+	},
+	"scenes":	{
+		"sample_scene":	"assets/scenes/sample_scene.json"
+	},
+	"physics_materials":	{
+		"physics_material_plastic":	"assets/physics_materials/physics_material_plastic.json"
+	}
+}
