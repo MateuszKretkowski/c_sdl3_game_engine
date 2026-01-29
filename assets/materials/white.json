@@ -1,0 +1,16 @@
+{
+  "id": "material_white",
+  "name": "Standard White Material",
+  
+  "shader": "standard_lit",
+
+  "maps": {
+    "diffuse": "assets/textures/white/white_color.png",
+    "specular": "assets/textures/brick_texture/bricks_roughness.png",
+    "normal": "assets/textures/brick_texture/bricks_normal.png"
+  },
+
+  "properties": {
+    "shininess": 32.0
+  }
+}

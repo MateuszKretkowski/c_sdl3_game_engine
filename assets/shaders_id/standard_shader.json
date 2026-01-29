@@ -1,0 +1,6 @@
+{
+  "id": "standard_lit",
+  "name": "standard_lit",
+  "vertex_path": "assets/shaders/vertex_shader.glsl",
+  "fragment_path": "assets/shaders/fragment_shader.glsl"
+}

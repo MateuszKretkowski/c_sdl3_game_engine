@@ -1,0 +1,19 @@
+{
+    "id": "sphere_2",
+    "name": "sphere_2",
+    "components": [
+        {
+            "id": "transform_component",
+            "position": [0, 0, 0],
+            "rotation": [0, 0, 0],
+            "scale": [1, 1, 1]
+        },
+        {
+            "id": "mesh_renderer_component",
+            "mesh": "sphere"
+        },
+        {"id": "rigid_body_component", "physics_material": "physics_material_plastic", "mass": 1.5, "velocity": [0, 0, 0], "use_gravity": true, "is_kinematic": false},
+        {"id": "sphere_collider_component", "position": [0, 0, 0], "radius": 0.25},
+        {"id": "sample_component"}
+    ]
+}

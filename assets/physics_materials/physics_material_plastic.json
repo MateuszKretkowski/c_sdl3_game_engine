@@ -1,0 +1,7 @@
+{
+  "id": "physics_material_plastic",
+  "name": "Plastic",
+  "friction": 0.5,
+  "restitution": 0.7,
+  "density": 1.2
+}
