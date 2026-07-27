@@ -4,8 +4,9 @@
         {
             "label": "build project",
             "type": "shell",
-            // Komenda to teraz 'make' (upewnij się, że masz go w MSYS64)
-            "command": "C:\\msys64\\usr\\bin\\make.exe",
+            // Uzywamy mingw32-make z ucrt64 (nie usr/bin/make z MSYS) - pasuje do tego samego
+            // toolchaina co gcc i unika problemow z mieszaniem srodowisk MSYS/native
+            "command": "C:\\msys64\\ucrt64\\bin\\mingw32-make.exe",
             "args": [],
             "options": {
                 "cwd": "${workspaceFolder}"

@@ -5,17 +5,10 @@
             "name": "Build Game Engine",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/src/main.exe",
-            "args": [
-                "-fdiagnostics-color=always",
-                "-g",
-                "main.c",
-                "utils.c",
-                "-o",
-                "main.exe"
-            ],
+            "program": "${workspaceFolder}/build/main.exe",
+            "args": [],
             "stopAtEntry": false,
-            "cwd": "${workspaceFolder}/src",
+            "cwd": "${workspaceFolder}",
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
@@ -27,7 +20,7 @@
                     "ignoreFailures": true
                 }
             ],
-            "preLaunchTask": "Build game engine (main + utils)"
+            "preLaunchTask": "build project"
         }
     ]
 }

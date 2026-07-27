@@ -1,11 +1,11 @@
-CC = C:/msys64/ucrt64/bin/gcc.exe
+CC = gcc
 TARGET = build/main.exe
 ASSET_INDEXER = build/asset_indexer.exe
 COMPONENT_GENERATOR = build/component_header_generator.exe
 CFLAGS = -g -Wall
 
-INCLUDES = -I. -Isrc -Iinclude -Ilibs -IC:/msys64/ucrt64/include -IC:/msys64/ucrt64/include/SDL3 -Isrc/engine -Isrc/graphics -Isrc/utils
-LIBS = -LC:/msys64/ucrt64/lib -lSDL3 -lopengl32 -lshlwapi
+INCLUDES = -I. -Isrc -Iinclude -Ilibs -Isrc/engine -Isrc/graphics -Isrc/utils
+LIBS = -lSDL3 -lopengl32 -lshlwapi
 
 SOURCES = $(filter-out src/build_tools/%, $(wildcard src/*.c src/*/*.c))
 

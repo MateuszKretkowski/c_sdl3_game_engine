@@ -9,7 +9,7 @@
           "${workspaceFolder}/src/engine",
           "${workspaceFolder}/src/graphics",
           "${workspaceFolder}/src/utils",
-          "C:/libs/SDL3/SDL3-3.2.22/x86_64-w64-mingw32/include",
+          "C:/msys64/ucrt64/include"
       ],
       "defines": [],
       "compilerPath": "C:/msys64/ucrt64/bin/gcc.exe",  // ← tu pełna ścieżka!
