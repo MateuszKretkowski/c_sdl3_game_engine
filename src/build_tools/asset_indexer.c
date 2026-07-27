@@ -5,15 +5,15 @@
 #include <dirent.h>
 #include <cJSON.h>
 
-const char *asset_index_path = "src/assets/asset_index.json";
+const char *asset_index_path = "assets/asset_index.json";
 
 const char *extension = ".json";
-const char *materials_path = "src/assets/materials/";
-const char *meshes_path = "src/assets/meshes/";
-const char *prefabs_path = "src/assets/prefabs/";
-const char *shaders_path = "src/assets/shaders/";
-const char *scenes_path = "src/assets/scenes/";
-const char *physics_materials_path = "src/assets/physics_materials/";
+const char *materials_path = "assets/materials/";
+const char *meshes_path = "assets/meshes/";
+const char *prefabs_path = "assets/prefabs/";
+const char *shaders_path = "assets/shaders/";
+const char *scenes_path = "assets/scenes/";
+const char *physics_materials_path = "assets/physics_materials/";
 
 void id_json(cJSON *asset_index_json, const char *path, const char *category) {
     struct dirent *entry;

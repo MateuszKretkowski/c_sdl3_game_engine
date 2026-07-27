@@ -15,7 +15,7 @@ HashMap *shader_cache = NULL;
 HashMap *prefab_cache = NULL;
 HashMap *physics_material_cache = NULL;
 
-const char *asset_index_path = "src/assets/asset_index.json";
+const char *asset_index_path = "assets/asset_index.json";
 cJSON *asset_index_json = NULL;
 
 void initialize_resource_manager()

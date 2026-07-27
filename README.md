@@ -20,3 +20,32 @@ Silnik używa SDL3 + OpenGL 3.3 Core i buduje się przez `make` z toolchainem MS
 Uwaga: `mingw32-make` (z `ucrt64\bin`), nie `make` z `usr\bin` — to drugie to build MSYS-owy i w parze z natywnym gcc z `ucrt64` potrafi się wykrzaczać (np. błędami o tworzeniu plików tymczasowych).
 
 macOS/Linux nie są obecnie wspierane (build i `src/engine/init.h` zakładają Windows albo Linux-owe `/proc/self/exe` — macOS wymaga osobnej gałęzi).
+
+## Struktura assetów
+
+Wszystkie zasoby runtime'u leżą pod jednym katalogiem `assets/`:
+
+| Katalog | Zawartość |
+|---|---|
+| `assets/asset_index.json` | indeks id → ścieżka, **generowany automatycznie** przez `asset_indexer` przy każdym buildzie (nie edytuj ręcznie) |
+| `assets/materials/`, `meshes/`, `prefabs/`, `scenes/`, `physics_materials/` | deskryptory JSON |
+| `assets/shaders/` | deskryptory shaderów (JSON wskazujący na pliki GLSL) |
+| `assets/glsl/` | surowy kod GLSL |
+| `assets/textures/` | surowe PNG |
+
+Ścieżki wewnątrz JSON-ów są **względne do katalogu głównego projektu** i zawsze zaczynają się od `assets/` (np. `"diffuse": "assets/textures/white/white_color.png"`). `main.exe` sam ustawia working directory na katalog projektu (dwa poziomy w górę od siebie — patrz `src/engine/init.h`), więc działa niezależnie od tego, skąd go uruchomisz.
+
+## Pakowanie release'a (.zip)
+
+```
+NazwaReleaseu/
+├── build/
+│   ├── main.exe
+│   ├── SDL3.dll             <- z C:\msys64\ucrt64\bin
+│   └── libwinpthread-1.dll  <- z C:\msys64\ucrt64\bin
+└── assets/                  <- cały katalog
+```
+
+To wszystko — `src/`, `include/`, `libs/`, `makefile` i `.vscode/` nie są potrzebne do uruchomienia. Z `build/` możesz też pominąć `asset_indexer.exe` i `component_header_generator.exe` (to narzędzia build-time, `main.exe` ich nie odpala).
+
+Dwa DLL-e to jedyne niesystemowe zależności (reszta — `api-ms-win-crt-*`, `KERNEL32`, `SHLWAPI` — jest wbudowana w Windows 10/11). `build/` musi zostać bratem `assets/` w tym samym katalogu, ale sam ZIP można rozpakować gdziekolwiek.

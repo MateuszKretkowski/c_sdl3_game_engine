@@ -32,15 +32,12 @@ unsigned char *create_checkerboard_texture(int width, int height, int box_size) 
 GLuint create_texture(const char *path) {
     int width, height, channels;
 
-    char full_path[256];
-    snprintf(full_path, sizeof(full_path), "textures/%s", path);
-
     stbi_set_flip_vertically_on_load(true);
-    unsigned char *curr_tex = stbi_load(full_path, &width, &height, &channels, 4);
+    unsigned char *curr_tex = stbi_load(path, &width, &height, &channels, 4);
 
     bool is_checkerboard = false;
     if (!curr_tex) {
-        fprintf(stderr, "create_texture: failed to load image: %s. Reason: %s\n", full_path, stbi_failure_reason());
+        fprintf(stderr, "create_texture: failed to load image: %s. Reason: %s\n", path, stbi_failure_reason());
         width = height = 64;
         curr_tex = create_checkerboard_texture(width, height, 8);
         if (!curr_tex) {
