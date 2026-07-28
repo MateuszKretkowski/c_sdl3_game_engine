@@ -1,0 +1,15 @@
+{
+  "id": "prototype_sphere_material",
+  "name": "Prototype Sphere White Material",
+  
+  "shader": "standard_lit",
+
+  "maps": {
+    "diffuse": "assets/textures/prototype_textures/prototype_white_diffuse.png"
+  },
+
+  "properties": {
+    "shininess": 0,
+    "outlineWidth": 0
+  }
+}

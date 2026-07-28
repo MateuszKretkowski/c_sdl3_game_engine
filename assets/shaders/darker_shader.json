@@ -1,0 +1,6 @@
+{
+  "id": "darker_lit",
+  "name": "darker_lit",
+  "vertex_path": "assets/glsl/darker/vertex_shader.glsl",
+  "fragment_path": "assets/glsl/darker/fragment_shader.glsl"
+}

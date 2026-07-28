@@ -33,11 +33,11 @@ void camera_update(Component* self) {
     }
 
     float speed = 8;
-    float horizontal_input = input_gamepad_get_axis_deadzone(SDL_GAMEPAD_AXIS_RIGHTX, 0.15f);
-    float vertical_input = input_gamepad_get_axis_deadzone(SDL_GAMEPAD_AXIS_RIGHTY, 0.15f);
+    // float horizontal_input = input_gamepad_get_axis_deadzone(SDL_GAMEPAD_AXIS_RIGHTX, 0.15f);
+    // float vertical_input = input_gamepad_get_axis_deadzone(SDL_GAMEPAD_AXIS_RIGHTY, 0.15f);
 
-    transform->position.x += horizontal_input * speed * physics_m->timestep;
-    transform->position.y += vertical_input * speed * physics_m->timestep;
+    // transform->position.x += horizontal_input * speed * physics_m->timestep;
+    // transform->position.y += vertical_input * speed * physics_m->timestep;
 
     if (!cam->target) {
         // Only log once per frame to avoid spam

@@ -1,0 +1,15 @@
+{
+  "id": "prototype_platform_material",
+  "name": "Prototype Platform White Material",
+  
+  "shader": "darker_lit",
+
+  "maps": {
+    "diffuse": "assets/textures/prototype_textures/prototype_white_diffuse.png"
+  },
+
+  "properties": {
+    "shininess": 0,
+    "outlineWidth": 0
+  }
+}

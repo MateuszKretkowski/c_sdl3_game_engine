@@ -8,25 +8,19 @@
 // API
 // ─────────────────────────────────────────────────────────────
 
-// Inicjalizuje system input (otwiera gamepad jeśli dostępny)
-void input_init(void);
-
-// Przetwarza eventy SDL (podłączanie/odłączanie gamepada)
-void input_process_event(SDL_Event *event);
-
-// Aktualizuje stan przycisków i osi (wołaj raz na klatkę)
+// Aktualizuje stan klawiatury (wołaj raz na klatkę, po SDL_PollEvent)
 void input_update_state(void);
 
-// Zwraca true jeśli przycisk jest wciśnięty
-bool input_gamepad_is_button_down(SDL_GamepadButton button);
+// Zwraca true jeśli klawisz jest trzymany
+bool input_key_down(SDL_Scancode key);
 
-// Zwraca true jeśli przycisk został właśnie wciśnięty (edge-detect)
-bool input_gamepad_was_button_pressed(SDL_GamepadButton button);
+// Zwraca true jeśli klawisz został wciśnięty w tej klatce (edge-detect)
+bool input_key_pressed(SDL_Scancode key);
 
-// Pobiera oś znormalizowaną do -1..1
-float input_gamepad_get_axis(SDL_GamepadAxis axis);
+// Zwraca true jeśli klawisz został puszczony w tej klatce (edge-detect)
+bool input_key_released(SDL_Scancode key);
 
-// Pobiera oś z deadzone: zwraca 0.0f jeśli wartość bezwzględna < deadzone
-float input_gamepad_get_axis_deadzone(SDL_GamepadAxis axis, float deadzone);
+// Para klawiszy jako oś: -1.0 dla neg, 1.0 dla pos, 0.0 dla obu/żadnego
+float input_axis(SDL_Scancode neg, SDL_Scancode pos);
 
 #endif
