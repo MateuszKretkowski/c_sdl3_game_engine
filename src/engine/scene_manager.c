@@ -77,11 +77,11 @@ void load_scene(char *id) {
             fprintf(stderr, "load_scene: Found camera with target_id '%s'\n", cam->target_id);
             // Find the target GameObject by ID
             for (int j=0; j<scene->gameObjects_length; j++) {
-                if (scene->gameObjects[j].id && strcmp(scene->gameObjects[j].id, cam->target_id) == 0) {
+                if (scene->gameObjects[j].id && strcmp(scene->gameObjects[j].name, cam->target_id) == 0) {
                     transform_component *target_transform = get_component(&scene->gameObjects[j], transform_component, "transform_component");
                     if (target_transform) {
                         cam->target = target_transform;
-                        fprintf(stderr, "load_scene: Resolved camera target to GameObject '%s'\n", scene->gameObjects[j].id);
+                        fprintf(stderr, "load_scene: Resolved camera target to GameObject '%s'\n", scene->gameObjects[j].name);
                     } else {
                         fprintf(stderr, "ERROR: Target GameObject '%s' has no transform_component\n", cam->target_id);
                     }

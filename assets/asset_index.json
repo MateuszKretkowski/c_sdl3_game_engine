@@ -13,6 +13,7 @@
 	"prefabs":	{
 		"camera":	"assets/prefabs/camera.json",
 		"floor":	"assets/prefabs/floor.json",
+		"platform":	"assets/prefabs/platform.json",
 		"sphere_1":	"assets/prefabs/sphere_1.json",
 		"sphere_2":	"assets/prefabs/sphere_2.json",
 		"sphere_debug_prefab":	"assets/prefabs/sphere_debug.json",
@@ -22,6 +23,7 @@
 		"standard_lit":	"assets/shaders/standard_shader.json"
 	},
 	"scenes":	{
+		"pong_scene":	"assets/scenes/pong_scene.json",
 		"sample_scene":	"assets/scenes/sample_scene.json"
 	},
 	"physics_materials":	{
