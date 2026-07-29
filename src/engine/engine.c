@@ -52,7 +52,7 @@ void engine_run(void) {
                 game_handle_event(&event);
             }
         }
-
+        input_update_state();
         game_update();
         render_frame();
         physics_manager_update();

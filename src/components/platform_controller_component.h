@@ -18,6 +18,6 @@ typedef struct {
     transform_component *tc_2;
 } platform_controller_component;
 
-platform_controller_component *create_platform_controller_component(float stiffness, rigid_body_component *obj_1, transform_component *tc_1, rigid_body_component *obj_2, transform_component *tc_2);
+platform_controller_component *create_platform_controller_component();
 
 #endif

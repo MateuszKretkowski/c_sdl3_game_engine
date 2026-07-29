@@ -7,8 +7,12 @@
 #include "core/gameObject.h"
 #include "json_utils.h"
 #include "transform_component.h"
+#include "input.h"
 
 #include <cglm/cglm.h>
+
+const float limit = 2.5f;
+const float speed = 8;
 
 void platform_controller_awake(Component* self) {
     platform_controller_component *comp = (platform_controller_component*)self;
@@ -20,13 +24,20 @@ void platform_controller_start(Component* self) {
 
 void platform_controller_update(Component* self) {
     platform_controller_component *comp = (platform_controller_component*)self;
+
+    float horizontal = input_axis(SDL_SCANCODE_A, SDL_SCANCODE_D);
+    float vertical = input_axis(SDL_SCANCODE_S, SDL_SCANCODE_W);
+
+    transform_component *transform = get_component(comp->base.gameObject, transform_component, "transform_component");
+    transform->position.z += -horizontal * speed * physics_m->timestep;
+    transform->position.y += vertical * speed * physics_m->timestep;
 }
 
 void platform_controller_destroy(Component* self) {
     platform_controller_component *comp = (platform_controller_component*)self;
 }
 
-platform_controller_component *create_platform_controller_component(float stiffness, rigid_body_component *obj_1, transform_component *tc_1,  rigid_body_component *obj_2, transform_component *tc_2) {
+platform_controller_component *create_platform_controller_component() {
     platform_controller_component* comp = malloc(sizeof(platform_controller_component));
     comp->base.id = strdup("platform_controller_component");
     comp->base.name = strdup("platform_controller");
@@ -39,12 +50,14 @@ platform_controller_component *create_platform_controller_component(float stiffn
     comp->base.standard_voids->update = platform_controller_update;
     comp->base.standard_voids->destroy = platform_controller_destroy;
 
-    comp->stiffness = stiffness;
-
-    comp->obj_1 = obj_1;
-    comp->tc_1 = tc_1;
-    comp->obj_2 = obj_2;
-    comp->tc_2 = tc_2;
-
     return comp;
+}
+
+Component* platform_controller_from_json(cJSON *json) {
+    return (Component*)create_platform_controller_component();
+}
+
+__attribute__((constructor))
+static void register_platform_controller_component() {
+    component_registry_register("platform_controller_component", platform_controller_from_json);
 }
