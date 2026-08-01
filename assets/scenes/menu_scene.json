@@ -1,0 +1,33 @@
+{
+    "id": "menu_scene",
+    "config": {
+        "physics": {
+            "gravity": [0, -9.81, 0],
+            "timestep": 0.0032,
+            "air_resistance": 1,
+            "max_velocity": 50.0
+        },
+        "spatial": {
+            "cell_size": 500.0,
+            "grid_width": 200,
+            "grid_height": 200,
+            "grid_depth": 200,
+            "grid_cell_capacity": 8
+        }
+    },
+    "gameObjects": [
+        {
+            "id": "camera",
+            "components": [
+                {"id": "transform_component", "position": [0, 0, 2.5], "rotation": [0, 0, 0], "scale": [1, 1, 1]},
+                {"id": "camera_component", "target": "platform_1", "up": [0, 1, 0], "fov": 90, "aspect_ratio": 1.777, "near_plane": 0.1, "far_plane": 100, "is_orthographic": false}
+            ]
+        },
+        {
+            "id": "network_manager",
+            "components": [
+                {"id": "transform_component", "position": [0, 0, 0], "rotation": [0, 0, 0], "scale": [1, 1, 1]}
+            ]
+        }
+    ]
+}

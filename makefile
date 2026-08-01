@@ -5,7 +5,7 @@ COMPONENT_GENERATOR = build/component_header_generator.exe
 CFLAGS = -g -Wall
 
 INCLUDES = -I. -Isrc -Iinclude -Ilibs -Isrc/engine -Isrc/graphics -Isrc/utils
-LIBS = -lSDL3 -lopengl32 -lshlwapi
+LIBS = -lSDL3 -lopengl32 -lshlwapi -lws2_32
 
 SOURCES = $(filter-out src/build_tools/%, $(wildcard src/*.c src/*/*.c))
 

@@ -3,10 +3,10 @@
 #include <stdio.h>
 
 char sample_scene[64] = "sample_scene";
-char pong_scene[64] = "pong_scene";
+char bootstrap_scene[64] = "menu_scene";
 
 bool game_init(void) {
-    load_scene(pong_scene);
+    load_scene(bootstrap_scene);
     return true;
 }
 
