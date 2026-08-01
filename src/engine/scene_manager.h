@@ -18,6 +18,8 @@ cJSON *scene_get_scene_config();
 Scene *scene_get_scene();
 
 void load_scene(char *id);
+void queue_scene_load(char *id);
+void scene_manager_process_pending_load();
 camera_component *render_get_active_camera();
 
 #endif // SCENE_MANAGER_H

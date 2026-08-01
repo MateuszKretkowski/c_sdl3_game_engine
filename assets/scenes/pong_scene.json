@@ -24,6 +24,12 @@
             ]
         },
         {
+            "id": "network_manager",
+            "components": [
+                {"id": "transform_component", "position": [0, 0, 0], "rotation": [0, 0, 0], "scale": [1, 1, 1]}
+            ]
+        },
+        {
             "id": "platform",
             "name": "platform_1",
             "components": [

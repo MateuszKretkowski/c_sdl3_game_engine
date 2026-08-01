@@ -43,6 +43,8 @@ void engine_run(void) {
     SDL_Event event;
 
     while (running) {
+        scene_manager_process_pending_load();
+
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_EVENT_QUIT) {
                 running = false;

@@ -4,6 +4,7 @@
 
 Scene *current_scene;
 camera_component *active_camera;
+static char *pending_scene_id = NULL;
 
 void scene_manager_init() {
     current_scene = NULL;
@@ -59,7 +60,7 @@ void load_scene(char *id) {
         // Clear render stack before freeing old scene
         render_clear_stack();
         for (int i=0; i<current_scene->gameObjects_length; i++) {
-            free_gameObject(&current_scene->gameObjects[i]);
+            free_gameObject_contents(&current_scene->gameObjects[i]);
         }
     }
     current_scene = scene;
@@ -124,7 +125,16 @@ void load_scene(char *id) {
 
         physics_manager_add(&current_scene->gameObjects[i]);
     }
-    
+}
 
-    
-}     
+void queue_scene_load(char *id) {
+    pending_scene_id = id;
+}
+
+void scene_manager_process_pending_load() {
+    if (pending_scene_id) {
+        char *id = pending_scene_id;
+        pending_scene_id = NULL;
+        load_scene(id);
+    }
+}

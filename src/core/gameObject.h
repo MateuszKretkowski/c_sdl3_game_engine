@@ -22,6 +22,7 @@ typedef struct GameObject {
 GameObject *instantiate_gameObject(char* id);
 GameObject *instantiate_prefab(GameObject *prefab);
 void free_gameObject(GameObject *gameObject);
+void free_gameObject_contents(GameObject *gameObject);
 void add_component(GameObject *gameObject, Component *component);
 void remove_component_by_id(GameObject *gameObject, const char *id);
 void remove_component(GameObject *gameObject, Component *component);

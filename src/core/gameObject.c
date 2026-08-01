@@ -45,9 +45,9 @@ GameObject *instantiate_gameObject(char* id) {
     return gameObject;
 }
 
-void free_gameObject(GameObject *gameObject) {
+void free_gameObject_contents(GameObject *gameObject) {
     if (!gameObject) {
-        fprintf(stderr, "free_gameObject: gameObject is NULL\n");
+        fprintf(stderr, "free_gameObject_contents: gameObject is NULL\n");
         return;
     }
     for (int i=0; i<gameObject->components_length; i++) {
@@ -56,6 +56,14 @@ void free_gameObject(GameObject *gameObject) {
     free(gameObject->components);
     free(gameObject->id);
     free(gameObject->name);
+}
+
+void free_gameObject(GameObject *gameObject) {
+    if (!gameObject) {
+        fprintf(stderr, "free_gameObject: gameObject is NULL\n");
+        return;
+    }
+    free_gameObject_contents(gameObject);
     free(gameObject);
 }
 
