@@ -78,7 +78,6 @@ void physics_manager_handle_collision(GameObject *objA, GameObject *objB, Vector
     transform_component *transform_b = get_component(objB, transform_component, "transform_component");
 
     // calculate depth
-    printf("depth: %f\n", depth);
     if (!rb_a->is_kinematic && depth != 0) {
         transform_a->position = vector3_subtract(transform_a->position, vector3_multiply(normal, -depth/2));
     }
@@ -160,9 +159,6 @@ void physics_manager_handle_collision(GameObject *objA, GameObject *objB, Vector
         Lbp -= Lbp_friction_force;
     }
 
-    
-    printf("GameObject: %s, Uao.y: %f\n", rb_b->base.gameObject->id, Uao.y);
-    printf("GameObject: %s, Lao: %f\n", rb_b->base.gameObject->id, Lbo);
     
     // now we have defined every variable that we need to calculate new velocities:
 

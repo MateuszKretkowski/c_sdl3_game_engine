@@ -61,7 +61,6 @@ Vector3 intersect_AABB_sphere(box_collider_component *compA, sphere_collider_com
     }
     else if (distance == compB->radius * compB->radius) {
         *depth = compB->radius - sqrt(distance);
-        printf("distance == radius^2\n");
         return vector3_divide(vector3_subtract(transform_b->position, p_avg), vector3_length(vector3_subtract(transform_b->position, p_avg)));
     }
     else {
@@ -87,27 +86,21 @@ Vector3 intersect_AABB_sphere(box_collider_component *compA, sphere_collider_com
         }
         *depth = closest;
         if (closest == left) {
-            printf("Collision direction: LEFT\n");
             return vector3_right();
         }
         else if (closest == right) {
-            printf("Collision direction: RIGHT\n");
             return vector3_left();
         }
         else if (closest == down) {
-            printf("Collision direction: DOWN\n");
             return vector3_up();
         }
         else if (closest == up) {
-            printf("Collision direction: UP\n");
             return vector3_down();
         }
         else if (closest == back) {
-            printf("Collision direction: BACK\n");
             return vector3_forward();
         }
         else {
-            printf("Collision direction: FRONT\n");
             return vector3_back();
         }
     }

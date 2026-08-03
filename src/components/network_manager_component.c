@@ -22,6 +22,11 @@ bool isReady;
 
 int port;
 char ip[64];
+int peerPort;
+
+int sock;
+struct sockaddr_in my_address;
+struct sockaddr_in peer_address;
 
 char* get_host_ip(void);
 
@@ -43,9 +48,10 @@ void network_manager_start(Component* self) {
     network_manager_component *comp = (network_manager_component*)self;
 
     char buf[64];
+    char buf2[64];
 
     
-    // printf("Host IP: %s\n", get_host_ip());
+    printf("Host IP: %s\n", get_host_ip());
 
     // printf("isHost (1 or 0): ");
     // fflush(stdout);
@@ -53,22 +59,55 @@ void network_manager_start(Component* self) {
     //     isHost = atoi(buf);
     // }
 
-    printf("Set Port: ");
+    printf("Set Port:");
     fflush(stdout);
     if (fgets(buf, sizeof(buf), stdin)) {
         port = atoi(buf);
     }
 
+    printf("Set Peer Port:");
+    fflush(stdout);
+    if (fgets(buf2, sizeof(buf2), stdin)) {
+        peerPort = atoi(buf2);
+    }
+
     // if (!isHost) {
-        printf("Set IP: ");
+        printf("Set IP:");
         fflush(stdout);
         if (fgets(ip, sizeof(ip), stdin)) {
             ip[strcspn(ip, "\r\n")] = '\0';
         }
     // }
     
+    // INITIALIZING SOCKETS =================
+
+    sock = socket(AF_INET, SOCK_DGRAM, 0);
+    if (sock < 0) {
+        printf("Creating the socket failed (%d): %d\n\n", sock, WSAGetLastError());
+        exit(EXIT_FAILURE);
+    }
+
+    my_address.sin_family = AF_INET;
+    my_address.sin_port = htons(port);
+    my_address.sin_addr.s_addr = INADDR_ANY;
+
+    if (bind(sock, (struct sockaddr*) &my_address, sizeof(my_address)) == SOCKET_ERROR) {
+        printf("bind() failed: %d\n", WSAGetLastError());
+    }
+    if (listen(sock, 5) == SOCKET_ERROR) {
+        printf("listen() failed: %d\n", WSAGetLastError());
+    }
+
+    peer_address.sin_family = AF_INET;
+    peer_address.sin_port = htons(peerPort);
+    if (inet_pton(AF_INET, ip, &peer_address.sin_addr) != 1) {
+        printf("inet_pton() failed for IP '%s': %d\n", ip, WSAGetLastError());
+    }
+
     isReady = true;
 }
+
+bool connected = false;
 
 void network_manager_update(Component* self) {
     network_manager_component *comp = (network_manager_component*)self;
@@ -77,46 +116,21 @@ void network_manager_update(Component* self) {
         return;
     }
 
-    // for peer-to-peer it is needed to have both server and client on both devices
+    char message[64] = "eloelo320";
     
-    // server
-
-    int server_socket;
-    server_socket = socket(AF_INET, SOCK_STREAM, 0);
-    if (server_socket < 0) {
-        printf("Creating the socket failed (%d)\n\n", server_socket);
-        exit(EXIT_FAILURE);
+    if (sendto(sock, message, strlen(message), 0, (struct sockaddr*) &peer_address, sizeof(peer_address)) == SOCKET_ERROR) {
+        printf("sendto() failed: %d\n", WSAGetLastError());
     }
 
-    struct sockaddr_in server_address;
-    server_address.sin_family = AF_INET;
-    server_address.sin_port = port;
-    server_address.sin_addr.s_addr = INADDR_ANY;
-
-    printf("SERVER_ADDRESS %s", server_address.sin_addr.s_addr);
-
-    bind(server_socket, (struct sockaddr*) &server_address, sizeof(server_address));
-    listen(server_socket, 5);
-
-    // client
-
-    int network_socket;
-    network_socket = socket(AF_INET, SOCK_STREAM, 0);
-    if (network_socket < 0) {
-        printf("Creating the socket failed (%d)\n\n", network_socket);
-        exit(EXIT_FAILURE);
+    char buff[256];
+    struct sockaddr_in from_addr;
+    int from_len = sizeof(from_addr);
+    int received = recvfrom(sock, buff, sizeof(buff), 0, (struct sockaddr*) &from_addr, &from_len);
+    if (received == SOCKET_ERROR) {
+        printf("recvfrom() failed: %d\n", WSAGetLastError());
+        return;
     }
-
-    int connection_status = connect(network_socket, (struct sockaddr*) &server_address, sizeof(server_address));
-
-    int client_socket = accept(server_socket, NULL, NULL);
-
-    char server_message[256] = "You have reached the server";
-    send(client_socket, server_message, sizeof(server_message), 0);
-
-    char server_response[256];
-    recv(network_socket, server_response, sizeof(server_response), 0);
-    printf("server_response: %s\n", server_response);
+    printf("od: %s:%d (%d bajtow)\n", inet_ntoa(from_addr.sin_addr), ntohs(from_addr.sin_port), received);
 }
 
 void network_manager_destroy(Component* self) {
