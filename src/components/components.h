@@ -5,6 +5,7 @@
 #include "camera_component.h"
 #include "client_component.h"
 #include "meshRenderer_component.h"
+#include "network_gameObject_component.h"
 #include "network_manager_component.h"
 #include "platform_controller_component.h"
 #include "rigid_body_component.h"

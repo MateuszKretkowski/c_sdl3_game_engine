@@ -27,6 +27,19 @@ Scene *scene_get_scene() {
     return current_scene;
 }
 
+GameObject *scene_get_gameObject(char* id) {
+    for (int i=0; i<current_scene->gameObjects_length; i++) {
+        if (current_scene->gameObjects[i].id && current_scene->gameObjects[i].id && strcmp(current_scene->gameObjects[i].id, id) == 0) {
+            GameObject *go = &current_scene->gameObjects[i];
+            if (go) {
+                return go;
+            }
+        }
+    }
+    fprintf(stderr, "ERROR: No active camera found in scene!\n");
+    return NULL;
+}
+
 camera_component *render_get_active_camera() {
     for (int i=0; i<current_scene->gameObjects_length; i++) {
         if (current_scene->gameObjects[i].id && current_scene->gameObjects[i].id && strcmp(current_scene->gameObjects[i].id, "camera") == 0) {

@@ -117,7 +117,7 @@ void network_manager_update(Component* self) {
     }
 
     char message[64] = "eloelo320";
-    
+
     if (sendto(sock, message, strlen(message), 0, (struct sockaddr*) &peer_address, sizeof(peer_address)) == SOCKET_ERROR) {
         printf("sendto() failed: %d\n", WSAGetLastError());
     }
@@ -126,11 +126,20 @@ void network_manager_update(Component* self) {
     struct sockaddr_in from_addr;
     int from_len = sizeof(from_addr);
     int received = recvfrom(sock, buff, sizeof(buff), 0, (struct sockaddr*) &from_addr, &from_len);
+    u_long mode = 1;
+    ioctlsocket(sock, FIONBIO, &mode);
     if (received == SOCKET_ERROR) {
-        printf("recvfrom() failed: %d\n", WSAGetLastError());
+        int err = WSAGetLastError();
+        if (err != WSAEWOULDBLOCK) {
+            printf("recvfrom() failed: %d\n", err);
+        }
         return;
     }
-    printf("od: %s:%d (%d bajtow)\n", inet_ntoa(from_addr.sin_addr), ntohs(from_addr.sin_port), received);
+    peer_address = from_addr;
+
+
+
+    printf("od: %s:%d (%d bajtow)\n buff: %s\n", inet_ntoa(from_addr.sin_addr), ntohs(from_addr.sin_port), received, buff);
 }
 
 void network_manager_destroy(Component* self) {
