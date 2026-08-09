@@ -19,6 +19,7 @@
 bool isHost;
 bool isGameActive;
 bool isReady;
+bool hasPeer;   // false = waiting to learn the peer address from the first packet
 
 int port;
 char ip[64];
@@ -27,6 +28,10 @@ int peerPort;
 int sock;
 struct sockaddr_in my_address;
 struct sockaddr_in peer_address;
+
+GameObject **registered_gameObjects;
+int registered_gameObjects_length = 0;
+int registered_gameObjects_capacity = 3;
 
 char* get_host_ip(void);
 
@@ -38,26 +43,22 @@ void network_manager_awake(Component* self) {
         fprintf(stderr, "WSAStartup failed\n");
         exit(1);
     }
+    
+    registered_gameObjects = malloc(sizeof(GameObject*) * registered_gameObjects_capacity);
 
     isHost = false;
     isGameActive = false;
     isReady = false;
+    hasPeer = false;
 }
 
 void network_manager_start(Component* self) {
     network_manager_component *comp = (network_manager_component*)self;
 
     char buf[64];
-    char buf2[64];
 
-    
+
     printf("Host IP: %s\n", get_host_ip());
-
-    // printf("isHost (1 or 0): ");
-    // fflush(stdout);
-    // if (fgets(buf, sizeof(buf), stdin)) {
-    //     isHost = atoi(buf);
-    // }
 
     printf("Set Port:");
     fflush(stdout);
@@ -65,20 +66,20 @@ void network_manager_start(Component* self) {
         port = atoi(buf);
     }
 
-    printf("Set Peer Port:");
+    printf("Set Peer IP (leave empty to wait for the peer to connect first):");
     fflush(stdout);
-    if (fgets(buf2, sizeof(buf2), stdin)) {
-        peerPort = atoi(buf2);
+    if (fgets(ip, sizeof(ip), stdin)) {
+        ip[strcspn(ip, "\r\n")] = '\0';
     }
 
-    // if (!isHost) {
-        printf("Set IP:");
+    if (ip[0] != '\0') {
+        printf("Set Peer Port:");
         fflush(stdout);
-        if (fgets(ip, sizeof(ip), stdin)) {
-            ip[strcspn(ip, "\r\n")] = '\0';
+        if (fgets(buf, sizeof(buf), stdin)) {
+            peerPort = atoi(buf);
         }
-    // }
-    
+    }
+
     // INITIALIZING SOCKETS =================
 
     sock = socket(AF_INET, SOCK_DGRAM, 0);
@@ -94,40 +95,50 @@ void network_manager_start(Component* self) {
     if (bind(sock, (struct sockaddr*) &my_address, sizeof(my_address)) == SOCKET_ERROR) {
         printf("bind() failed: %d\n", WSAGetLastError());
     }
-    if (listen(sock, 5) == SOCKET_ERROR) {
-        printf("listen() failed: %d\n", WSAGetLastError());
+
+    u_long mode = 1;
+    if (ioctlsocket(sock, FIONBIO, &mode) == SOCKET_ERROR) {
+        printf("ioctlsocket() failed: %d\n", WSAGetLastError());
     }
 
-    peer_address.sin_family = AF_INET;
-    peer_address.sin_port = htons(peerPort);
-    if (inet_pton(AF_INET, ip, &peer_address.sin_addr) != 1) {
-        printf("inet_pton() failed for IP '%s': %d\n", ip, WSAGetLastError());
+    if (ip[0] != '\0') {
+        peer_address.sin_family = AF_INET;
+        peer_address.sin_port = htons(peerPort);
+        if (inet_pton(AF_INET, ip, &peer_address.sin_addr) != 1) {
+            printf("inet_pton() failed for IP '%s': %d\n", ip, WSAGetLastError());
+        } else {
+            hasPeer = true;
+            printf("Sending to %s:%d\n", ip, peerPort);
+        }
+    } else {
+        printf("Waiting for the first packet on port %d...\n", port);
     }
 
     isReady = true;
 }
 
-bool connected = false;
-
 void network_manager_update(Component* self) {
     network_manager_component *comp = (network_manager_component*)self;
 
-    if (!isReady || !ip || !port) {
+    if (!isReady || !port) {
         return;
     }
 
-    char message[64] = "eloelo320";
+    // Nothing to send to until we know who the peer is.
+    if (hasPeer) {
+        
 
-    if (sendto(sock, message, strlen(message), 0, (struct sockaddr*) &peer_address, sizeof(peer_address)) == SOCKET_ERROR) {
-        printf("sendto() failed: %d\n", WSAGetLastError());
+        char message[64] = "eloelo320";
+
+        if (sendto(sock, message, strlen(message), 0, (struct sockaddr*) &peer_address, sizeof(peer_address)) == SOCKET_ERROR) {
+            printf("sendto() failed: %d\n", WSAGetLastError());
+        }
     }
 
     char buff[256];
     struct sockaddr_in from_addr;
     int from_len = sizeof(from_addr);
-    int received = recvfrom(sock, buff, sizeof(buff), 0, (struct sockaddr*) &from_addr, &from_len);
-    u_long mode = 1;
-    ioctlsocket(sock, FIONBIO, &mode);
+    int received = recvfrom(sock, buff, sizeof(buff) - 1, 0, (struct sockaddr*) &from_addr, &from_len);
     if (received == SOCKET_ERROR) {
         int err = WSAGetLastError();
         if (err != WSAEWOULDBLOCK) {
@@ -135,15 +146,41 @@ void network_manager_update(Component* self) {
         }
         return;
     }
-    peer_address = from_addr;
+    buff[received] = '\0';
 
-
+    if (!hasPeer) {
+        peer_address = from_addr;
+        hasPeer = true;
+        printf("Peer connected: %s:%d\n", inet_ntoa(from_addr.sin_addr), ntohs(from_addr.sin_port));
+    } else if (from_addr.sin_addr.s_addr != peer_address.sin_addr.s_addr
+            || from_addr.sin_port != peer_address.sin_port) {
+        return;
+    }
 
     printf("od: %s:%d (%d bajtow)\n buff: %s\n", inet_ntoa(from_addr.sin_addr), ntohs(from_addr.sin_port), received, buff);
 }
 
 void network_manager_destroy(Component* self) {
     network_manager_component *comp = (network_manager_component*)self;
+
+    free(registered_gameObjects);
+}
+
+void network_manager_register(GameObject *gameObject) {
+    if (registered_gameObjects_length == registered_gameObjects_capacity) {
+        registered_gameObjects_capacity *= 2;
+        registered_gameObjects = realloc(registered_gameObjects, sizeof(GameObject*) * registered_gameObjects_capacity);
+    }
+    registered_gameObjects[registered_gameObjects_length * sizeof(GameObject*)] = gameObject;
+    registered_gameObjects_length++;
+}
+
+void network_manager_unregister(GameObject *gameObject) {
+    for (int i=0; i<registered_gameObjects_length; i++) {
+        if (&registered_gameObjects[i] == gameObject) {
+            registered_gameObjects[i] = NULL;
+        }
+    }
 }
 
 void IP_formatter(char *IPbuffer) { 

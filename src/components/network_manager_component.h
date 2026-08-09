@@ -9,6 +9,9 @@ typedef struct {
 
 } network_manager_component;
 
+void network_manager_register(GameObject *gameObject);
+void network_manager_unregister(GameObject *gameObject);
+
 network_manager_component *create_network_manager_component();
 
 #endif

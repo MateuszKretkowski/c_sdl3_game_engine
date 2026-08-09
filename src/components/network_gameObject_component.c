@@ -26,6 +26,8 @@ void network_gameObject_start(Component* self) {
         printf("ERROR: network_manager has no network_manager_component.\n");
         return;
     }
+
+    network_manager_register(comp->base.gameObject);
 }
 
 void network_gameObject_update(Component* self) {
@@ -33,27 +35,19 @@ void network_gameObject_update(Component* self) {
 
     transform_component *transform = get_component(comp->base.gameObject, transform_component, "transform_component");
 
-    unsigned char *positionTB = malloc(sizeof(transform->position));
-    positionTB[0] = (unsigned char) &transform->position.x;
-    positionTB[sizeof(int)] = (unsigned char) &transform->position.y;
-    positionTB[sizeof(int)*2] = (unsigned char) &transform->position.z;
+    unsigned char buffer[sizeof(Vector3)*3];
 
-    unsigned char *rotationTB = malloc(sizeof(transform->rotation));
-    rotationTB[0] = (unsigned char) &transform->rotation.x;
-    rotationTB[sizeof(float)] = (unsigned char) &transform->rotation.y;
-    rotationTB[sizeof(float)*2] = (unsigned char) &transform->rotation.z;
-
-    unsigned char *scaleTB = malloc(sizeof(transform->scale));
-    scaleTB[0] = (unsigned char) &transform->scale.x;
-    scaleTB[sizeof(float)] = (unsigned char) &transform->scale.y;
-    scaleTB[sizeof(float)*2] = (unsigned char) &transform->scale.z;
+    memcpy(buffer, &transform->position, sizeof(Vector3));
+    memcpy(buffer + sizeof(Vector3), &transform->rotation, sizeof(Vector3));
+    memcpy(buffer + sizeof(Vector3) * 2, &transform->scale, sizeof(Vector3));
 }
 
 void network_gameObject_destroy(Component* self) {
     network_gameObject_component *comp = (network_gameObject_component*)self;
+    network_manager_unregister(comp->base.gameObject);
 }
 
-network_gameObject_component *create_network_gameObject_component() {
+network_gameObject_component *create_network_gameObject_component(int owner) {
     network_gameObject_component* comp = malloc(sizeof(network_gameObject_component));
     comp->base.id = strdup("network_gameObject_component");
     comp->base.name = strdup("Network GameObject");
@@ -66,6 +60,8 @@ network_gameObject_component *create_network_gameObject_component() {
     comp->base.standard_voids->update = network_gameObject_update;
     comp->base.standard_voids->destroy = network_gameObject_destroy;
 
+    comp->owner = owner;
+
     return comp;
 }
 
@@ -75,7 +71,14 @@ Component* network_gameObject_from_json(cJSON *json) {
         return NULL;
     }
 
-    return (Component*)create_network_gameObject_component();
+    int owner = 0;
+
+    cJSON *owner_json = cJSON_GetObjectItemCaseSensitive(json, "owner");
+    if (owner_json && cJSON_IsNumber(owner_json)) {
+        owner = owner_json->valueint;
+    }
+
+    return (Component*)create_network_gameObject_component(owner);
 }
 
 __attribute__((constructor))

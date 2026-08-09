@@ -7,8 +7,9 @@
 typedef struct {
     Component base;
 
+    int owner;
 } network_gameObject_component;
 
-network_gameObject_component *create_network_gameObject_component();
+network_gameObject_component *create_network_gameObject_component(int owner);
 
 #endif
