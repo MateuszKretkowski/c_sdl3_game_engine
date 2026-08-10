@@ -35,11 +35,9 @@ void network_gameObject_update(Component* self) {
 
     transform_component *transform = get_component(comp->base.gameObject, transform_component, "transform_component");
 
-    unsigned char buffer[sizeof(Vector3)*3];
-
-    memcpy(buffer, &transform->position, sizeof(Vector3));
-    memcpy(buffer + sizeof(Vector3), &transform->rotation, sizeof(Vector3));
-    memcpy(buffer + sizeof(Vector3) * 2, &transform->scale, sizeof(Vector3));
+    memcpy(comp->buffer, &transform->position, sizeof(Vector3));
+    memcpy(comp->buffer + sizeof(Vector3), &transform->rotation, sizeof(Vector3));
+    memcpy(comp->buffer + sizeof(Vector3) * 2, &transform->scale, sizeof(Vector3));
 }
 
 void network_gameObject_destroy(Component* self) {

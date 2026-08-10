@@ -124,21 +124,24 @@ void network_manager_update(Component* self) {
         return;
     }
 
-    // Nothing to send to until we know who the peer is.
     if (hasPeer) {
-        
+        for (int i=0; i<registered_gameObjects_length; i++) {
+            network_gameObject_component *net = get_component(registered_gameObjects[i], network_gameObject_component, "network_gameObject_component");            
+            
+            if (net->owner == 1) {
+                continue;
+            }
 
-        char message[64] = "eloelo320";
-
-        if (sendto(sock, message, strlen(message), 0, (struct sockaddr*) &peer_address, sizeof(peer_address)) == SOCKET_ERROR) {
-            printf("sendto() failed: %d\n", WSAGetLastError());
+            if (sendto(sock, (char*)net->buffer, sizeoF(net->buffer), 0, (struct sockaddr*) &peer_address, sizeof(peer_address)) == SOCKET_ERROR) {
+                printf("sendto() failed: %d\n", WSAGetLastError());
+            }
         }
     }
 
-    char buff[256];
+    unsigned char buffer[32 + sizeof(Vector3) * 3];
     struct sockaddr_in from_addr;
     int from_len = sizeof(from_addr);
-    int received = recvfrom(sock, buff, sizeof(buff) - 1, 0, (struct sockaddr*) &from_addr, &from_len);
+    int received = recvfrom(sock, buffer, sizeof(buffer) - 1, 0, (struct sockaddr*) &from_addr, &from_len);
     if (received == SOCKET_ERROR) {
         int err = WSAGetLastError();
         if (err != WSAEWOULDBLOCK) {
@@ -146,7 +149,6 @@ void network_manager_update(Component* self) {
         }
         return;
     }
-    buff[received] = '\0';
 
     if (!hasPeer) {
         peer_address = from_addr;
@@ -157,7 +159,21 @@ void network_manager_update(Component* self) {
         return;
     }
 
-    printf("od: %s:%d (%d bajtow)\n buff: %s\n", inet_ntoa(from_addr.sin_addr), ntohs(from_addr.sin_port), received, buff);
+    char gameObject_id[32];
+    memcpy(gameObject_id, buffer, 32);
+    GameObject *gameObject = scene_get_gameObject(gameObject_id);
+    transform_component *gameObject_tc = get_component(gameObject, transform_component, "transform_component");
+    Vector3 pos;
+    Vector3 rot;
+    Vector3 scale;
+
+    memcpy(&pos, &buffer[32], sizeof(Vector3));
+    memcpy(&pos, &buffer[32 + sizeof(Vector3)], sizeof(Vector3));
+    memcpy(&pos, &buffer[32 + sizeof(Vector3) * 2], sizeof(Vector3));
+
+    gameObject_tc->position = pos;
+    gameObject_tc->rotation = rot;
+    gameObject_tc->scale = scale;
 }
 
 void network_manager_destroy(Component* self) {
