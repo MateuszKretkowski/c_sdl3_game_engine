@@ -11,6 +11,7 @@ typedef struct {
 
 void network_manager_register(GameObject *gameObject);
 void network_manager_unregister(GameObject *gameObject);
+bool network_manager_is_host();
 
 network_manager_component *create_network_manager_component();
 

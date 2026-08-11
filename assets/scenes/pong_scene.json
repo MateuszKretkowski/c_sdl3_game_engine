@@ -20,7 +20,7 @@
             "id": "camera",
             "components": [
                 {"id": "transform_component", "position": [0, 0, 2.5], "rotation": [0, 0, 0], "scale": [1, 1, 1]},
-                {"id": "camera_component", "target": "platform_1", "up": [0, 1, 0], "fov": 90, "aspect_ratio": 1.777, "near_plane": 0.1, "far_plane": 100, "is_orthographic": false}
+                {"id": "camera_component", "target": "", "up": [0, 1, 0], "fov": 90, "aspect_ratio": 1.777, "near_plane": 0.1, "far_plane": 100, "is_orthographic": false}
             ]
         },
         {
@@ -71,7 +71,7 @@
         },
         {
             "id": "floor",
-            "name": "floor left",
+            "name": "goal_host",
             "components": [
                 {"id": "transform_component", "position": [-2.55, 0, 0], "rotation": [0, 0, 90], "scale": [5, 0.1, 5]},
                 {"id": "box_collider_component", "position": [0, 0, 0], "scale": [0.1, 4.9, 4.9]}
@@ -79,7 +79,7 @@
         },
         {
             "id": "floor",
-            "name": "floor right",
+            "name": "goal_peer",
             "components": [
                 {"id": "transform_component", "position": [2.55, 0, 0], "rotation": [0, 0, 90], "scale": [5, 0.1, 5]},
                 {"id": "box_collider_component", "position": [0, 0, 0], "scale": [0.1, 4.9, 4.9]}

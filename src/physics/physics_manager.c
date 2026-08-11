@@ -1,3 +1,4 @@
+#include <string.h>
 #include "physics_manager.h"
 
 physics_manager *physics_m = NULL;
@@ -66,7 +67,22 @@ void physics_manager_remove(GameObject *gameObject) {
     }
 }
 
+static bool is_goal(GameObject *gameObject) {
+    return gameObject->name && (strcmp(gameObject->name, "goal_host") == 0 || strcmp(gameObject->name, "goal_peer") == 0);
+}
+
+static bool is_ball(GameObject *gameObject) {
+    return gameObject->name && strcmp(gameObject->name, "sphere_1") == 0;
+}
+
 void physics_manager_handle_collision(GameObject *objA, GameObject *objB, Vector3 normal, float depth) {
+    if (is_goal(objA) && is_ball(objB)) {
+        printf("GOL: %s\n", objA->name);
+    }
+    else if (is_goal(objB) && is_ball(objA)) {
+        printf("GOL: %s\n", objB->name);
+    }
+
     rigid_body_component *rb_a = get_component(objA, rigid_body_component, "rigid_body_component");
     rigid_body_component *rb_b = get_component(objB, rigid_body_component, "rigid_body_component");
 
@@ -179,6 +195,9 @@ void physics_manager_calculate_objects() {
         GameObject *curr = physics_m->gameObjects[i];
         rigid_body_component *rb =  get_component(curr, rigid_body_component, "rigid_body_component");
         transform_component *transform = get_component(curr, transform_component, "transform_component");
+        if (rb->is_kinematic) {
+            continue;
+        }
         if (rb->use_gravity == true) {
             rb->acceleration = vector3_add(rb->acceleration, physics_m->gravity_force);
         }

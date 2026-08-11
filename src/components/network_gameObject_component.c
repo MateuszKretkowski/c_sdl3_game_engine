@@ -35,6 +35,15 @@ void network_gameObject_update(Component* self) {
 
     transform_component *transform = get_component(comp->base.gameObject, transform_component, "transform_component");
 
+    int myOwner = network_manager_is_host() ? 0 : 1;
+    if (comp->owner != myOwner) {
+        rigid_body_component *rb = get_component(comp->base.gameObject, rigid_body_component, "rigid_body_component");
+        if (rb) {
+            rb->is_kinematic = true;
+            rb->velocity = vector3_zero();
+        }
+    }
+
     memset(comp->buffer, 0, 32);
     strncpy((char*)comp->buffer, comp->base.gameObject->name, 31);
 
@@ -62,6 +71,7 @@ network_gameObject_component *create_network_gameObject_component(int owner) {
     comp->base.standard_voids->destroy = network_gameObject_destroy;
 
     comp->owner = owner;
+    memset(comp->buffer, 0, sizeof(comp->buffer));
 
     return comp;
 }

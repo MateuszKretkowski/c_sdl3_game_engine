@@ -25,6 +25,11 @@ void platform_controller_start(Component* self) {
 void platform_controller_update(Component* self) {
     platform_controller_component *comp = (platform_controller_component*)self;
 
+    network_gameObject_component *net = get_component(comp->base.gameObject, network_gameObject_component, "network_gameObject_component");
+    if (net && net->owner != (network_manager_is_host() ? 0 : 1)) {
+        return;
+    }
+
     float horizontal = input_axis(SDL_SCANCODE_A, SDL_SCANCODE_D);
     float vertical = input_axis(SDL_SCANCODE_S, SDL_SCANCODE_W);
 
@@ -33,6 +38,12 @@ void platform_controller_update(Component* self) {
     transform_component *transform = get_component(comp->base.gameObject, transform_component, "transform_component");
     transform->position.z += -horizontal * speed * physics_m->timestep;
     transform->position.y += vertical * speed * physics_m->timestep;
+
+    float bound_y = limit - transform->scale.y * 0.5f;
+    float bound_z = limit - transform->scale.z * 0.5f;
+
+    transform->position.y = min(max(transform->position.y, -bound_y), bound_y);
+    transform->position.z = min(max(transform->position.z, -bound_z), bound_z);
 }
 
 void platform_controller_destroy(Component* self) {

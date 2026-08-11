@@ -29,6 +29,9 @@ int sock;
 struct sockaddr_in my_address;
 struct sockaddr_in peer_address;
 
+Uint64 lastSendTime = 0;
+const Uint64 sendIntervalMs = 50;
+
 GameObject **registered_gameObjects;
 int registered_gameObjects_length = 0;
 int registered_gameObjects_capacity = 3;
@@ -101,6 +104,8 @@ void network_manager_start(Component* self) {
         printf("ioctlsocket() failed: %d\n", WSAGetLastError());
     }
 
+    isHost = (ip[0] == '\0');
+
     if (ip[0] != '\0') {
         peer_address.sin_family = AF_INET;
         peer_address.sin_port = htons(peerPort);
@@ -124,7 +129,9 @@ void network_manager_update(Component* self) {
         return;
     }
 
-    if (hasPeer) {
+    if (hasPeer && SDL_GetTicks() - lastSendTime >= sendIntervalMs) {
+        lastSendTime = SDL_GetTicks();
+
         for (int i=0; i<registered_gameObjects_length; i++) {
             network_gameObject_component *net = get_component(registered_gameObjects[i], network_gameObject_component, "network_gameObject_component");            
             
@@ -140,42 +147,56 @@ void network_manager_update(Component* self) {
         }
     }
 
-    unsigned char buffer[32 + sizeof(Vector3) * 3];
-    struct sockaddr_in from_addr;
-    int from_len = sizeof(from_addr);
-    int received = recvfrom(sock, buffer, sizeof(buffer) - 1, 0, (struct sockaddr*) &from_addr, &from_len);
-    if (received == SOCKET_ERROR) {
-        int err = WSAGetLastError();
-        if (err != WSAEWOULDBLOCK) {
-            printf("recvfrom() failed: %d\n", err);
+    while (true) {
+        unsigned char buffer[32 + sizeof(Vector3) * 3];
+        struct sockaddr_in from_addr;
+        int from_len = sizeof(from_addr);
+        int received = recvfrom(sock, (char*)buffer, sizeof(buffer), 0, (struct sockaddr*) &from_addr, &from_len);
+        if (received == SOCKET_ERROR) {
+            int err = WSAGetLastError();
+            if (err != WSAEWOULDBLOCK) {
+                printf("recvfrom() failed: %d\n", err);
+            }
+            return;
         }
-        return;
+
+        if (!hasPeer) {
+            peer_address = from_addr;
+            hasPeer = true;
+            printf("Peer connected: %s:%d\n", inet_ntoa(from_addr.sin_addr), ntohs(from_addr.sin_port));
+        } else if (from_addr.sin_addr.s_addr != peer_address.sin_addr.s_addr
+                || from_addr.sin_port != peer_address.sin_port) {
+            continue;
+        }
+
+        if (received != (int)sizeof(buffer)) {
+            continue;
+        }
+
+        char gameObject_id[32];
+        memcpy(gameObject_id, buffer, 32);
+        GameObject *gameObject = scene_get_gameObject_by_name(gameObject_id);
+        if (!gameObject) {
+            continue;
+        }
+
+        transform_component *gameObject_tc = get_component(gameObject, transform_component, "transform_component");
+        if (!gameObject_tc) {
+            continue;
+        }
+
+        Vector3 pos;
+        Vector3 rot;
+        Vector3 scale;
+
+        memcpy(&pos, &buffer[32], sizeof(Vector3));
+        memcpy(&rot, &buffer[32 + sizeof(Vector3)], sizeof(Vector3));
+        memcpy(&scale, &buffer[32 + sizeof(Vector3) * 2], sizeof(Vector3));
+
+        gameObject_tc->position = pos;
+        gameObject_tc->rotation = rot;
+        gameObject_tc->scale = scale;
     }
-
-    if (!hasPeer) {
-        peer_address = from_addr;
-        hasPeer = true;
-        printf("Peer connected: %s:%d\n", inet_ntoa(from_addr.sin_addr), ntohs(from_addr.sin_port));
-    } else if (from_addr.sin_addr.s_addr != peer_address.sin_addr.s_addr
-            || from_addr.sin_port != peer_address.sin_port) {
-        return;
-    }
-
-    char gameObject_id[32];
-    memcpy(gameObject_id, buffer, 32);
-    GameObject *gameObject = scene_get_gameObject_by_name(gameObject_id);
-    transform_component *gameObject_tc = get_component(gameObject, transform_component, "transform_component");
-    Vector3 pos;
-    Vector3 rot;
-    Vector3 scale;
-
-    memcpy(&pos, &buffer[32], sizeof(Vector3));
-    memcpy(&pos, &buffer[32 + sizeof(Vector3)], sizeof(Vector3));
-    memcpy(&pos, &buffer[32 + sizeof(Vector3) * 2], sizeof(Vector3));
-
-    gameObject_tc->position = pos;
-    gameObject_tc->rotation = rot;
-    gameObject_tc->scale = scale;
 }
 
 void network_manager_destroy(Component* self) {
@@ -184,19 +205,25 @@ void network_manager_destroy(Component* self) {
     free(registered_gameObjects);
 }
 
+bool network_manager_is_host() {
+    return isHost;
+}
+
 void network_manager_register(GameObject *gameObject) {
     if (registered_gameObjects_length == registered_gameObjects_capacity) {
         registered_gameObjects_capacity *= 2;
         registered_gameObjects = realloc(registered_gameObjects, sizeof(GameObject*) * registered_gameObjects_capacity);
     }
-    registered_gameObjects[registered_gameObjects_length * sizeof(GameObject*)] = gameObject;
+    registered_gameObjects[registered_gameObjects_length] = gameObject;
     registered_gameObjects_length++;
 }
 
 void network_manager_unregister(GameObject *gameObject) {
     for (int i=0; i<registered_gameObjects_length; i++) {
-        if (&registered_gameObjects[i] == gameObject) {
-            registered_gameObjects[i] = NULL;
+        if (registered_gameObjects[i] == gameObject) {
+            registered_gameObjects[i] = registered_gameObjects[registered_gameObjects_length - 1];
+            registered_gameObjects_length--;
+            break;
         }
     }
 }
