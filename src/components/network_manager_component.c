@@ -128,11 +128,13 @@ void network_manager_update(Component* self) {
         for (int i=0; i<registered_gameObjects_length; i++) {
             network_gameObject_component *net = get_component(registered_gameObjects[i], network_gameObject_component, "network_gameObject_component");            
             
-            if (net->owner == 1) {
+            bool myOwner = isHost ? 0 : 1;
+
+            if (net->owner != myOwner) {
                 continue;
             }
 
-            if (sendto(sock, (char*)net->buffer, sizeoF(net->buffer), 0, (struct sockaddr*) &peer_address, sizeof(peer_address)) == SOCKET_ERROR) {
+            if (sendto(sock, (char*)net->buffer, sizeof(net->buffer), 0, (struct sockaddr*) &peer_address, sizeof(peer_address)) == SOCKET_ERROR) {
                 printf("sendto() failed: %d\n", WSAGetLastError());
             }
         }
@@ -161,7 +163,7 @@ void network_manager_update(Component* self) {
 
     char gameObject_id[32];
     memcpy(gameObject_id, buffer, 32);
-    GameObject *gameObject = scene_get_gameObject(gameObject_id);
+    GameObject *gameObject = scene_get_gameObject_by_name(gameObject_id);
     transform_component *gameObject_tc = get_component(gameObject, transform_component, "transform_component");
     Vector3 pos;
     Vector3 rot;

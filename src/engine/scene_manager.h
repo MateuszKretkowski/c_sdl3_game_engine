@@ -21,6 +21,7 @@ void load_scene(char *id);
 void queue_scene_load(char *id);
 void scene_manager_process_pending_load();
 GameObject *scene_get_gameObject(char* id);
+GameObject *scene_get_gameObject_by_name(char* name);
 camera_component *render_get_active_camera();
 
 #endif // SCENE_MANAGER_H

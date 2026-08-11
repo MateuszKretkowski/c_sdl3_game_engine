@@ -40,6 +40,16 @@ GameObject *scene_get_gameObject(char* id) {
     return NULL;
 }
 
+GameObject *scene_get_gameObject_by_name(char* name) {
+    for (int i=0; i<current_scene->gameObjects_length; i++) {
+        if (current_scene->gameObjects[i].name && strcmp(current_scene->gameObjects[i].name, name) == 0) {
+            return &current_scene->gameObjects[i];
+        }
+    }
+    fprintf(stderr, "ERROR: No gameObject named '%s' found in scene!\n", name);
+    return NULL;
+}
+
 camera_component *render_get_active_camera() {
     for (int i=0; i<current_scene->gameObjects_length; i++) {
         if (current_scene->gameObjects[i].id && current_scene->gameObjects[i].id && strcmp(current_scene->gameObjects[i].id, "camera") == 0) {

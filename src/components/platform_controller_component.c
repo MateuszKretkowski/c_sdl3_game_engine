@@ -28,6 +28,8 @@ void platform_controller_update(Component* self) {
     float horizontal = input_axis(SDL_SCANCODE_A, SDL_SCANCODE_D);
     float vertical = input_axis(SDL_SCANCODE_S, SDL_SCANCODE_W);
 
+    
+
     transform_component *transform = get_component(comp->base.gameObject, transform_component, "transform_component");
     transform->position.z += -horizontal * speed * physics_m->timestep;
     transform->position.y += vertical * speed * physics_m->timestep;
